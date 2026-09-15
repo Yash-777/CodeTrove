@@ -38,6 +38,7 @@ import nodejsTopics from './nodejs.js';
 import jsonTopics from './json.js';
 import jwtTopics from './jwt.js';
 import gitTopics from './git.js';
+import { getTopicContent } from './contentLoader.js';
 
 export const CATEGORIES = [
   {
@@ -45,7 +46,10 @@ export const CATEGORIES = [
     label: 'Java',
     color: '#E76F51',
     codeLang: 'java',
-    topics: javaTopics,
+    topics: javaTopics.map((topic) => ({
+      ...topic,
+      body: getTopicContent('java', topic.slug),
+    })),
     tools: [
       { name: 'Java Formatter', description: 'Beautify Java source using standard style rules.', internalTool: 'java-formatter', externalUrl: null },
       { name: 'Maven POM Formatter', description: 'One dependency per line, pretty-printed XML.', internalTool: 'pom-formatter', externalUrl: null },
@@ -56,7 +60,10 @@ export const CATEGORIES = [
     label: 'JavaScript',
     color: '#D9A404',
     codeLang: 'javascript',
-    topics: javascriptTopics,
+    topics: javascriptTopics.map((topic) => ({
+      ...topic,
+      body: getTopicContent('javascript', topic.slug),
+    })),
     tools: [
       { name: 'JS/JSON Validator', description: 'Catch syntax errors before you run the code.', internalTool: 'json-formatter', externalUrl: null },
     ],
@@ -66,7 +73,10 @@ export const CATEGORIES = [
     label: 'Node.js',
     color: '#3FA34D',
     codeLang: 'javascript',
-    topics: nodejsTopics,
+    topics: nodejsTopics.map((topic) => ({
+      ...topic,
+      body: getTopicContent('nodejs', topic.slug),
+    })),
     tools: [
       { name: 'package.json Validator', description: 'Check for common manifest mistakes.', internalTool: null, externalUrl: 'https://www.npmjs.com/package/package-json-validator' },
     ],
@@ -76,7 +86,10 @@ export const CATEGORIES = [
     label: 'JSON',
     color: '#3B82F6',
     codeLang: 'json',
-    topics: jsonTopics,
+    topics: jsonTopics.map((topic) => ({
+      ...topic,
+      body: getTopicContent('json', topic.slug),
+    })),
     tools: [
       { name: 'JSON Formatter & Validator', description: 'Format, minify, and validate JSON.', internalTool: 'json-formatter', externalUrl: null },
       { name: 'JSON Diff', description: 'Compare two JSON documents side by side.', internalTool: 'json-diff', externalUrl: null },
@@ -88,7 +101,10 @@ export const CATEGORIES = [
     label: 'JWT',
     color: '#8B5CF6',
     codeLang: 'json',
-    topics: jwtTopics,
+    topics: jwtTopics.map((topic) => ({
+      ...topic,
+      body: getTopicContent('jwt', topic.slug),
+    })),
     tools: [
       { name: 'JWT Encode/Decode', description: 'Inspect header, payload, and signature.', internalTool: 'jwt-tool', externalUrl: null },
       { name: 'jwt.io', description: 'The reference JWT debugger, for cross-checking results.', internalTool: null, externalUrl: 'https://jwt.io' },
@@ -99,7 +115,10 @@ export const CATEGORIES = [
     label: 'Git',
     color: '#FB7185',
     codeLang: 'bash',
-    topics: gitTopics,
+    topics: gitTopics.map((topic) => ({
+      ...topic,
+      body: getTopicContent('git', topic.slug),
+    })),
     tools: [
       { name: 'Live Coding Interview Tool', description: 'Real-time collaborative coding sandbox.', internalTool: null, externalUrl: 'https://codeinterview.io/' },
     ],
@@ -113,7 +132,9 @@ export function getCategory(categoryKey) {
 export function getTopic(categoryKey, topicSlug) {
   const category = getCategory(categoryKey);
   if (!category) return undefined;
-  return category.topics.find((t) => t.slug === topicSlug);
+
+  const topic = category.topics.find((t) => t.slug === topicSlug);
+  return topic ? { ...topic } : undefined;
 }
 
 export function getAllTopicsFlat() {

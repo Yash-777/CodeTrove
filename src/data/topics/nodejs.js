@@ -13,14 +13,7 @@ const nodejsTopics = [
     tags: ['nodejs', 'modules'],
     gifUrl: null,
     relatedTool: null,
-    body: `CommonJS (older, default in .js files unless configured otherwise):
-  const fs = require('fs');
-  module.exports = myFunction;
-
-ES Modules (modern, used when package.json has "type": "module", or in .mjs
-files - this is also what this whole React project uses):
-  import fs from 'fs';
-  export default myFunction;`,
+    body: '',
   },
   {
     slug: 'express-basics',
@@ -29,14 +22,7 @@ files - this is also what this whole React project uses):
     tags: ['nodejs', 'express', 'api'],
     gifUrl: null,
     relatedTool: null,
-    body: `Example:
-  import express from 'express';
-  const app = express();
-  app.use(express.json());
-
-  app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
-
-  app.listen(3000, () => console.log('Listening on :3000'));`,
+    body: '',
   },
 ];
 

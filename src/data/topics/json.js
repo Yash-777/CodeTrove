@@ -16,19 +16,7 @@ const jsonTopics = [
     tags: ['json'],
     gifUrl: null,
     relatedTool: 'json-formatter',
-    body: `JSON (JavaScript Object Notation) supports exactly 6 value types:
-string, number, boolean, null, object, and array. There are no dates,
-no functions, no comments - if you need those, you're extending JSON
-with a convention on top of it (e.g. ISO date strings).
-
-Example:
-  {
-    "name": "Ana",
-    "active": true,
-    "score": 87.5,
-    "tags": ["a", "b"],
-    "manager": null
-  }`,
+    body: '',
   },
   {
     slug: 'json-path',
@@ -37,11 +25,7 @@ Example:
     tags: ['json', 'query'],
     gifUrl: null,
     relatedTool: 'json-key-editor',
-    body: `JSONPath lets you address nested values without writing manual
-traversal code, similar to XPath for XML.
-
-Example document: { "user": { "roles": ["admin", "editor"] } }
-Path $.user.roles[0]  -> "admin"`,
+    body: '',
   },
   {
     slug: 'schema-validation',
@@ -51,21 +35,7 @@ Path $.user.roles[0]  -> "admin"`,
     gifUrl: null,
     relatedTool: 'json-formatter',
     restricted: true,
-    body: `A JSON Schema is itself JSON, describing types, required fields, and
-constraints for another JSON document.
-
-Schema:
-  {
-    "type": "object",
-    "required": ["id", "email"],
-    "properties": {
-      "id": { "type": "number" },
-      "email": { "type": "string", "format": "email" }
-    }
-  }
-
-A document missing "email", or with id as a string, fails validation
-against this schema - catching bad data before it reaches your code.`,
+    body: '',
   },
 ];
 

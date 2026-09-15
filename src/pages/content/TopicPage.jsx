@@ -2,31 +2,36 @@
  * src/pages/content/TopicPage.jsx
  * ------------------------------------------------------------------
  * Route: /content/:categoryKey/:topicSlug
- * Renders one topic's detail using CodeBlock for syntax-highlighted
- * code, records the visit into "Recent" (utils/recentTopics.js), and
- * enforces `topic.restricted` - some topics are viewable without
+ * Renders one topic's detail using MarkdownContent for markdown
+ * rendering, records the visit into "Recent" (utils/recentTopics.js),
+ * and enforces `topic.restricted` - some topics are viewable without
  * signing in, others require any logged-in account (any role,
  * including plain "viewer" - see the roles table in README.md).
  */
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { getTopic, getCategory } from '../../data/topics/index.js';
+import { getTopicContent } from '../../data/topics/contentLoader.js';
 import { addRecentTopic } from '../../utils/recentTopics.js';
 import { paths } from '../../routes/routes.config.js';
 import { useAuth } from '../../context/AuthContext.jsx';
-import CodeBlock from '../../components/CodeBlock.jsx';
+import MarkdownContent from '../../components/MarkdownContent.jsx';
 import './ContentPages.css';
 
 export default function TopicPage() {
   const { categoryKey, topicSlug } = useParams();
   const { user } = useAuth();
+  const [content, setContent] = useState('');
   const topic = getTopic(categoryKey, topicSlug);
   const category = getCategory(categoryKey);
 
   useEffect(() => {
     if (topic) {
       addRecentTopic({ categoryKey, slug: topicSlug, title: topic.title });
+      // Load markdown content
+      const md = getTopicContent(categoryKey, topicSlug);
+      setContent(md);
     }
   }, [categoryKey, topicSlug, topic]);
 
@@ -67,7 +72,7 @@ export default function TopicPage() {
           </div>
         </div>
       ) : (
-        <CodeBlock code={topic.body} language={category?.codeLang ?? 'text'} />
+        <MarkdownContent>{content}</MarkdownContent>
       )}
 
       {topic.gifUrl && !isLocked && (

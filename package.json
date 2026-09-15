@@ -19,7 +19,11 @@
     "lucide-react": "^0.436.0",
     "express": "^4.19.2",
     "cors": "^2.8.5",
-    "express-rate-limit": "^7.4.0"
+    "express-rate-limit": "^7.4.0",
+    
+    "dotenv": "^16.3.1",
+    "react-markdown": "^8.0.7",
+    "remark-gfm": "^3.0.1"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.3.1",
