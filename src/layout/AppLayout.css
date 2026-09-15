@@ -1,0 +1,32 @@
+/* src/layout/AppLayout.css
+   ------------------------------------------------------------------
+   Plain CSS file, imported directly into AppLayout.jsx. Vite supports
+   importing .css files straight into a component file - it's bundled
+   automatically, no extra setup needed.
+*/
+
+.app-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+.app-body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+.app-content {
+  flex: 1;
+  padding: 2rem clamp(1.25rem, 4vw, 3rem);
+  max-width: 920px;
+}
+
+@media (max-width: 720px) {
+  .app-body {
+    flex-direction: column;
+  }
+}

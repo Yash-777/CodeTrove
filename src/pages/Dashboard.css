@@ -1,0 +1,132 @@
+/* src/pages/Dashboard.css */
+
+.dashboard__hero h1 {
+  margin-bottom: 0.4rem;
+  font-size: 2rem;
+}
+
+.dashboard__lede {
+  color: var(--color-muted);
+  max-width: 62ch;
+  margin-bottom: 1.5rem;
+}
+
+.dashboard__jump {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 2.5rem;
+  padding: 1.1rem;
+  background: var(--color-paper);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+}
+
+.dashboard__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+  color: var(--color-muted);
+  min-width: 200px;
+}
+
+.dashboard__field select {
+  padding: 0.5rem 0.6rem;
+  border-radius: 6px;
+  border: 1px solid var(--color-border);
+  font-size: 0.95rem;
+  background: var(--color-paper);
+  color: var(--color-text);
+}
+
+.dashboard__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 1rem;
+}
+
+.dashboard__pillars {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.pillar-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  align-items: flex-start;
+  padding: 1.2rem 1.3rem;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: var(--color-paper);
+  cursor: pointer;
+  text-align: left;
+}
+
+.pillar-card:hover {
+  border-color: var(--color-accent);
+}
+
+.pillar-card strong {
+  font-size: 1.05rem;
+}
+
+.pillar-card span {
+  font-size: 0.82rem;
+  color: var(--color-muted);
+}
+
+@media (max-width: 640px) {
+  .dashboard__pillars {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Each card is tinted using the --card-color custom property set
+   inline from JS (category.color) - this lets one CSS rule handle
+   every category's color instead of writing one class per language. */
+.lang-card {
+  --card-color: #999;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 1.3rem 1.2rem;
+  border: none;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--card-color) 12%, white);
+  cursor: pointer;
+  text-align: left;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.lang-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+
+.lang-card__badge {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  background: var(--card-color);
+  color: white;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lang-card__title {
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--color-text);
+}
+
+.lang-card__meta {
+  font-size: 0.8rem;
+  color: var(--color-muted);
+}

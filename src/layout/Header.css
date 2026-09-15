@@ -1,0 +1,97 @@
+/* src/layout/Header.css */
+
+.app-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.65rem 1rem;
+  background: var(--color-paper);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.app-header__toggle {
+  border: none;
+  background: transparent;
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 0.3rem 0.5rem;
+  border-radius: 6px;
+  color: var(--color-muted);
+}
+
+.app-header__toggle:hover {
+  background: var(--color-bg);
+}
+
+.app-header__brand {
+  font-family: var(--font-mono);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+.app-header__spacer {
+  flex: 1;
+}
+
+.app-header__action {
+  padding: 0.4rem 0.85rem;
+  border-radius: 6px;
+  background: var(--color-accent);
+  color: white;
+  text-decoration: none;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.app-header__action:hover {
+  filter: brightness(1.06);
+}
+
+.app-header__action--ghost {
+  background: transparent;
+  color: var(--color-muted);
+  border: 1px solid var(--color-border);
+}
+
+.app-header__icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  color: var(--color-muted);
+  text-decoration: none;
+  font-size: 1.05rem;
+}
+
+.app-header__icon-btn:hover {
+  background: var(--color-bg);
+}
+
+.app-header__user {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.app-header__role-badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
+}
+
+.app-header__email {
+  font-size: 0.82rem;
+  color: var(--color-muted);
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
