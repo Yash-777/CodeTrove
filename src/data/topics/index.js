@@ -38,6 +38,7 @@ import nodejsTopics from './nodejs.js';
 import jsonTopics from './json.js';
 import jwtTopics from './jwt.js';
 import gitTopics from './git.js';
+import emailTopics from './email.js';
 import { getTopicContent } from './contentLoader.js';
 
 export const CATEGORIES = [
@@ -121,6 +122,20 @@ export const CATEGORIES = [
     })),
     tools: [
       { name: 'Live Coding Interview Tool', description: 'Real-time collaborative coding sandbox.', internalTool: null, externalUrl: 'https://codeinterview.io/' },
+    ],
+  },
+  {
+    key: 'email',
+    label: 'Email',
+    color: '#06B6D4',
+    codeLang: 'javascript',
+    topics: emailTopics.map((topic) => ({
+      ...topic,
+      body: getTopicContent('email', topic.slug),
+    })),
+    tools: [
+      { name: 'Temp Mail', description: 'Disposable inbox for testing email delivery.', internalTool: null, externalUrl: 'https://temp-mail.org/en/' },
+      { name: 'Temp Mail IO', description: 'Alternative disposable inbox for email verification.', internalTool: null, externalUrl: 'https://temp-mail.io/en' },
     ],
   },
 ];
