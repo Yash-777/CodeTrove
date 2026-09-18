@@ -33,6 +33,15 @@ const gitTopics = [
     relatedTool: null,
     body: '',
   },
+  {
+    slug: 'service-account-from-github-secrets',
+    title: 'Service account from GitHub Secrets',
+    summary: 'Use GitHub Actions to write a Firebase service account file from secrets.',
+    tags: ['git', 'security'],
+    gifUrl: null,
+    relatedTool: null,
+    body: '',
+  },
 ];
 
 export default gitTopics;
