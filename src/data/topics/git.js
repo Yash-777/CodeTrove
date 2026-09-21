@@ -34,6 +34,15 @@ const gitTopics = [
     body: '',
   },
   {
+    slug: 'sourcetree',
+    title: 'Sourcetree',
+    summary: 'Visual Git workflows, branch management, and merge tools with Sourcetree.',
+    tags: ['git', 'gui', 'sourcetree'],
+    gifUrl: null,
+    relatedTool: null,
+    body: '',
+  },
+  {
     slug: 'service-account-from-github-secrets',
     title: 'Service account from GitHub Secrets',
     summary: 'Use GitHub Actions to write a Firebase service account file from secrets.',
