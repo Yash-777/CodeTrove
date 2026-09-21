@@ -1,30 +1,3 @@
-/**
- * src/App.jsx
- * ------------------------------------------------------------------
- * URL <-> page mapping, organized around the three Codetrove pillars:
- *
- *   LEARN   /                                    Dashboard
- *           /content/:categoryKey                CategoryPage
- *           /content/:categoryKey/:topicSlug      TopicPage (some restricted)
- *           /learn/practice                        PracticePage (placeholder)
- *           /create-page, /drafts                   [admin, editor only]
- *
- *   BUILD   /build/compiler                       CompilerPage (placeholder)
- *           /build/tools                           ToolsPage
- *           /build/projects                         ProjectsPage [any logged-in user]
- *
- *   STORE   /store/profile                        ProfilePage [any logged-in user]
- *           /store/resume                          ResumePage (placeholder) [logged-in]
- *           /store/certificates                     CertificatesPage (placeholder) [logged-in]
- *           /store/career                            CareerPage (placeholder) [logged-in]
- *
- *   account /signup, /signin, /admin/users [admin only], /preferences
- *
- * `RequireRole allow={['admin','editor','viewer']}` is the pattern
- * used for "must be logged in, any role" - every account defaults to
- * "viewer", so listing all three roles is equivalent to "signed in."
- */
-
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import AppLayout from './layout/AppLayout.jsx';
 import Dashboard from './pages/Dashboard.jsx';
@@ -36,6 +9,7 @@ import DraftsPage from './pages/admin/DraftsPage.jsx';
 import UsersPage from './pages/admin/UsersPage.jsx';
 import CompilerPage from './pages/build/CompilerPage.jsx';
 import ToolsPage from './pages/build/ToolsPage.jsx';
+import JwtToolPage from './pages/build/JwtToolPage.jsx';
 import ProjectsPage from './pages/build/ProjectsPage.jsx';
 import ProfilePage from './pages/store/ProfilePage.jsx';
 import ResumePage from './pages/store/ResumePage.jsx';
@@ -54,40 +28,27 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route element={<AppLayout />}>
-          {/* LEARN */}
           <Route path="/" element={<Dashboard />} />
           <Route path="/content/:categoryKey" element={<CategoryPage />} />
           <Route path="/content/:categoryKey/:topicSlug" element={<TopicPage />} />
           <Route path="/learn/practice" element={<PracticePage />} />
-          <Route
-            path="/create-page"
-            element={<RequireRole allow={['admin', 'editor']}><NewTopicPage /></RequireRole>}
-          />
-          <Route
-            path="/drafts"
-            element={<RequireRole allow={['admin', 'editor']}><DraftsPage /></RequireRole>}
-          />
+          <Route path="/create-page" element={<RequireRole allow={['admin', 'editor']}><NewTopicPage /></RequireRole>} />
+          <Route path="/drafts" element={<RequireRole allow={['admin', 'editor']}><DraftsPage /></RequireRole>} />
 
-          {/* BUILD */}
           <Route path="/build/compiler" element={<CompilerPage />} />
           <Route path="/build/tools" element={<ToolsPage />} />
-          <Route
-            path="/build/projects"
-            element={<RequireRole allow={ANY_LOGGED_IN}><ProjectsPage /></RequireRole>}
-          />
+          <Route path="/build/tools/jwt-tool" element={<JwtToolPage />} />
+          <Route path="/build/projects" element={<RequireRole allow={ANY_LOGGED_IN}><ProjectsPage /></RequireRole>} />
 
-          {/* STORE (personal - all require login) */}
           <Route path="/store/profile" element={<RequireRole allow={ANY_LOGGED_IN}><ProfilePage /></RequireRole>} />
           <Route path="/store/resume" element={<RequireRole allow={ANY_LOGGED_IN}><ResumePage /></RequireRole>} />
           <Route path="/store/certificates" element={<RequireRole allow={ANY_LOGGED_IN}><CertificatesPage /></RequireRole>} />
           <Route path="/store/career" element={<RequireRole allow={ANY_LOGGED_IN}><CareerPage /></RequireRole>} />
 
-          {/* account / admin */}
           <Route path="/signup" element={<SignUpPage />} />
           <Route path="/signin" element={<SignInPage />} />
           <Route path="/admin/users" element={<RequireRole allow={['admin']}><UsersPage /></RequireRole>} />
           <Route path="/preferences" element={<Preferences />} />
-
           <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>
