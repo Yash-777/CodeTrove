@@ -28,6 +28,11 @@ function nodeFromPath(filePath, markdown) {
   const parts = filePath.replace(/^\.\//, '').split('/');
   parts.pop();
 
+  // `git/sourcetree` was the legacy location. Keep its files in the repo,
+  // but do not discover them, otherwise Sourcetree appears as a duplicate
+  // sibling instead of the parent of the source-tree children.
+  if (parts[0] === 'git' && parts[1] === 'sourcetree') return null;
+
   let categoryKey;
   let pathParts;
   let root = 'topics';
@@ -52,7 +57,6 @@ function nodeFromPath(filePath, markdown) {
   const routeSegments = root === 'source-tree'
     ? ['git', 'source-tree', ...pathParts]
     : [categoryKey, ...pathParts];
-  const parentPath = routeSegments.slice(0, -1).join('/');
 
   return {
     id: `${root}:${routeSegments.join('/')}`,
@@ -60,7 +64,7 @@ function nodeFromPath(filePath, markdown) {
     title: meta.title || titleFromSlug(slug),
     description: meta.description || '',
     path: routeSegments.join('/'),
-    parentPath,
+    parentPath: routeSegments.slice(0, -1).join('/'),
     contentPath: filePath,
     category: categoryKey,
     root,
