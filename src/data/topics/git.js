@@ -1,10 +1,3 @@
-/**
- * src/data/topics/git.js
- * ------------------------------------------------------------------
- * Same shape/rules as java.js - see that file's header comment.
- * Covers the "Git" category.
- */
-
 const gitTopics = [
   {
     slug: 'common-commands',
@@ -41,6 +34,7 @@ const gitTopics = [
     gifUrl: null,
     relatedTool: null,
     body: '',
+    contentRoot: 'topics',
   },
   {
     slug: 'service-account-from-github-secrets',

@@ -1,11 +1,3 @@
-/**
- * src/data/topics/javascript.js
- * ------------------------------------------------------------------
- * Same shape/rules as java.js - see that file's header comment for the
- * full field-by-field explanation. This file only covers "JavaScript"
- * category topics.
- */
-
 const javascriptTopics = [
   {
     slug: 'promises',
@@ -36,12 +28,21 @@ const javascriptTopics = [
   },
   {
     slug: 'array-methods',
-    title: 'map, filter, reduce',
-    summary: 'The three array methods that replace most manual loops.',
+    title: 'Array methods',
+    summary: 'A reference-friendly guide to the methods used to transform and inspect arrays.',
     tags: ['javascript', 'arrays'],
     gifUrl: null,
     relatedTool: null,
     body: '',
+    subtopics: [
+      {
+        slug: 'map-filter-reduce',
+        title: 'map, filter, and reduce',
+        summary: 'Transform, select, and aggregate array values.',
+        tags: ['javascript', 'arrays', 'functional'],
+        contentRoot: 'sub-topics',
+      },
+    ],
   },
 ];
 
