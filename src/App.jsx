@@ -28,24 +28,27 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route element={<AppLayout />}>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/content/:categoryKey" element={<CategoryPage />} />
-          <Route path="/content/:categoryKey/*" element={<TopicPage />} />
-          <Route path="/learn/practice" element={<PracticePage />} />
-          <Route path="/create-page" element={<RequireRole allow={['admin', 'editor']}><NewTopicPage /></RequireRole>} />
-          <Route path="/drafts" element={<RequireRole allow={['admin', 'editor']}><DraftsPage /></RequireRole>} />
-          <Route path="/build/compiler" element={<CompilerPage />} />
-          <Route path="/build/tools" element={<ToolsPage />} />
-          <Route path="/build/tools/jwt-tool" element={<JwtToolPage />} />
-          <Route path="/build/projects" element={<RequireRole allow={ANY_LOGGED_IN}><ProjectsPage /></RequireRole>} />
-          <Route path="/store/profile" element={<RequireRole allow={ANY_LOGGED_IN}><ProfilePage /></RequireRole>} />
-          <Route path="/store/resume" element={<RequireRole allow={ANY_LOGGED_IN}><ResumePage /></RequireRole>} />
-          <Route path="/store/certificates" element={<RequireRole allow={ANY_LOGGED_IN}><CertificatesPage /></RequireRole>} />
-          <Route path="/store/career" element={<RequireRole allow={ANY_LOGGED_IN}><CareerPage /></RequireRole>} />
-          <Route path="/signup" element={<SignUpPage />} />
-          <Route path="/signin" element={<SignInPage />} />
-          <Route path="/admin/users" element={<RequireRole allow={['admin']}><UsersPage /></RequireRole>} />
-          <Route path="/preferences" element={<Preferences />} />
+          <Route index element={<Dashboard />} />
+          <Route path="content/:categoryKey" element={<CategoryPage />} />
+          <Route path="content/:categoryKey/*" element={<TopicPage />} />
+
+          <Route path="learn/practice" element={<PracticePage />} />
+          <Route path="build/compiler" element={<CompilerPage />} />
+          <Route path="build/tools" element={<ToolsPage />} />
+          <Route path="build/tools/jwt-tool" element={<JwtToolPage />} />
+          <Route path="build/projects" element={<RequireRole allow={ANY_LOGGED_IN}><ProjectsPage /></RequireRole>} />
+
+          <Route path="create-page" element={<RequireRole allow={['admin', 'editor']}><NewTopicPage /></RequireRole>} />
+          <Route path="drafts" element={<RequireRole allow={['admin', 'editor']}><DraftsPage /></RequireRole>} />
+          <Route path="store/profile" element={<RequireRole allow={ANY_LOGGED_IN}><ProfilePage /></RequireRole>} />
+          <Route path="store/resume" element={<RequireRole allow={ANY_LOGGED_IN}><ResumePage /></RequireRole>} />
+          <Route path="store/certificates" element={<RequireRole allow={ANY_LOGGED_IN}><CertificatesPage /></RequireRole>} />
+          <Route path="store/career" element={<RequireRole allow={ANY_LOGGED_IN}><CareerPage /></RequireRole>} />
+
+          <Route path="signup" element={<SignUpPage />} />
+          <Route path="signin" element={<SignInPage />} />
+          <Route path="admin/users" element={<RequireRole allow={['admin']}><UsersPage /></RequireRole>} />
+          <Route path="preferences" element={<Preferences />} />
           <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>
