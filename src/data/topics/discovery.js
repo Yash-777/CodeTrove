@@ -28,42 +28,42 @@ function nodeFromPath(filePath, markdown) {
   const parts = filePath.replace(/^\.\//, '').split('/');
   parts.pop();
 
-  // `git/sourcetree` was the legacy location. Keep its files in the repo,
-  // but do not discover them, otherwise Sourcetree appears as a duplicate
-  // sibling instead of the parent of the source-tree children.
+  // The old git/sourcetree location is retained for history but is not part
+  // of navigation. The canonical parent is git/source-tree.
   if (parts[0] === 'git' && parts[1] === 'sourcetree') return null;
 
   let categoryKey;
-  let pathParts;
+  let routeSegments;
   let root = 'topics';
 
   if (parts[0] === 'sub-topics') {
     root = 'sub-topics';
     categoryKey = parts[1];
-    pathParts = parts.slice(2);
+    routeSegments = [categoryKey, ...parts.slice(2)];
   } else if (parts[0] === 'git' && parts[1] === 'source-tree') {
+    // Keep source-tree as a real parent node. For example:
+    // git/source-tree/content.md -> git/source-tree
+    // git/source-tree/ssh-key-setup/content.md -> git/source-tree/ssh-key-setup
     root = 'source-tree';
     categoryKey = 'git';
-    pathParts = parts.slice(2);
+    routeSegments = parts.slice(1);
   } else {
     categoryKey = parts[0];
-    pathParts = parts.slice(1);
+    routeSegments = parts.slice(1);
   }
 
-  if (!categoryKey || !pathParts.length) return null;
+  if (!categoryKey || !routeSegments.length) return null;
 
   const meta = frontmatter(markdown);
-  const slug = pathParts[pathParts.length - 1];
-  const routeSegments = root === 'source-tree'
-    ? ['git', 'source-tree', ...pathParts]
-    : [categoryKey, ...pathParts];
+  const slug = routeSegments[routeSegments.length - 1];
+  const path = routeSegments.join('/');
 
   return {
-    id: `${root}:${routeSegments.join('/')}`,
+    id: `${root}:${path}`,
     slug,
     title: meta.title || titleFromSlug(slug),
     description: meta.description || '',
-    path: routeSegments.join('/'),
+    path,
     parentPath: routeSegments.slice(0, -1).join('/'),
     contentPath: filePath,
     category: categoryKey,
