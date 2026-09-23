@@ -36,6 +36,12 @@ export function getTopicByPath(path) {
   return CATEGORIES.flatMap((category) => category.topics).find((topic) => topic.path === path);
 }
 
+/** Resolve a short legacy URL such as /content/array-buffer. */
+export function getTopicBySlug(slug) {
+  const matches = CATEGORIES.flatMap((category) => category.topics).filter((topic) => topic.slug === slug);
+  return matches.length === 1 ? matches[0] : undefined;
+}
+
 export function getAllTopicsFlat() {
   return CATEGORIES.flatMap((category) => category.topics.map((topic) => ({
     ...topic,
