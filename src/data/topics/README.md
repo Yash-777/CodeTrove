@@ -1,22 +1,41 @@
-# Topic content architecture
+# Documentation tree architecture
 
-CodeTrove uses a metadata-first content model. JavaScript metadata, Git metadata, and markdown are intentionally separate so content can grow without changing React components.
-
-## Supported content roots
+The documentation UI is filesystem-driven:
 
 ```text
-src/data/topics/{category}/{slug}/content.md
-src/data/topics/sub-topics/{category}/{slug}/content.md
-src/data/topics/git/source-tree/{slug}/content.md
+src/data/topics/**/*.md
+          ↓ import.meta.glob
+src/data/topics/discovery.js
+          ↓ normalized TopicNode tree
+src/data/topics/index.js
+          ↓
+Sidebar / routes / document viewer
 ```
 
-`contentRoot` in a topic descriptor selects the second or third form. Existing topic descriptors default to the first form, preserving backwards compatibility.
+## Content conventions
 
-## Adding a topic
+A Markdown file creates a topic automatically:
 
-1. Add a descriptor to the category module (`javascript.js`, `git.js`, etc.).
-2. Add its `content.md` at the matching path.
-3. Use `subtopics` for children and `parentSlug` for dedicated content groups.
-4. Keep slugs lowercase and URL-safe.
+```text
+src/data/topics/javascript/async-generator/content.md
+src/data/topics/javascript/async-generator/next/content.md
+```
 
-This makes sidebar, category pages, routing, and markdown loading read one consistent model.
+The second path becomes a child of the first. Optional frontmatter controls presentation without duplicating content metadata:
+
+```md
+---
+title: AsyncGenerator.next
+order: 10
+description: Returns the next async generator result.
+---
+```
+
+Git SourceTree content uses the same model:
+
+```text
+src/data/topics/git/source-tree/getting-started/content.md
+src/data/topics/git/source-tree/getting-started/clone-repository/content.md
+```
+
+Topic counts are calculated only from actual discovered child nodes. No visual or fake counts are stored in React components.
