@@ -1,4 +1,4 @@
-import { getMarkdown, TOPIC_TREES, SUBTOPIC_TREES, flattenTree } from './discovery.js';
+import { getMarkdown, TOPIC_TREES, flattenTree } from './discovery.js';
 
 const categoryConfig = [
   { key: 'javascript', label: 'JavaScript', color: '#D9A404', codeLang: 'javascript', tools: [] },
@@ -12,8 +12,7 @@ const categoryConfig = [
 
 export const CATEGORIES = categoryConfig.map((config) => {
   const tree = TOPIC_TREES[config.key] || [];
-  const subtopics = SUBTOPIC_TREES[config.key] || [];
-  const topics = flattenTree([...tree, ...subtopics]).map((topic) => ({
+  const topics = flattenTree(tree).map((topic) => ({
     ...topic,
     body: getMarkdown(topic.contentPath),
     tags: [config.key, topic.root === 'source-tree' ? 'sourcetree' : 'topic'],
@@ -21,7 +20,7 @@ export const CATEGORIES = categoryConfig.map((config) => {
     relatedTool: null,
   }));
 
-  return { ...config, tree, subtopics, topics };
+  return { ...config, tree, topics };
 });
 
 export function getCategory(categoryKey) {

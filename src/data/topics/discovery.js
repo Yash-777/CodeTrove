@@ -15,15 +15,18 @@ function titleFromSlug(slug) {
 function frontmatter(markdown) {
   const match = markdown.match(/^---\s*\n([\s\S]*?)\n---\s*\n?/);
   if (!match) return {};
+
   return Object.fromEntries(match[1].split('\n').flatMap((line) => {
     const [key, ...value] = line.split(':');
-    return key && value.length ? [[key.trim(), value.join(':').trim().replace(/^['"]|['"]$/g, '')]] : [];
+    return key && value.length
+      ? [[key.trim(), value.join(':').trim().replace(/^['"]|['"]$/g, '')]]
+      : [];
   }));
 }
 
 function nodeFromPath(filePath, markdown) {
   const parts = filePath.replace(/^\.\//, '').split('/');
-  parts.pop(); // content.md
+  parts.pop();
 
   let categoryKey;
   let pathParts;
@@ -43,11 +46,13 @@ function nodeFromPath(filePath, markdown) {
   }
 
   if (!categoryKey || !pathParts.length) return null;
+
   const meta = frontmatter(markdown);
   const slug = pathParts[pathParts.length - 1];
   const routeSegments = root === 'source-tree'
     ? ['git', 'source-tree', ...pathParts]
     : [categoryKey, ...pathParts];
+  const parentPath = routeSegments.slice(0, -1).join('/');
 
   return {
     id: `${root}:${routeSegments.join('/')}`,
@@ -55,10 +60,12 @@ function nodeFromPath(filePath, markdown) {
     title: meta.title || titleFromSlug(slug),
     description: meta.description || '',
     path: routeSegments.join('/'),
+    parentPath,
     contentPath: filePath,
     category: categoryKey,
     root,
     order: Number(meta.order) || 0,
+    count: null,
     children: [],
   };
 }
@@ -69,18 +76,22 @@ function sortNodes(nodes) {
 
 function buildTree(nodes) {
   const roots = [];
-  const byPath = new Map();
-  nodes.forEach((node) => byPath.set(node.path, node));
+  const byPath = new Map(nodes.map((node) => [node.path, node]));
 
   nodes.forEach((node) => {
-    const parentPath = node.path.split('/').slice(0, -1).join('/');
-    const parent = byPath.get(parentPath);
+    const parent = byPath.get(node.parentPath);
     if (parent) parent.children.push(node);
     else roots.push(node);
   });
 
-  const sort = (items) => items.forEach((item) => { sortNodes(item.children); sort(item.children); });
-  sortNodes(roots);
+  const sort = (items) => {
+    sortNodes(items);
+    items.forEach((item) => {
+      item.count = item.children.length || null;
+      sort(item.children);
+    });
+  };
+
   sort(roots);
   return roots;
 }
@@ -96,19 +107,15 @@ export const TOPIC_TREES = Object.fromEntries(
   ])
 );
 
-export const SUBTOPIC_TREES = Object.fromEntries(
-  [...new Set(TOPIC_NODES.filter((node) => node.root === 'sub-topics').map((node) => node.category))].map((category) => [
-    category,
-    buildTree(TOPIC_NODES.filter((node) => node.root === 'sub-topics' && node.category === category)),
-  ])
-);
-
 export function findTopic(path) {
   return TOPIC_NODES.find((node) => node.path === path);
 }
 
 export function getMarkdown(contentPath) {
-  return typeof markdownFiles[contentPath] === 'string' ? markdownFiles[contentPath].replace(/^---[\s\S]*?---\s*\n?/, '').trimEnd() : '';
+  const markdown = markdownFiles[contentPath];
+  return typeof markdown === 'string'
+    ? markdown.replace(/^---[\s\S]*?---\s*\n?/, '').trimEnd()
+    : '';
 }
 
 export function flattenTree(nodes) {

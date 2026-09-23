@@ -8,25 +8,39 @@ import './Sidebar.css';
 
 const PILLARS = [{ key: 'learn', label: 'Learn' }, { key: 'build', label: 'Build' }, { key: 'store', label: 'Store' }];
 function pillarForPath(pathname) { if (pathname.startsWith('/build')) return 'build'; if (pathname.startsWith('/store')) return 'store'; return 'learn'; }
+function isActiveBranch(node, pathname) { return pathname.includes(`/content/${node.path}`); }
 
-function TopicTree({ nodes, search, depth = 0 }) {
+function TopicTree({ nodes, search, pathname }) {
   return nodes.map((node) => {
     const matches = !search || `${node.title} ${node.path}`.toLowerCase().includes(search);
-    const childNodes = TopicTree({ nodes: node.children, search, depth: depth + 1 });
-    if (!matches && !childNodes.length) return null;
+    const visibleChildren = TopicTree({ nodes: node.children, search, pathname });
+    if (!matches && !visibleChildren.length) return null;
+
     const hasChildren = node.children.length > 0;
+    const active = isActiveBranch(node, pathname);
+    const label = node.parentPath ? `${node.title}` : node.title;
+
     return (
       <li key={node.id} className="sidebar__tree-item">
         {hasChildren ? (
-          <details open={Boolean(search)} className="sidebar__details">
+          <details open={Boolean(search) || active} className="sidebar__details">
             <summary className="sidebar__topic-summary">
               <span className="sidebar__disclosure" aria-hidden="true">›</span>
-              <NavLink to={paths.topicPath(node.path)} className="sidebar__link" onClick={(event) => event.stopPropagation()}>{node.title}</NavLink>
+              <NavLink
+                to={paths.topicPath(node.path)}
+                className={({ isActive }) => `sidebar__link sidebar__parent-link${isActive ? ' sidebar__link--active' : ''}`}
+                onClick={(event) => event.stopPropagation()}
+              >
+                {label}
+              </NavLink>
+              {node.count && <span className="sidebar__topic-count" aria-label={`${node.count} child topics`}>{node.count}</span>}
             </summary>
-            <ul className="sidebar__tree-list">{childNodes}</ul>
+            <ul className="sidebar__tree-list">{visibleChildren}</ul>
           </details>
         ) : (
-          <NavLink to={paths.topicPath(node.path)} className={({ isActive }) => `sidebar__link sidebar__topic-link${isActive ? ' sidebar__link--active' : ''}`} aria-current="page">{node.title}</NavLink>
+          <NavLink to={paths.topicPath(node.path)} className={({ isActive }) => `sidebar__link sidebar__topic-link${isActive ? ' sidebar__link--active' : ''}`}>
+            {label}
+          </NavLink>
         )}
       </li>
     );
@@ -54,8 +68,8 @@ export default function Sidebar({ open }) {
       <p className="sidebar__section-label">Documentation</p>
       {CATEGORIES.map((category) => <section key={category.key} className="sidebar__category-group">
         <details open={Boolean(query) || activeCategoryKey === category.key}>
-          <summary className="sidebar__group-header"><span className="sidebar__dot" style={{ background: category.color }} /><span className="sidebar__group-title">{category.label}</span><span className="sidebar__topic-count">{category.topics.length || ''}</span></summary>
-          <ul className="sidebar__tree-list"><TopicTree nodes={category.tree} search={query} /></ul>
+          <summary className="sidebar__group-header"><span className="sidebar__disclosure" aria-hidden="true">›</span><span className="sidebar__dot" style={{ background: category.color }} /><span className="sidebar__group-title">{category.label}</span></summary>
+          <ul className="sidebar__tree-list"><TopicTree nodes={category.tree} search={query} pathname={location.pathname} /></ul>
         </details>
       </section>)}
       {recent.length > 0 && !query && <><p className="sidebar__section-label">Recent</p><ul className="sidebar__list">{recent.map((item) => <li key={`${item.categoryKey}-${item.slug}`}><NavLink to={paths.topic(item.categoryKey, item.slug)} className="sidebar__link">{item.title}</NavLink></li>)}</ul></>}
