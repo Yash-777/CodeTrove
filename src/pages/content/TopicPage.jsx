@@ -1,18 +1,7 @@
-/**
- * src/pages/content/TopicPage.jsx
- * ------------------------------------------------------------------
- * Route: /content/:categoryKey/:topicSlug
- * Renders one topic's detail using MarkdownContent for markdown
- * rendering, records the visit into "Recent" (utils/recentTopics.js),
- * and enforces `topic.restricted` - some topics are viewable without
- * signing in, others require any logged-in account (any role,
- * including plain "viewer" - see the roles table in README.md).
- */
-
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { getTopic, getCategory } from '../../data/topics/index.js';
-import { getTopicContent } from '../../data/topics/contentLoader.js';
+import { getTopicByPath, getCategory } from '../../data/topics/index.js';
+import { getMarkdown } from '../../data/topics/discovery.js';
 import { addRecentTopic } from '../../utils/recentTopics.js';
 import { paths } from '../../routes/routes.config.js';
 import { useAuth } from '../../context/AuthContext.jsx';
@@ -20,70 +9,27 @@ import MarkdownContent from '../../components/MarkdownContent.jsx';
 import './ContentPages.css';
 
 export default function TopicPage() {
-  const { categoryKey, topicSlug } = useParams();
+  const { categoryKey, '*': topicPath = '' } = useParams();
+  const resolvedPath = `${categoryKey}/${topicPath}`.replace(/\/$/, '');
+  const topic = getTopicByPath(resolvedPath);
+  const category = getCategory(categoryKey);
   const { user } = useAuth();
   const [content, setContent] = useState('');
-  const topic = getTopic(categoryKey, topicSlug);
-  const category = getCategory(categoryKey);
 
   useEffect(() => {
     if (topic) {
-      addRecentTopic({ categoryKey, slug: topicSlug, title: topic.title });
-      // Load markdown content
-      const md = getTopicContent(categoryKey, topicSlug);
-      setContent(md);
+      setContent(getMarkdown(topic.contentPath));
+      addRecentTopic({ categoryKey, slug: topic.path.replace(`${categoryKey}/`, ''), title: topic.title });
     }
-  }, [categoryKey, topicSlug, topic]);
+  }, [topic, categoryKey]);
 
-  if (!topic) {
-    return (
-      <div className="content-page">
-        <h1>Topic not found</h1>
-        <p>
-          Couldn't find "{topicSlug}" under "{categoryKey}".{' '}
-          <Link to={paths.category(categoryKey)}>Back to category</Link>
-        </p>
-      </div>
-    );
-  }
-
+  if (!topic) return <div className="content-page"><h1>Topic not found</h1><p>Couldn’t find “{resolvedPath}”. <Link to={paths.category(categoryKey)}>Back to category</Link></p></div>;
   const isLocked = topic.restricted && !user;
-
-  return (
-    <article className="content-page">
-      <p className="content-page__breadcrumb">
-        <Link to={paths.category(categoryKey)}>{categoryKey}</Link>
-      </p>
-
-      <h1>{topic.title}</h1>
-
-      <div className="content-page__tags">
-        {topic.tags.map((tag) => (
-          <span key={tag} className="content-page__tag">{tag}</span>
-        ))}
-      </div>
-
-      {isLocked ? (
-        <div className="content-page__locked">
-          <p>This topic is available to signed-in members.</p>
-          <div className="content-page__locked-actions">
-            <Link to={paths.signIn()} className="btn-primary" style={{ textDecoration: 'none' }}>Sign in</Link>
-            <Link to={paths.signUp()} className="btn-secondary" style={{ textDecoration: 'none' }}>Create a free account</Link>
-          </div>
-        </div>
-      ) : (
-        <MarkdownContent>{content}</MarkdownContent>
-      )}
-
-      {topic.gifUrl && !isLocked && (
-        <img src={topic.gifUrl} alt={`${topic.title} demo`} className="content-page__gif" />
-      )}
-
-      {topic.relatedTool && !isLocked && (
-        <p className="content-page__tool-link">
-          Try it: <code>{topic.relatedTool}</code> tool (coming soon)
-        </p>
-      )}
-    </article>
-  );
+  return <article className="content-page content-page--document">
+    <p className="content-page__breadcrumb"><Link to={paths.category(categoryKey)}>{category?.label || categoryKey}</Link> <span aria-hidden="true">/</span> {topic.title}</p>
+    <h1>{topic.title}</h1>
+    {topic.description && <p className="content-page__lead">{topic.description}</p>}
+    <div className="content-page__tags">{topic.tags.map((tag) => <span key={tag} className="content-page__tag">{tag}</span>)}</div>
+    {isLocked ? <div className="content-page__locked"><p>This topic is available to signed-in members.</p><div className="content-page__locked-actions"><Link to={paths.signIn()} className="btn-primary">Sign in</Link><Link to={paths.signUp()} className="btn-secondary">Create a free account</Link></div></div> : <MarkdownContent>{content}</MarkdownContent>}
+  </article>;
 }
