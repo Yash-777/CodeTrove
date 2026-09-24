@@ -70,6 +70,19 @@ export const CATEGORIES = [
     ],
   },
   {
+    key: 'text',
+    label: 'Text',
+    color: '#10B981',
+    codeLang: 'text',
+    topics: [],
+    tools: [
+      { name: 'Character Counter', description: 'Count characters, words, lines and common platform limits.', internalTool: 'character-counter', externalUrl: null },
+      { name: 'Compare — Diffchecker', description: 'Compare text or files in a new tab.', internalTool: null, externalUrl: 'https://www.diffchecker.com/' },
+      { name: 'Compare — Text-Compare', description: 'Quick online text comparison.', internalTool: null, externalUrl: 'https://text-compare.com/' },
+      { name: 'Beyond Compare', description: 'Powerful local file comparison tool (heavy files).', internalTool: null, externalUrl: 'https://www.scootersoftware.com/' },
+    ],
+  },
+  {
     key: 'nodejs',
     label: 'Node.js',
     color: '#3FA34D',

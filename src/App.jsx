@@ -10,6 +10,7 @@ import UsersPage from './pages/admin/UsersPage.jsx';
 import CompilerPage from './pages/build/CompilerPage.jsx';
 import ToolsPage from './pages/build/ToolsPage.jsx';
 import JwtToolPage from './pages/build/JwtToolPage.jsx';
+import CharacterCounterPage from './pages/build/CharacterCounterPage.jsx';
 import ProjectsPage from './pages/build/ProjectsPage.jsx';
 import ProfilePage from './pages/store/ProfilePage.jsx';
 import ResumePage from './pages/store/ResumePage.jsx';
@@ -38,6 +39,7 @@ export default function App() {
           <Route path="/build/compiler" element={<CompilerPage />} />
           <Route path="/build/tools" element={<ToolsPage />} />
           <Route path="/build/tools/jwt-tool" element={<JwtToolPage />} />
+          <Route path="/build/tools/character-counter" element={<CharacterCounterPage />} />
           <Route path="/build/projects" element={<RequireRole allow={ANY_LOGGED_IN}><ProjectsPage /></RequireRole>} />
 
           <Route path="/store/profile" element={<RequireRole allow={ANY_LOGGED_IN}><ProfilePage /></RequireRole>} />
