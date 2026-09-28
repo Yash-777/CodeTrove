@@ -32,6 +32,8 @@ export default function App() {
           <Route path="/" element={<Dashboard />} />
           <Route path="/content/:categoryKey" element={<CategoryPage />} />
           <Route path="/content/:categoryKey/:topicSlug" element={<TopicPage />} />
+          <Route path="/content/:sectionKey/:topicSlug/:subtopicSlug" element={<TopicPage />} />
+          <Route path="/content/:sectionKey/:topicSlug/:subtopicSlug/:pageSlug" element={<TopicPage />} />
           <Route path="/learn/practice" element={<PracticePage />} />
           <Route path="/create-page" element={<RequireRole allow={['admin', 'editor']}><NewTopicPage /></RequireRole>} />
           <Route path="/drafts" element={<RequireRole allow={['admin', 'editor']}><DraftsPage /></RequireRole>} />

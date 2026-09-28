@@ -16,8 +16,12 @@
  */
 
 import { useEffect, useMemo, useState } from 'react';
-import { NavLink, useNavigate, useParams, useLocation } from 'react-router-dom';
+import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { CATEGORIES } from '../data/topics/index.js';
+import {
+  DOCUMENTATION_NAVIGATION,
+  getDocumentationSearchResults,
+} from '../data/topics/navigation.js';
 import { getRecentTopics } from '../utils/recentTopics.js';
 import { paths } from '../routes/routes.config.js';
 import { useAuth } from '../context/AuthContext.jsx';
@@ -29,49 +33,156 @@ const PILLARS = [
   { key: 'store', label: 'Store' },
 ];
 
-/** Which pillar a given URL belongs to, so opening a direct link
- * (e.g. /build/tools) highlights the right tab automatically. */
 function pillarForPath(pathname) {
   if (pathname.startsWith('/build')) return 'build';
   if (pathname.startsWith('/store')) return 'store';
   return 'learn';
 }
 
+function hasChildren(item) {
+  return item.subtopics.length > 0 || item.pages.length > 0;
+}
+
 export default function Sidebar({ open }) {
   const navigate = useNavigate();
   const location = useLocation();
-  const { categoryKey: activeCategoryKey } = useParams();
   const { user, role } = useAuth();
   const canAuthorContent = role === 'admin' || role === 'editor';
 
   const [activePillar, setActivePillar] = useState(() => pillarForPath(location.pathname));
-  useEffect(() => setActivePillar(pillarForPath(location.pathname)), [location.pathname]);
-
   const [search, setSearch] = useState('');
   const [recent, setRecent] = useState([]);
+  const [expandedSections, setExpandedSections] = useState({});
+  const [expandedTopics, setExpandedTopics] = useState({});
+  const [expandedSubtopics, setExpandedSubtopics] = useState({});
 
-  useEffect(() => {
-    setRecent(getRecentTopics());
-  }, [activeCategoryKey]);
+  useEffect(() => setActivePillar(pillarForPath(location.pathname)), [location.pathname]);
+  useEffect(() => setRecent(getRecentTopics()), [location.pathname]);
 
   const trimmedSearch = search.trim().toLowerCase();
+  const searchResults = useMemo(() => getDocumentationSearchResults(search), [search]);
 
-  const expandedKeys = useMemo(() => {
-    if (trimmedSearch) {
-      return new Set(
-        CATEGORIES.filter((c) => c.topics.some((t) => t.title.toLowerCase().includes(trimmedSearch))).map((c) => c.key)
-      );
-    }
-    return new Set(activeCategoryKey ? [activeCategoryKey] : []);
-  }, [trimmedSearch, activeCategoryKey]);
+  useEffect(() => {
+    if (!trimmedSearch) return;
 
-  const [manualOverrides, setManualOverrides] = useState({});
-  function isExpanded(categoryKey) {
-    if (categoryKey in manualOverrides) return manualOverrides[categoryKey];
-    return expandedKeys.has(categoryKey);
+    const sections = {};
+    const topics = {};
+    const subtopics = {};
+
+    searchResults.forEach((result) => {
+      sections[result.sectionKey] = true;
+      topics[`${result.sectionKey}/${result.topic.key}`] = true;
+      if (result.subtopic) {
+        subtopics[`${result.sectionKey}/${result.topic.key}/${result.subtopic.key}`] = true;
+      }
+    });
+
+    setExpandedSections((prev) => ({ ...prev, ...sections }));
+    setExpandedTopics((prev) => ({ ...prev, ...topics }));
+    setExpandedSubtopics((prev) => ({ ...prev, ...subtopics }));
+  }, [trimmedSearch, searchResults]);
+
+  function toggle(setter, key, fallback = false) {
+    setter((prev) => ({ ...prev, [key]: !(prev[key] ?? fallback) }));
   }
-  function toggleGroup(categoryKey) {
-    setManualOverrides((prev) => ({ ...prev, [categoryKey]: !isExpanded(categoryKey) }));
+
+  function isSectionActive(section) {
+    return location.pathname.startsWith(`/content/${section.key}/`);
+  }
+
+  function isTopicActive(section, topic) {
+    const path = paths.documentationTopic(section.key, topic.key);
+    return location.pathname === path || location.pathname.startsWith(`${path}/`);
+  }
+
+  function isSubtopicActive(section, topic, subtopic) {
+    const path = paths.documentationSubtopic(section.key, topic.key, subtopic.key);
+    return location.pathname === path || location.pathname.startsWith(`${path}/`);
+  }
+
+  function renderPage(section, topic, page, subtopic = null) {
+    const path = subtopic
+      ? paths.documentationPage(section.key, topic.key, subtopic.key, page.key)
+      : `${paths.documentationTopic(section.key, topic.key)}/${page.key}`;
+
+    return (
+      <li key={page.key}>
+        <NavLink
+          to={path}
+          className={({ isActive }) => isActive
+            ? 'sidebar__link sidebar__link--active sidebar__link--page'
+            : 'sidebar__link sidebar__link--page'}
+        >
+          {page.title}
+        </NavLink>
+      </li>
+    );
+  }
+
+  function renderSubtopic(section, topic, subtopic) {
+    const key = `${section.key}/${topic.key}/${subtopic.key}`;
+    const active = isSubtopicActive(section, topic, subtopic);
+    const expanded = expandedSubtopics[key] ?? active;
+
+    return (
+      <li key={subtopic.key} className="sidebar__tree-item">
+        <button
+          type="button"
+          className={`sidebar__tree-header ${active ? 'sidebar__tree-header--active' : ''}`}
+          onClick={() => {
+            if (subtopic.pages.length === 0) {
+              navigate(paths.documentationSubtopic(section.key, topic.key, subtopic.key));
+              return;
+            }
+            toggle(setExpandedSubtopics, key, active);
+          }}
+          aria-expanded={subtopic.pages.length > 0 ? expanded : undefined}
+        >
+          <span className="sidebar__tree-title">{subtopic.title}</span>
+          <span className={`sidebar__chevron ${expanded ? 'sidebar__chevron--open' : ''}`}>›</span>
+        </button>
+        {expanded && subtopic.pages.length > 0 && (
+          <ul className="sidebar__tree-list sidebar__tree-list--pages">
+            {subtopic.pages.map((page) => renderPage(section, topic, page, subtopic))}
+          </ul>
+        )}
+      </li>
+    );
+  }
+
+  function renderTopic(section, topic) {
+    const key = `${section.key}/${topic.key}`;
+    const active = isTopicActive(section, topic);
+    const expanded = expandedTopics[key] ?? active;
+
+    return (
+      <li key={topic.key} className="sidebar__tree-item">
+        <button
+          type="button"
+          className={`sidebar__tree-header sidebar__tree-header--topic ${active ? 'sidebar__tree-header--active' : ''}`}
+          onClick={() => {
+            if (!hasChildren(topic)) {
+              navigate(paths.documentationTopic(section.key, topic.key));
+              return;
+            }
+            toggle(setExpandedTopics, key, active);
+          }}
+          aria-expanded={hasChildren(topic) ? expanded : undefined}
+        >
+          <span className="sidebar__dot" />
+          <span className="sidebar__tree-title">{topic.title}</span>
+          {hasChildren(topic) && (
+            <span className={`sidebar__chevron ${expanded ? 'sidebar__chevron--open' : ''}`}>›</span>
+          )}
+        </button>
+        {expanded && hasChildren(topic) && (
+          <ul className="sidebar__tree-list">
+            {topic.subtopics.map((subtopic) => renderSubtopic(section, topic, subtopic))}
+            {topic.pages.map((page) => renderPage(section, topic, page))}
+          </ul>
+        )}
+      </li>
+    );
   }
 
   if (!open) {
@@ -110,14 +221,17 @@ export default function Sidebar({ open }) {
 
       {activePillar === 'learn' && (
         <>
-          <input
-            type="search"
-            className="sidebar__search"
-            placeholder="Search topics…"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            aria-label="Search topics"
-          />
+          <div className="sidebar__search-wrap">
+            <input
+              type="search"
+              className="sidebar__search"
+              placeholder="Search CodeTrove..."
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              aria-label="Search CodeTrove documentation"
+            />
+            <span className="sidebar__search-shortcut">⌘K</span>
+          </div>
 
           {canAuthorContent && (
             <button type="button" className="sidebar__new-btn" onClick={() => navigate(paths.createPage())}>
@@ -129,57 +243,74 @@ export default function Sidebar({ open }) {
             Practice
           </NavLink>
 
-          <p className="sidebar__section-label">Languages</p>
+          {trimmedSearch ? (
+            <>
+              <p className="sidebar__section-label">Search results</p>
+              {searchResults.length === 0 ? (
+                <p className="sidebar__empty">No documentation matches "{search}".</p>
+              ) : (
+                <ul className="sidebar__search-results">
+                  {searchResults.map((result, index) => (
+                    <li key={`${result.type}-${result.path}-${index}`}>
+                      <NavLink
+                        to={result.path}
+                        className={({ isActive }) => isActive
+                          ? 'sidebar__search-result sidebar__search-result--active'
+                          : 'sidebar__search-result'}
+                      >
+                        <span>{result.topic.title}</span>
+                        {result.subtopic && <span>└── {result.subtopic.title}</span>}
+                        {result.page && (
+                          <span className="sidebar__search-result-page">
+                            {result.subtopic ? '     ├── ' : '└── '}{result.page.title}
+                          </span>
+                        )}
+                      </NavLink>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </>
+          ) : (
+            <>
+              {DOCUMENTATION_NAVIGATION.map((section) => {
+                const expanded = expandedSections[section.key] ?? isSectionActive(section);
 
-          {CATEGORIES.map((category) => {
-            const matchingTopics = trimmedSearch
-              ? category.topics.filter((t) => t.title.toLowerCase().includes(trimmedSearch))
-              : category.topics;
-            if (trimmedSearch && matchingTopics.length === 0) return null;
-            const expanded = isExpanded(category.key);
+                return (
+                  <div key={section.key} className="sidebar__section">
+                    <button
+                      type="button"
+                      className="sidebar__section-toggle"
+                      onClick={() => toggle(setExpandedSections, section.key, isSectionActive(section))}
+                      aria-expanded={expanded}
+                    >
+                      <span className="sidebar__section-label">{section.title}</span>
+                      <span className={`sidebar__chevron ${expanded ? 'sidebar__chevron--open' : ''}`}>›</span>
+                    </button>
 
-            return (
-              <div key={category.key} className="sidebar__group">
-                <button
-                  type="button"
-                  className="sidebar__group-header"
-                  onClick={() => toggleGroup(category.key)}
-                  aria-expanded={expanded}
-                >
-                  <span className="sidebar__dot" style={{ background: category.color }} />
-                  <span className="sidebar__group-title">{category.label}</span>
-                  <span className={`sidebar__chevron ${expanded ? 'sidebar__chevron--open' : ''}`}>›</span>
-                </button>
-                {expanded && (
+                    {expanded && (
+                      <ul className="sidebar__tree-list sidebar__tree-list--root">
+                        {section.topics.map((topic) => renderTopic(section, topic))}
+                      </ul>
+                    )}
+                  </div>
+                );
+              })}
+
+              {recent.length > 0 && (
+                <>
+                  <p className="sidebar__section-label">Recent</p>
                   <ul className="sidebar__list">
-                    {matchingTopics.map((topic) => (
-                      <li key={topic.slug}>
-                        <NavLink
-                          to={paths.topic(category.key, topic.slug)}
-                          className={({ isActive }) => (isActive ? 'sidebar__link sidebar__link--active' : 'sidebar__link')}
-                        >
-                          {topic.title}
+                    {recent.map((item) => (
+                      <li key={`${item.categoryKey}-${item.slug}`}>
+                        <NavLink to={paths.topic(item.categoryKey, item.slug)} className="sidebar__link">
+                          {item.title}
                         </NavLink>
                       </li>
                     ))}
                   </ul>
-                )}
-              </div>
-            );
-          })}
-
-          {recent.length > 0 && !trimmedSearch && (
-            <>
-              <p className="sidebar__section-label">Recent</p>
-              <ul className="sidebar__list">
-                {recent.map((item) => (
-                  <li key={`${item.categoryKey}-${item.slug}`}>
-                    <NavLink to={paths.topic(item.categoryKey, item.slug)} className="sidebar__link">
-                      {item.title}
-                    </NavLink>
-                  </li>
-                ))}
-              </ul>
+                </>
+              )}
             </>
           )}
         </>
