@@ -138,7 +138,8 @@ export default function Sidebar({ open }) {
 
   return (
     <nav className="sidebar" aria-label="Navigation">
-      <div className="sidebar__pillars" role="tablist">
+      <div className="sidebar__top">
+        <div className="sidebar__pillars" role="tablist">
         {PILLARS.map((pillar) => (
           <button
             key={pillar.key}
@@ -149,11 +150,10 @@ export default function Sidebar({ open }) {
           >
             {pillar.label}
           </button>
-        ))}
-      </div>
+          ))}
+        </div>
 
-      {activePillar === 'learn' && (
-        <>
+        {activePillar === 'learn' && (
           <div className="sidebar__search-wrap">
             <input
               type="search"
@@ -165,7 +165,12 @@ export default function Sidebar({ open }) {
             />
             <span className="sidebar__search-shortcut">⌘K</span>
           </div>
+        )}
+      </div>
 
+      <div className="sidebar__scroll">
+        {activePillar === 'learn' && (
+          <>
           {canAuthorContent && (
             <button type="button" className="sidebar__new-btn" onClick={() => navigate(paths.createPage())}>
               + New topic
@@ -269,11 +274,12 @@ export default function Sidebar({ open }) {
         )
       )}
 
-      {role === 'admin' && (
-        <NavLink to={paths.adminUsers()} className="sidebar__link" style={{ marginTop: 'auto' }}>
-          Manage users
-        </NavLink>
-      )}
+        {role === 'admin' && (
+          <NavLink to={paths.adminUsers()} className="sidebar__link" style={{ marginTop: 'auto' }}>
+            Manage users
+          </NavLink>
+        )}
+      </div>
     </nav>
   );
 }

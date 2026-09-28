@@ -1,12 +1,17 @@
 /* src/layout/Header.css */
 
 .app-header {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 1000;
+  height: var(--app-header-height);
   display: flex;
   align-items: center;
   gap: 0.75rem;
   padding: 0.65rem 1rem;
   background: var(--color-paper);
   border-bottom: 1px solid var(--color-border);
+  box-sizing: border-box;
 }
 
 .app-header__toggle {
