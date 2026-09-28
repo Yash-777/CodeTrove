@@ -3,6 +3,7 @@ import AppLayout from './layout/AppLayout.jsx';
 import Dashboard from './pages/Dashboard.jsx';
 import CategoryPage from './pages/content/CategoryPage.jsx';
 import TopicPage from './pages/content/TopicPage.jsx';
+import NavigationPage from './pages/content/NavigationPage.jsx';
 import PracticePage from './pages/learn/PracticePage.jsx';
 import NewTopicPage from './pages/admin/NewTopicPage.jsx';
 import DraftsPage from './pages/admin/DraftsPage.jsx';
@@ -34,6 +35,7 @@ export default function App() {
           <Route path="/content/:categoryKey/:topicSlug" element={<TopicPage />} />
           <Route path="/content/:sectionKey/:topicSlug/:subtopicSlug" element={<TopicPage />} />
           <Route path="/content/:sectionKey/:topicSlug/:subtopicSlug/:pageSlug" element={<TopicPage />} />
+          <Route path="/content/tree/*" element={<NavigationPage />} />
           <Route path="/learn/practice" element={<PracticePage />} />
           <Route path="/create-page" element={<RequireRole allow={['admin', 'editor']}><NewTopicPage /></RequireRole>} />
           <Route path="/drafts" element={<RequireRole allow={['admin', 'editor']}><DraftsPage /></RequireRole>} />

@@ -20,3 +20,11 @@ export function getTopicContent(categoryKey, topicSlug) {
 
   return `Missing content for ${categoryKey}/${topicSlug}. Create a file at src/data/topics/${categoryKey}/${topicSlug}/content.md or src/data/topics/${categoryKey}/content_info.md`;
 }
+
+
+export function getNavigationContent(contentKey) {
+  const key = `./${contentKey}/content.md`;
+  const content = topicContentFiles[key];
+  if (typeof content === 'string' && content.trim()) return content.trimEnd();
+  return `Missing content for ${contentKey}. Create a file at src/data/topics/${contentKey}/content.md`;
+}
