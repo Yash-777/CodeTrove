@@ -5,8 +5,12 @@
    automatically, no extra setup needed.
 */
 
+:root {
+  --app-header-height: 52px;
+}
+
 .app-shell {
-  min-height: 100vh;
+  height: 100vh;
   display: flex;
   flex-direction: column;
   background: var(--color-bg);
@@ -15,14 +19,19 @@
 
 .app-body {
   display: flex;
-  flex: 1;
+  height: 100vh;
   min-height: 0;
+  padding-top: var(--app-header-height);
+  overflow: hidden;
 }
 
 .app-content {
   flex: 1;
+  min-width: 0;
+  min-height: 0;
   padding: 2rem clamp(1.25rem, 4vw, 3rem);
-  max-width: 920px;
+  width: 100%;
+  overflow-y: auto;
 }
 
 @media (max-width: 720px) {

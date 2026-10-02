@@ -12,6 +12,9 @@ export const paths = {
   // LEARN
   category: (categoryKey) => `/content/${categoryKey}`,
   topic: (categoryKey, slug) => `/content/${categoryKey}/${slug}`,
+  documentationTopic: (sectionKey, topicKey) => `/content/${sectionKey}/${topicKey}`,
+  documentationSubtopic: (sectionKey, topicKey, subtopicKey) => `/content/${sectionKey}/${topicKey}/${subtopicKey}`,
+  documentationPage: (sectionKey, topicKey, subtopicKey, pageKey) => `/content/${sectionKey}/${topicKey}/${subtopicKey}/${pageKey}`,
   practice: () => '/learn/practice',
   createPage: () => '/create-page',
   drafts: () => '/drafts',

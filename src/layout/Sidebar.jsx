@@ -2,22 +2,17 @@
  * src/layout/Sidebar.jsx
  * ------------------------------------------------------------------
  * Two layers of navigation:
- *   1. A LEARN / BUILD / STORE pillar switcher (tabs) at the top -
- *      this is Codetrove's top-level structure from the project's
- *      IA diagram.
- *   2. Below it, whichever pillar is selected renders its own nav
- *      list - Learn shows the search + "Languages" accordion (the
- *      original claude.ai-style behavior); Build and Store show flat
- *      link lists, since they don't need search/collapse behavior.
+ *   1. LEARN / BUILD / STORE pillar switcher.
+ *   2. Learn renders a metadata-driven documentation tree.
  *
- * `activePillar` is local UI state (not part of the URL) - simplest
- * option here since switching pillars is just "which list do I show
- * in the sidebar," not a page navigation by itself.
+ * Documentation hierarchy is recursive so new sections, topics,
+ * subtopics, sub-subtopics, and pages do not require sidebar changes.
  */
 
 import { useEffect, useMemo, useState } from 'react';
-import { NavLink, useNavigate, useParams, useLocation } from 'react-router-dom';
+import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { CATEGORIES } from '../data/topics/index.js';
+import { NAVIGATION_TREE, getNavigationSearchResults } from '../data/navigation.js';
 import { getRecentTopics } from '../utils/recentTopics.js';
 import { paths } from '../routes/routes.config.js';
 import { useAuth } from '../context/AuthContext.jsx';
@@ -29,49 +24,98 @@ const PILLARS = [
   { key: 'store', label: 'Store' },
 ];
 
-/** Which pillar a given URL belongs to, so opening a direct link
- * (e.g. /build/tools) highlights the right tab automatically. */
 function pillarForPath(pathname) {
   if (pathname.startsWith('/build')) return 'build';
   if (pathname.startsWith('/store')) return 'store';
   return 'learn';
 }
 
+function nodeHasContent(node) {
+  return (node.children?.length || 0) > 0 || (node.pages?.length || 0) > 0;
+}
+
 export default function Sidebar({ open }) {
   const navigate = useNavigate();
   const location = useLocation();
-  const { categoryKey: activeCategoryKey } = useParams();
   const { user, role } = useAuth();
   const canAuthorContent = role === 'admin' || role === 'editor';
 
   const [activePillar, setActivePillar] = useState(() => pillarForPath(location.pathname));
-  useEffect(() => setActivePillar(pillarForPath(location.pathname)), [location.pathname]);
-
   const [search, setSearch] = useState('');
   const [recent, setRecent] = useState([]);
+  const [expanded, setExpanded] = useState({});
 
-  useEffect(() => {
-    setRecent(getRecentTopics());
-  }, [activeCategoryKey]);
+  useEffect(() => setActivePillar(pillarForPath(location.pathname)), [location.pathname]);
+  useEffect(() => setRecent(getRecentTopics()), [location.pathname]);
 
   const trimmedSearch = search.trim().toLowerCase();
+  const searchResults = useMemo(() => getNavigationSearchResults(search), [search]);
 
-  const expandedKeys = useMemo(() => {
-    if (trimmedSearch) {
-      return new Set(
-        CATEGORIES.filter((c) => c.topics.some((t) => t.title.toLowerCase().includes(trimmedSearch))).map((c) => c.key)
-      );
-    }
-    return new Set(activeCategoryKey ? [activeCategoryKey] : []);
-  }, [trimmedSearch, activeCategoryKey]);
+  useEffect(() => {
+    if (!trimmedSearch) return;
+    setExpanded((previous) => {
+      const next = { ...previous };
+      searchResults.forEach((result) => result.ancestors.forEach((ancestor) => { next[ancestor.path] = true; }));
+      return next;
+    });
+  }, [trimmedSearch, searchResults]);
 
-  const [manualOverrides, setManualOverrides] = useState({});
-  function isExpanded(categoryKey) {
-    if (categoryKey in manualOverrides) return manualOverrides[categoryKey];
-    return expandedKeys.has(categoryKey);
+  function isActivePath(path) {
+    return location.pathname === `/content/tree/${path}`;
   }
-  function toggleGroup(categoryKey) {
-    setManualOverrides((prev) => ({ ...prev, [categoryKey]: !isExpanded(categoryKey) }));
+
+  function isNodeActive(node) {
+    return location.pathname.startsWith(`/content/tree/${node.path}/`);
+  }
+
+  function toggleNode(node) {
+    setExpanded((previous) => ({ ...previous, [node.path]: !(previous[node.path] ?? isNodeActive(node)) }));
+  }
+
+  function renderPage(page) {
+    return (
+      <li key={page.path} className="sidebar__tree-item">
+        <NavLink
+          to={`/content/tree/${page.path}`}
+          className={({ isActive }) => isActive
+            ? 'sidebar__link sidebar__link--active sidebar__link--page'
+            : 'sidebar__link sidebar__link--page'}
+        >
+          {page.label}
+        </NavLink>
+      </li>
+    );
+  }
+
+  function renderNode(node, depth = 0) {
+    const hasContent = nodeHasContent(node);
+    const active = isNodeActive(node);
+    const isOpen = expanded[node.path] ?? active;
+
+    return (
+      <li key={node.path} className="sidebar__tree-item">
+        <button
+          type="button"
+          className={`sidebar__tree-header ${depth === 0 ? 'sidebar__tree-header--topic' : ''} ${active ? 'sidebar__tree-header--active' : ''}`}
+          onClick={() => {
+            if (!hasContent) return;
+            toggleNode(node);
+          }}
+          aria-expanded={hasContent ? isOpen : undefined}
+        >
+          {depth === 0 && <span className="sidebar__dot" />}
+          <span className="sidebar__tree-title">{node.label}</span>
+          {hasContent && <span className={`sidebar__chevron ${isOpen ? 'sidebar__chevron--open' : ''}`}>›</span>}
+        </button>
+
+        {isOpen && hasContent && (
+          <ul className="sidebar__tree-list">
+            {(node.children || []).map((child) => renderNode(child, depth + 1))}
+            {(node.pages || []).map(renderPage)}
+          </ul>
+        )}
+      </li>
+    );
   }
 
   if (!open) {
@@ -94,7 +138,8 @@ export default function Sidebar({ open }) {
 
   return (
     <nav className="sidebar" aria-label="Navigation">
-      <div className="sidebar__pillars" role="tablist">
+      <div className="sidebar__top">
+        <div className="sidebar__pillars" role="tablist">
         {PILLARS.map((pillar) => (
           <button
             key={pillar.key}
@@ -105,20 +150,27 @@ export default function Sidebar({ open }) {
           >
             {pillar.label}
           </button>
-        ))}
+          ))}
+        </div>
+
+        {activePillar === 'learn' && (
+          <div className="sidebar__search-wrap">
+            <input
+              type="search"
+              className="sidebar__search"
+              placeholder="Search CodeTrove..."
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              aria-label="Search CodeTrove documentation"
+            />
+            <span className="sidebar__search-shortcut">⌘K</span>
+          </div>
+        )}
       </div>
 
-      {activePillar === 'learn' && (
-        <>
-          <input
-            type="search"
-            className="sidebar__search"
-            placeholder="Search topics…"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            aria-label="Search topics"
-          />
-
+      <div className="sidebar__scroll">
+        {activePillar === 'learn' && (
+          <>
           {canAuthorContent && (
             <button type="button" className="sidebar__new-btn" onClick={() => navigate(paths.createPage())}>
               + New topic
@@ -129,57 +181,71 @@ export default function Sidebar({ open }) {
             Practice
           </NavLink>
 
-          <p className="sidebar__section-label">Languages</p>
+          {trimmedSearch ? (
+            <>
+              <p className="sidebar__section-label">Search results</p>
+              {searchResults.length === 0 ? (
+                <p className="sidebar__empty">No documentation matches "{search}".</p>
+              ) : (
+                <ul className="sidebar__search-results">
+                  {searchResults.map((result) => (
+                    <li key={result.path}>
+                      <NavLink
+                        to={`/content/tree/${result.path}`}
+                        className={({ isActive }) => isActive
+                          ? 'sidebar__search-result sidebar__search-result--active'
+                          : 'sidebar__search-result'}
+                      >
+                        {result.ancestors.slice(0, -1).map((ancestor) => (
+                          <span key={ancestor.path}>{ancestor.label}</span>
+                        ))}
+                        <span className="sidebar__search-result-page">└── {result.label}</span>
+                      </NavLink>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </>
+          ) : (
+            <>
+              {NAVIGATION_TREE.map((section) => {
+                const active = isNodeActive(section);
+                const isOpen = expanded[section.path] ?? active;
+                return (
+                  <div key={section.path} className="sidebar__section">
+                    <button
+                      type="button"
+                      className="sidebar__section-toggle"
+                      onClick={() => toggleNode(section)}
+                      aria-expanded={isOpen}
+                    >
+                      <span className="sidebar__section-label">{section.label}</span>
+                      <span className={`sidebar__chevron ${isOpen ? 'sidebar__chevron--open' : ''}`}>›</span>
+                    </button>
+                    {isOpen && (
+                      <ul className="sidebar__tree-list sidebar__tree-list--root">
+                        {(section.children || []).map((child) => renderNode(child, 0))}
+                        {(section.pages || []).map(renderPage)}
+                      </ul>
+                    )}
+                  </div>
+                );
+              })}
 
-          {CATEGORIES.map((category) => {
-            const matchingTopics = trimmedSearch
-              ? category.topics.filter((t) => t.title.toLowerCase().includes(trimmedSearch))
-              : category.topics;
-            if (trimmedSearch && matchingTopics.length === 0) return null;
-            const expanded = isExpanded(category.key);
-
-            return (
-              <div key={category.key} className="sidebar__group">
-                <button
-                  type="button"
-                  className="sidebar__group-header"
-                  onClick={() => toggleGroup(category.key)}
-                  aria-expanded={expanded}
-                >
-                  <span className="sidebar__dot" style={{ background: category.color }} />
-                  <span className="sidebar__group-title">{category.label}</span>
-                  <span className={`sidebar__chevron ${expanded ? 'sidebar__chevron--open' : ''}`}>›</span>
-                </button>
-                {expanded && (
+              {recent.length > 0 && (
+                <>
+                  <p className="sidebar__section-label">Recent</p>
                   <ul className="sidebar__list">
-                    {matchingTopics.map((topic) => (
-                      <li key={topic.slug}>
-                        <NavLink
-                          to={paths.topic(category.key, topic.slug)}
-                          className={({ isActive }) => (isActive ? 'sidebar__link sidebar__link--active' : 'sidebar__link')}
-                        >
-                          {topic.title}
+                    {recent.map((item) => (
+                      <li key={`${item.categoryKey}-${item.slug}`}>
+                        <NavLink to={paths.topic(item.categoryKey, item.slug)} className="sidebar__link">
+                          {item.title}
                         </NavLink>
                       </li>
                     ))}
                   </ul>
-                )}
-              </div>
-            );
-          })}
-
-          {recent.length > 0 && !trimmedSearch && (
-            <>
-              <p className="sidebar__section-label">Recent</p>
-              <ul className="sidebar__list">
-                {recent.map((item) => (
-                  <li key={`${item.categoryKey}-${item.slug}`}>
-                    <NavLink to={paths.topic(item.categoryKey, item.slug)} className="sidebar__link">
-                      {item.title}
-                    </NavLink>
-                  </li>
-                ))}
-              </ul>
+                </>
+              )}
             </>
           )}
         </>
@@ -208,11 +274,12 @@ export default function Sidebar({ open }) {
         )
       )}
 
-      {role === 'admin' && (
-        <NavLink to={paths.adminUsers()} className="sidebar__link" style={{ marginTop: 'auto' }}>
-          Manage users
-        </NavLink>
-      )}
+        {role === 'admin' && (
+          <NavLink to={paths.adminUsers()} className="sidebar__link" style={{ marginTop: 'auto' }}>
+            Manage users
+          </NavLink>
+        )}
+      </div>
     </nav>
   );
 }
