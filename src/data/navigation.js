@@ -43,7 +43,27 @@ const tree = [
       ]},
       { key: 'sql', label: 'SQL', pages: ['sql-interview-questions', 'joins-and-indexes', 'transactions-and-locking', 'query-tuning'] },
       { key: 'microservices', label: 'Microservices', children: [
-        { key: 'project-flow', label: 'Project Flow & Architecture', pages: ['microservice-project-flow-architecture'] },
+        { key: 'project-flow', label: 'Project Flow & Architecture', pages: ['microservice-project-flow-architecture', 'microservice-architecture-deep-dive'], children: [
+          { key: 'api-gateway-idempotency', label: 'API Gateway & Idempotency', pages: ['api-gateway-idempotency'] },
+          { key: 'eureka-service-discovery', label: 'Eureka Service Discovery (Registry)', children: [
+            { key: 'mechanics-client-lifecycle', label: 'Eureka Server Mechanics & Client Lifecycle', pages: ['eureka-mechanics-client-lifecycle'] },
+            { key: 'resilience-failure-scenarios', label: 'Resilience & Failure Scenarios', pages: ['eureka-resilience-failure-scenarios'] },
+            { key: 'eureka-vs-zookeeper-consul', label: 'Eureka vs Zookeeper / Consul', pages: ['eureka-vs-zookeeper-consul'] },
+          ] },
+          { key: 'zipkin-sleuth', label: 'Zipkin & Sleuth', pages: ['zipkin-sleuth'] },
+          { key: 'kafka', label: 'Kafka', children: [
+            { key: 'topic-partition-broker', label: 'Topic, Partition & Broker Relationship', pages: ['kafka-topic-partition-broker'] },
+            { key: 'producer-consumer-offsets', label: 'Producer & Consumer Mechanics / Offset Management', pages: ['kafka-producer-consumer-offsets'] },
+            { key: 'zookeeper-vs-kraft', label: 'ZooKeeper vs KRaft', pages: ['kafka-zookeeper-vs-kraft'] },
+            { key: 'sync-vs-async', label: 'Synchronous vs Asynchronous Communication', pages: ['kafka-sync-vs-async'] },
+          ] },
+          { key: 'saga-pattern', label: 'Saga Design Pattern', children: [
+            { key: 'choreography', label: 'Choreography (Decentralized)', pages: ['saga-choreography'] },
+            { key: 'orchestration', label: 'Orchestration (Centralized)', pages: ['saga-orchestration'] },
+          ] },
+          { key: 'config-server-vault', label: 'Config Server vs Vault', pages: ['config-server-vs-vault'] },
+          { key: 'circuit-breaker-fallback', label: 'Circuit Breaker & Fallback', pages: ['circuit-breaker-fallback'] },
+        ] },
         { key: 'distributed-systems', label: 'Distributed Systems', pages: ['service-discovery', 'config-server-vault', 'circuit-breaker', 'distributed-tracing', 'metrics-observability'] },
         { key: 'messaging', label: 'Messaging', pages: ['kafka', 'kafka-transactions', 'message-brokers'] },
       ]},
