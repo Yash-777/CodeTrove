@@ -1,18 +1,13 @@
-# Threads
+# Java Threads
 
-> Content placeholder. Add the practical explanation, examples, commands, diagrams, common mistakes, and production notes here.
+A thread is an independently scheduled execution path that shares the process heap with other threads. Threads can overlap work, but shared mutable state requires coordination and blocking consumes resources.
 
-## What to learn
+Prefer submitting tasks to a managed `ExecutorService` rather than creating unbounded threads. Handle interruption cooperatively: if a method cannot propagate `InterruptedException`, restore the interrupt flag before returning.
 
-- Definition and purpose
-- How it works internally
-- Common implementation patterns
-- Failure modes and troubleshooting
-- Performance and scalability considerations
-- Security considerations
-- Testing strategy
+Virtual threads (Java 21+) reduce the cost of large numbers of blocking tasks, but do not make CPU-bound work faster or remove database and remote-service capacity limits.
 
-## References
+**Pitfalls:** unbounded thread creation, lost interrupts, data races, and blocking an event-loop thread.
 
-- Prefer official documentation and primary sources.
-- If this concept is covered in another CodeTrove section, add an internal reference using a new-tab HTML link.
+**Interview points:** distinguish concurrency from parallelism; discuss scheduling, visibility, thread safety, and why pools need bounded queues and explicit shutdown.
+
+**Related:** [Executors](/content/tree/languages/java/core/concurrency/executors), [Synchronization](/content/tree/languages/java/core/concurrency/synchronization), [Virtual Threads](/content/tree/languages/java/advanced/modern-java/virtual-threads).

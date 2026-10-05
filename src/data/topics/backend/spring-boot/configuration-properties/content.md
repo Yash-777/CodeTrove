@@ -1,18 +1,18 @@
-# Configuration Properties
+# Spring Boot Configuration Properties
 
-> Content placeholder. Add the practical explanation, examples, commands, diagrams, common mistakes, and production notes here.
+`@ConfigurationProperties` binds a group of external properties to a typed object. It provides a cohesive configuration contract, relaxed property-name binding, and support for validation when configured with a validation provider.
 
-## What to learn
+```java
+@ConfigurationProperties(prefix = "payments")
+@Validated
+public record PaymentProperties(@NotBlank String baseUrl,
+								@Positive long timeoutMillis) {}
+```
 
-- Definition and purpose
-- How it works internally
-- Common implementation patterns
-- Failure modes and troubleshooting
-- Performance and scalability considerations
-- Security considerations
-- Testing strategy
+Register the properties type with configuration-properties scanning or explicit enablement. Keep environment-specific values outside source control; use a secrets manager for credentials. Prefer typed properties over scattered `@Value` fields for related settings.
 
-## References
+**Pitfalls:** missing registration, unvalidated invalid values, ambiguous precedence, and treating profiles as a secret store.
 
-- Prefer official documentation and primary sources.
-- If this concept is covered in another CodeTrove section, add an internal reference using a new-tab HTML link.
+**Interview points:** describe binding and validation, configuration precedence, and how you prevent invalid configuration from reaching production.
+
+**Related:** [Profiles](/content/tree/backend/spring-boot/profiles), [Auto-Configuration](/content/tree/backend/spring-boot/auto-configuration).

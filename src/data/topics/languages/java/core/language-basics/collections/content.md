@@ -1,18 +1,19 @@
-# Collections
+# Java Collections
 
-> Content placeholder. Add the practical explanation, examples, commands, diagrams, common mistakes, and production notes here.
+The Collections Framework provides standard interfaces and implementations for common data structures. Choose according to lookup patterns, ordering, uniqueness, concurrency needs, and expected scale.
 
-## What to learn
+- `ArrayList`: fast indexed access and append; middle insertion shifts elements.
+- `HashMap` / `HashSet`: average constant-time lookup with correct `equals` and `hashCode`.
+- `TreeMap` / `TreeSet`: sorted values with logarithmic operations.
+- `ArrayDeque`: efficient queue and stack operations.
 
-- Definition and purpose
-- How it works internally
-- Common implementation patterns
-- Failure modes and troubleshooting
-- Performance and scalability considerations
-- Security considerations
-- Testing strategy
+```java
+Map<String, Integer> counts = new HashMap<>();
+counts.merge("api", 1, Integer::sum);
+```
 
-## References
+Most standard collections are not thread-safe. `ConcurrentHashMap` protects individual operations, not a multi-step business invariant. Use immutable snapshots or explicit synchronization when needed.
 
-- Prefer official documentation and primary sources.
-- If this concept is covered in another CodeTrove section, add an internal reference using a new-tab HTML link.
+**Interview points:** cover hashing, collisions, resizing, iteration ordering, fail-fast iterators, and complexity assumptions.
+
+**Related:** [Generics](/content/tree/languages/java/core/language-basics/generics), [Synchronization](/content/tree/languages/java/core/concurrency/synchronization).

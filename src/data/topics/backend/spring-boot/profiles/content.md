@@ -1,18 +1,18 @@
-# Profiles
+# Spring Boot Profiles
 
-> Content placeholder. Add the practical explanation, examples, commands, diagrams, common mistakes, and production notes here.
+Profiles select environment-specific bean definitions and configuration, for example `local`, `test`, or `production`. Activate profiles explicitly through deployment configuration and keep common defaults in the base configuration.
 
-## What to learn
+```yaml
+spring:
+	config:
+		activate:
+			on-profile: production
+```
 
-- Definition and purpose
-- How it works internally
-- Common implementation patterns
-- Failure modes and troubleshooting
-- Performance and scalability considerations
-- Security considerations
-- Testing strategy
+Profiles are useful for wiring differences, but avoid maintaining unrelated application behavior in a growing matrix of profile-specific branches. Do not store credentials in profile files; inject secrets through a secret-management mechanism. Test the effective configuration used by each deployment.
 
-## References
+**Pitfalls:** relying on an accidental local default, activating conflicting profiles, and treating profiles as a substitute for deployment configuration management.
 
-- Prefer official documentation and primary sources.
-- If this concept is covered in another CodeTrove section, add an internal reference using a new-tab HTML link.
+**Interview points:** discuss property precedence, profile activation, configuration validation, and how to avoid environment drift.
+
+**Related:** [Configuration Properties](/content/tree/backend/spring-boot/configuration-properties), [Actuator](/content/tree/backend/spring-boot/actuator).

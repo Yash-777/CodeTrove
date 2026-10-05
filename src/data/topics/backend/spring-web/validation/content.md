@@ -1,18 +1,16 @@
-# Validation
+# Spring Request Validation
 
-> Content placeholder. Add the practical explanation, examples, commands, diagrams, common mistakes, and production notes here.
+Spring MVC integrates Jakarta Bean Validation with request binding. Put constraints on request DTOs and use `@Valid` or `@Validated` at the controller boundary so malformed input is rejected before application logic runs.
 
-## What to learn
+```java
+record CreateUser(@NotBlank @Email String email,
+				  @Size(min = 12, max = 128) String password) {}
+```
 
-- Definition and purpose
-- How it works internally
-- Common implementation patterns
-- Failure modes and troubleshooting
-- Performance and scalability considerations
-- Security considerations
-- Testing strategy
+Return stable field-error information without echoing sensitive values. Keep domain invariants enforced in the domain/service layer as well, because jobs, messaging, and internal calls may bypass MVC validation.
 
-## References
+**Pitfalls:** validating only controller requests, returning framework exception details directly, and expressing business rules as syntax-only constraints.
 
-- Prefer official documentation and primary sources.
-- If this concept is covered in another CodeTrove section, add an internal reference using a new-tab HTML link.
+**Interview points:** distinguish request validation from domain validation and test invalid, boundary, and valid inputs through the HTTP layer.
+
+**Related:** [REST Controllers](/content/tree/backend/spring-web/rest-controllers), [Global Exception Handling](/content/tree/backend/spring-web/global-exception-handling).

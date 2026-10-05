@@ -1,18 +1,17 @@
-# Pattern Matching
+# Pattern Matching in Java
 
-> Content placeholder. Add the practical explanation, examples, commands, diagrams, common mistakes, and production notes here.
+Pattern matching combines a type or structural test with extraction of the matched value, reducing repetitive casts and making branching clearer. Modern Java supports type patterns for `instanceof` and pattern matching in `switch` (available in current LTS-era JDKs).
 
-## What to learn
+```java
+if (value instanceof String text) {
+	return text.strip();
+}
+```
 
-- Definition and purpose
-- How it works internally
-- Common implementation patterns
-- Failure modes and troubleshooting
-- Performance and scalability considerations
-- Security considerations
-- Testing strategy
+Pattern variables are in scope only where the compiler can prove the match succeeded. Switch pattern matching can improve exhaustive handling when paired with sealed hierarchies, but null behavior and guards must be explicit.
 
-## References
+**Pitfalls:** assuming syntax is supported by the project's configured source level, and building deeply nested patterns that are harder to understand than ordinary methods.
 
-- Prefer official documentation and primary sources.
-- If this concept is covered in another CodeTrove section, add an internal reference using a new-tab HTML link.
+**Interview points:** explain flow-scoped variables, exhaustive switches, and how language level is controlled by build configuration.
+
+**Related:** [Sealed Classes](/content/tree/languages/java/advanced/modern-java/sealed-classes), [Polymorphism](/content/tree/languages/java/core/oop/polymorphism).

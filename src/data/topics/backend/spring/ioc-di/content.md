@@ -1,18 +1,19 @@
-# Ioc Di
+# Spring IoC and Dependency Injection
 
-> Content placeholder. Add the practical explanation, examples, commands, diagrams, common mistakes, and production notes here.
+Inversion of Control means an application delegates object creation and lifecycle to a container. Dependency Injection (DI) is the mechanism Spring commonly uses: components declare dependencies and the container supplies them.
 
-## What to learn
+```java
+@Service
+class CheckoutService {
+	private final PaymentGateway gateway;
+	CheckoutService(PaymentGateway gateway) { this.gateway = gateway; }
+}
+```
 
-- Definition and purpose
-- How it works internally
-- Common implementation patterns
-- Failure modes and troubleshooting
-- Performance and scalability considerations
-- Security considerations
-- Testing strategy
+Prefer constructor injection for required dependencies. It makes invariants explicit, supports immutability, and allows ordinary unit construction. Spring resolves candidates by type, then qualifiers or primary markers where needed.
 
-## References
+**Pitfalls:** field injection hides dependencies; circular dependencies often indicate unclear ownership; too many constructor parameters can reveal a class with too many responsibilities.
 
-- Prefer official documentation and primary sources.
-- If this concept is covered in another CodeTrove section, add an internal reference using a new-tab HTML link.
+**Interview points:** distinguish IoC from DI, describe bean registration and dependency resolution, and explain why constructor injection improves testability without requiring a container in unit tests.
+
+**Related:** [Bean Lifecycle](/content/tree/backend/spring/bean-lifecycle), [Application Context](/content/tree/backend/spring/application-context), [Java Abstraction](/content/tree/languages/java/core/oop/abstraction).

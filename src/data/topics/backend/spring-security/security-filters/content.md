@@ -1,18 +1,11 @@
-# Security Filters
+# Spring Security Filter Chain
 
-> Content placeholder. Add the practical explanation, examples, commands, diagrams, common mistakes, and production notes here.
+Spring Security integrates with servlet requests through a `DelegatingFilterProxy` and a `FilterChainProxy` containing one or more `SecurityFilterChain` instances. Matchers select a chain; its filters establish the security context, authenticate credentials, translate failures, and authorize requests.
 
-## What to learn
+Order matters: authentication must establish a principal before authorization checks it. Prefer the Spring Security DSL and standard filters over custom filters whose order and matching behavior are unclear.
 
-- Definition and purpose
-- How it works internally
-- Common implementation patterns
-- Failure modes and troubleshooting
-- Performance and scalability considerations
-- Security considerations
-- Testing strategy
+**Pitfalls:** broad matchers, a second chain unexpectedly capturing requests, disabling CSRF without considering the client model, and logging credentials or tokens.
 
-## References
+**Interview points:** trace a request through the chain, distinguish servlet filters from MVC interceptors, and explain how multiple chains are selected.
 
-- Prefer official documentation and primary sources.
-- If this concept is covered in another CodeTrove section, add an internal reference using a new-tab HTML link.
+**Related:** [Authentication](/content/tree/backend/spring-security/authentication), [Authorization](/content/tree/backend/spring-security/authorization), [Servlet Filters](/content/tree/backend/spring/filters).

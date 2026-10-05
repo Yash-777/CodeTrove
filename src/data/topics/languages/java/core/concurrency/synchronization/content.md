@@ -1,18 +1,18 @@
-# Synchronization
+# Java Synchronization and Visibility
 
-> Content placeholder. Add the practical explanation, examples, commands, diagrams, common mistakes, and production notes here.
+Synchronization coordinates shared state. A monitor lock provides mutual exclusion and a happens-before relationship: writes before releasing a lock become visible to a thread that later acquires the same lock.
 
-## What to learn
+```java
+final class Counter {
+	private long value;
+	synchronized long incrementAndGet() { return ++value; }
+}
+```
 
-- Definition and purpose
-- How it works internally
-- Common implementation patterns
-- Failure modes and troubleshooting
-- Performance and scalability considerations
-- Security considerations
-- Testing strategy
+`volatile` provides visibility and ordering for reads and writes to a variable, but does not make compound operations such as `count++` atomic. Prefer immutability, thread confinement, or higher-level concurrency utilities when they clarify ownership.
 
-## References
+**Pitfalls:** races, lock-order deadlocks, holding locks during I/O, and locking on publicly accessible objects. Keep critical sections small and lock ordering consistent.
 
-- Prefer official documentation and primary sources.
-- If this concept is covered in another CodeTrove section, add an internal reference using a new-tab HTML link.
+**Interview points:** distinguish atomicity from visibility, explain happens-before, and why a thread-safe collection does not make a sequence of operations atomic.
+
+**Related:** [Locks](/content/tree/languages/java/core/concurrency/locks), [Collections](/content/tree/languages/java/core/language-basics/collections).

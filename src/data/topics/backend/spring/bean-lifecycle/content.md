@@ -1,18 +1,11 @@
-# Bean Lifecycle
+# Spring Bean Lifecycle
 
-> Content placeholder. Add the practical explanation, examples, commands, diagrams, common mistakes, and production notes here.
+A Spring bean is an object managed by the container. In a typical lifecycle, Spring instantiates it, injects dependencies, runs aware callbacks and bean post-processors, invokes initialization callbacks, and later calls destruction callbacks when the context closes. Exact phases depend on scope and configuration.
 
-## What to learn
+Use `@PostConstruct` for initialization that requires injected dependencies and `@PreDestroy` for cleanup of resources owned by the bean. Prefer framework-managed clients and pools when they already define lifecycle behavior.
 
-- Definition and purpose
-- How it works internally
-- Common implementation patterns
-- Failure modes and troubleshooting
-- Performance and scalability considerations
-- Security considerations
-- Testing strategy
+**Pitfalls:** doing long or blocking work during startup, relying on lifecycle callbacks for business workflows, and assuming prototype-scoped beans receive the same destruction management as singletons.
 
-## References
+**Interview points:** explain bean post-processors and how proxies can be applied, distinguish initialization from construction, and discuss shutdown ordering for owned resources.
 
-- Prefer official documentation and primary sources.
-- If this concept is covered in another CodeTrove section, add an internal reference using a new-tab HTML link.
+**Related:** [IoC / DI](/content/tree/backend/spring/ioc-di), [Application Context](/content/tree/backend/spring/application-context).

@@ -1,18 +1,13 @@
-# Service Versioning
+# Service and API Versioning
 
-> Content placeholder. Add the practical explanation, examples, commands, diagrams, common mistakes, and production notes here.
+Versioning manages change across independently deployed producers and consumers. Prefer backward-compatible evolution: add optional fields, preserve existing meanings, and let consumers tolerate unknown fields. Use a new major contract when a breaking change cannot be avoided.
 
-## What to learn
+HTTP APIs may version by path, header, or media type; events need schema compatibility rules. Versioning a service name in discovery is not a substitute for API compatibility.
 
-- Definition and purpose
-- How it works internally
-- Common implementation patterns
-- Failure modes and troubleshooting
-- Performance and scalability considerations
-- Security considerations
-- Testing strategy
+**Migration flow:** publish the new contract, deploy consumers that can handle both forms, deploy the producer, observe adoption, and retire the old form after a communicated window. Contract tests and telemetry reveal lagging consumers.
 
-## References
+**Pitfalls:** versioning every change, silently changing field semantics, and retaining old versions indefinitely without ownership or usage data.
 
-- Prefer official documentation and primary sources.
-- If this concept is covered in another CodeTrove section, add an internal reference using a new-tab HTML link.
+**Interview points:** explain expand-and-contract deployment, consumer-driven contracts, and safe deprecation.
+
+**Related:** [API Composition](/content/tree/architecture/microservices/api-composition), [Data Ownership](/content/tree/architecture/microservices/data-ownership).

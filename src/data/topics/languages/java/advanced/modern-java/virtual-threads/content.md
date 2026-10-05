@@ -1,18 +1,11 @@
-# Virtual Threads
+# Java Virtual Threads
 
-> Content placeholder. Add the practical explanation, examples, commands, diagrams, common mistakes, and production notes here.
+Virtual threads are lightweight JVM-managed threads intended to make thread-per-task code practical for large numbers of mostly blocking tasks. They preserve familiar synchronous control flow while the runtime schedules them over a smaller set of platform threads.
 
-## What to learn
+They are most useful for blocking I/O workloads. They do not accelerate CPU-bound work, increase database connection capacity, or remove the need for admission control and deadlines.
 
-- Definition and purpose
-- How it works internally
-- Common implementation patterns
-- Failure modes and troubleshooting
-- Performance and scalability considerations
-- Security considerations
-- Testing strategy
+**Production considerations:** test library compatibility and pinning behavior on the deployed JDK; measure throughput, memory, and tail latency. Avoid pooling virtual threads as if they were scarce platform threads; bound the scarce resource instead (for example, database permits).
 
-## References
+**Interview points:** compare virtual and platform threads, explain the workload fit, and discuss backpressure and downstream limits.
 
-- Prefer official documentation and primary sources.
-- If this concept is covered in another CodeTrove section, add an internal reference using a new-tab HTML link.
+**Related:** [Threads](/content/tree/languages/java/core/concurrency/threads), [Executors](/content/tree/languages/java/core/concurrency/executors), [Concurrency](/content/tree/languages/java/core/concurrency/synchronization).

@@ -1,18 +1,11 @@
-# Oauth2 Jwt
+# OAuth 2.0 Resource Server and JWT
 
-> Content placeholder. Add the practical explanation, examples, commands, diagrams, common mistakes, and production notes here.
+An OAuth 2.0 resource server accepts access tokens and enforces their scopes or authorities. JWT is a token format, not an authorization protocol by itself. Spring Security can validate bearer JWTs using issuer metadata or configured keys and map claims to authorities.
 
-## What to learn
+Validate the signature and expected issuer; enforce expiration and, when required, audience and allowed algorithms. Use a maintained resource-server integration rather than hand-parsing tokens. Key rotation and JWKS availability are operational concerns.
 
-- Definition and purpose
-- How it works internally
-- Common implementation patterns
-- Failure modes and troubleshooting
-- Performance and scalability considerations
-- Security considerations
-- Testing strategy
+**Pitfalls:** trusting decoded claims before signature validation, accepting tokens for another audience, logging bearer tokens, and assuming JWT revocation is immediate. Keep tokens short-lived and define key/issuer policy deliberately.
 
-## References
+**Interview points:** distinguish access and ID tokens, explain issuer/audience/signature validation, and discuss key rotation and revocation trade-offs.
 
-- Prefer official documentation and primary sources.
-- If this concept is covered in another CodeTrove section, add an internal reference using a new-tab HTML link.
+**Related:** [Authentication](/content/tree/backend/spring-security/authentication), [Authorization](/content/tree/backend/spring-security/authorization).

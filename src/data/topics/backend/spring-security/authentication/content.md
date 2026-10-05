@@ -1,18 +1,11 @@
-# Authentication
+# Authentication in Spring Security
 
-> Content placeholder. Add the practical explanation, examples, commands, diagrams, common mistakes, and production notes here.
+Authentication establishes who is making a request. Spring Security represents the result as an `Authentication` in the `SecurityContext`, with a principal, credentials (normally erased after use), and granted authorities.
 
-## What to learn
+Common mechanisms include form login, HTTP Basic for controlled contexts, sessions, and OAuth 2.0 resource-server bearer tokens. Select based on client type and threat model; do not invent token formats or store plaintext passwords.
 
-- Definition and purpose
-- How it works internally
-- Common implementation patterns
-- Failure modes and troubleshooting
-- Performance and scalability considerations
-- Security considerations
-- Testing strategy
+**Operational concerns:** configure session-fixation protection, secure cookie attributes, password hashing, and safe failure responses. For stateless APIs, evaluate CSRF based on whether credentials are sent automatically by browsers.
 
-## References
+**Interview points:** distinguish authentication from authorization and trace how credentials become an authenticated principal.
 
-- Prefer official documentation and primary sources.
-- If this concept is covered in another CodeTrove section, add an internal reference using a new-tab HTML link.
+**Related:** [Authorization](/content/tree/backend/spring-security/authorization), [OAuth2 / JWT](/content/tree/backend/spring-security/oauth2-jwt), [Security Filters](/content/tree/backend/spring-security/security-filters).

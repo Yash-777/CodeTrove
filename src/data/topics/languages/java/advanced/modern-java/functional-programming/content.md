@@ -1,18 +1,18 @@
-# Functional Programming
+# Functional Programming in Java
 
-> Content placeholder. Add the practical explanation, examples, commands, diagrams, common mistakes, and production notes here.
+Functional programming emphasizes values, functions, composition, and avoiding unintended mutation. Java supports this style through lambdas, functional interfaces, streams, and immutable data types; it remains interoperable with object-oriented design.
 
-## What to learn
+```java
+var activeNames = users.stream()
+	.filter(User::isActive)
+	.map(User::name)
+	.toList();
+```
 
-- Definition and purpose
-- How it works internally
-- Common implementation patterns
-- Failure modes and troubleshooting
-- Performance and scalability considerations
-- Security considerations
-- Testing strategy
+Use pure transformations for logic that benefits from local reasoning and testing. Keep side effects at clear boundaries such as persistence, messaging, or HTTP calls. Streams are lazy until a terminal operation and should not be used to obscure simple control flow.
 
-## References
+**Trade-offs:** immutable pipelines can simplify concurrency but may allocate intermediate values or become difficult to debug when over-chained.
 
-- Prefer official documentation and primary sources.
-- If this concept is covered in another CodeTrove section, add an internal reference using a new-tab HTML link.
+**Interview points:** explain side effects, referential transparency, composition, and why parallel streams are not automatically faster or appropriate for blocking I/O.
+
+**Related:** [Streams](/content/tree/languages/java/core/language-basics/streams), [Collections](/content/tree/languages/java/core/language-basics/collections), [CompletableFuture](/content/tree/languages/java/core/concurrency/completable-future).
