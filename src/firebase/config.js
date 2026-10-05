@@ -58,87 +58,14 @@ const clientApiKey = import.meta.env.VITE_FIREBASE_API_KEY || '';
       messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
       appId: import.meta.env.VITE_FIREBASE_APP_ID,
     };
-    conssole.log('Initializing Firebase client SDK with config:', firebaseConfig);
+    console.info('Initializing Firebase client SDK.');
     const app = initializeApp(firebaseConfig);
     auth = getAuth(app);
     db = getFirestore(app);
     return;
   }
 
-  // If we get here the client API key is empty. Attempt server-side admin
-  // initialization if running in Node and GOOGLE_APPLICATION_CREDENTIALS is
-  // available (or a local service account file exists).
-  if (typeof window === 'undefined') {
-    console.log('VITE_FIREBASE_API_KEY is empty. Attempting server-side Firebase Admin SDK initialization...');
-    try {
-      const adminImport = await import('firebase-admin');
-      const admin = adminImport.default ?? adminImport;
-      const fs = await import('fs');
-      const path = await import('path');
-      const { fileURLToPath } = await import('url');
-
-      const __filename = fileURLToPath(import.meta.url);
-      const __dirname = path.dirname(__filename);
-
-      let serviceAccount = null;
-
-      if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
-        const credPath = process.env.GOOGLE_APPLICATION_CREDENTIALS;
-        try {
-          const content = fs.readFileSync(credPath, 'utf8');
-          serviceAccount = JSON.parse(content);
-        } catch (err) {
-          console.error('Failed to read GOOGLE_APPLICATION_CREDENTIALS file:', err);
-        }
-      } else {
-        const localPath = path.join(__dirname, 'serviceAccountKeyUAT.json');
-        if (fs.existsSync(localPath)) {
-          try {
-            const content = fs.readFileSync(localPath, 'utf8');
-            serviceAccount = JSON.parse(content);
-          } catch (err) {
-            console.error('Failed to read local service account file:', err);
-          }
-        } else {
-          console.log('VITE_FIREBASE_API_KEY is empty and GOOGLE_APPLICATION_CREDENTIALS is not set.');
-        }
-      }
-
-      if (serviceAccount) {
-        admin.initializeApp({
-          credential: admin.credential.cert(serviceAccount),
-        });
-        db = admin.firestore();
-      }
-    } catch (err) {
-      console.error('Error initializing Firebase Admin SDK:', err);
-    }
-    return;
-  }
-
-  // Running in browser and no client API key: nothing we can do here.
-  console.error(`
-╔════════════════════════════════════════════════════════════════════╗
-║                   FIREBASE NOT CONFIGURED                          ║
-╚════════════════════════════════════════════════════════════════════╝
-
-VITE_FIREBASE_API_KEY is empty and no server-side credentials available.
-
-TO FIX THIS:
-1. Go to  Firebase Console: https://console.firebase.google.com
-2. Select your project → Project Settings → General tab
-3. Scroll to "Your apps" → Click on your Web app → Firebase SDK snippet → Config - Copy the entire config object
-4. Open .env file in your project root
-5. Fill in the VITE_FIREBASE_* variables:
-   VITE_FIREBASE_API_KEY=AIza...
-   VITE_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
-   VITE_FIREBASE_PROJECT_ID=your-project-id
-   VITE_FIREBASE_STORAGE_BUCKET=your-project.appspot.com
-   VITE_FIREBASE_MESSAGING_SENDER_ID=123456789
-   VITE_FIREBASE_APP_ID=1:123456789:web:abc123...
-
-6. Save the file and refresh your browser
-
-See README.md "Setting up Firebase" for detailed instructions.
-`);
+  // Firebase Admin credentials are server-only. The browser must never
+  // attempt to load service-account files or initialize firebase-admin.
+  console.error('[CodeTrove] Firebase client configuration is missing. Copy .env.example to .env and fill in the VITE_FIREBASE_* web app values. Public pages remain available; sign-in/sign-up will return a configuration error.');
 })();

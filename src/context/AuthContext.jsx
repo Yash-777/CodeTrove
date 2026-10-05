@@ -37,7 +37,22 @@ import { auth, db } from '../firebase/config.js';
 import { getDeviceId } from '../utils/deviceId.js';
 
 const MAX_DEVICES = 2;
-const DEV_MODE_ADMIN = import.meta.env.DEV && import.meta.env.VITE_DEV_ADMIN === 'true';
+const TEST_AUTH_MODE = import.meta.env.MODE === 'test' && import.meta.env.DEV;
+
+async function signInWithTestFixture(email, password) {
+  const response = await fetch('/__dev/test-users.csv', { cache: 'no-store' });
+  if (!response.ok) throw new Error('Test users are unavailable. Start the app with `npm run dev test`.');
+  const rows = (await response.text()).trim().split(/\r?\n/);
+  const headers = rows.shift().split(',');
+  const users = rows.map((row) => Object.fromEntries(row.split(',').map((value, index) => [headers[index], value.trim()])));
+  const match = users.find((candidate) => candidate.email.toLowerCase() === email.trim().toLowerCase() && candidate.password === password);
+  if (!match) {
+    const error = new Error('Invalid test email or password. Choose one of the sample roles shown on the sign-in page.');
+    error.code = 'auth/invalid-credential';
+    throw error;
+  }
+  return { uid: match.uid, email: match.email, displayName: match.displayName, role: match.role };
+}
 
 const AuthContext = createContext(null);
 
@@ -48,22 +63,11 @@ export function AuthProvider({ children }) {
 
   // DEV MODE: automatically create a fake admin user for development
   useEffect(() => {
-    if (DEV_MODE_ADMIN) {
-      console.log('🔐 DEV MODE ADMIN: Auto-authenticated as admin (no Firebase login required)');
-      setUser({
-        uid: 'dev-admin-uid',
-        email: 'dev@admin.local',
-        displayName: 'Dev Admin',
-      });
-      setProfile({
-        email: 'dev@admin.local',
-        role: 'admin',
-        displayName: 'Dev Admin',
-      });
+    if (TEST_AUTH_MODE) {
+      console.warn('[CodeTrove] Test CSV authentication is enabled. This is for local UI testing only.');
       setLoading(false);
       return;
     }
-
     // Normal Firebase auth flow
     if (!auth) {
       setLoading(false);
@@ -81,6 +85,7 @@ export function AuthProvider({ children }) {
   // if an admin changes someone's role, that person's UI updates
   // live, without needing to refresh or sign out/in again.
   useEffect(() => {
+    if (TEST_AUTH_MODE) return;
     if (!user || !db) {
       setProfile(null);
       return;
@@ -111,6 +116,12 @@ export function AuthProvider({ children }) {
   }
 
   async function signIn(email, password) {
+    if (TEST_AUTH_MODE) {
+      const fixtureUser = await signInWithTestFixture(email, password);
+      setUser(fixtureUser);
+      setProfile({ uid: fixtureUser.uid, email: fixtureUser.email, displayName: fixtureUser.displayName, role: fixtureUser.role });
+      return;
+    }
     if (!auth || !db) {
       console.error('signIn: Firebase is not configured. Please check your .env file and ensure VITE_FIREBASE_API_KEY and other Firebase credentials are filled in. See README.md "Setting up Firebase" for instructions.');
       throw new Error(
@@ -143,7 +154,7 @@ export function AuthProvider({ children }) {
   }
 
   async function signOutCurrentDevice() {
-    if (DEV_MODE_ADMIN) {
+    if (TEST_AUTH_MODE) {
       setUser(null);
       setProfile(null);
       return;
@@ -163,7 +174,7 @@ export function AuthProvider({ children }) {
   /** Frees up every OTHER device slot, keeping only this one - lets
    * someone locked out on a new device reclaim access themselves. */
   async function signOutOtherDevices() {
-    if (!user) return;
+    if (TEST_AUTH_MODE || !user) return;
     await updateDoc(doc(db, 'users', user.uid), { sessions: [getDeviceId()] });
   }
 
