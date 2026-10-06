@@ -1,18 +1,19 @@
-# Class
+# Java Classes
 
-> Content placeholder. Add the practical explanation, examples, commands, diagrams, common mistakes, and production notes here.
+A class defines a type's state, behavior, constructors, and access rules. It is a blueprint; an object is a runtime instance. Classes should protect invariants and keep related data and behavior together.
 
-## What to learn
+```java
+final class Money {
+	private final long cents;
+	Money(long cents) { this.cents = cents; }
+	long cents() { return cents; }
+}
+```
 
-- Definition and purpose
-- How it works internally
-- Common implementation patterns
-- Failure modes and troubleshooting
-- Performance and scalability considerations
-- Security considerations
-- Testing strategy
+Prefer cohesive classes, explicit construction, and narrow visibility. `final` prevents subclassing or reassignment, but does not make referenced objects immutable. Use a record for simple data carriers when its value semantics fit.
 
-## References
+**Trade-offs:** inheritance can reuse behavior but couples subclasses to base-class assumptions; composition usually makes dependencies more explicit. Avoid turning classes into unrelated utility buckets.
 
-- Prefer official documentation and primary sources.
-- If this concept is covered in another CodeTrove section, add an internal reference using a new-tab HTML link.
+**Interview points:** distinguish a class from an object and a record, explain identity versus value, and describe how constructors and visibility preserve invariants.
+
+**Related:** [Objects](/content/tree/languages/java/core/oop/object), [Encapsulation](/content/tree/languages/java/core/oop/encapsulation), [Records](/content/tree/languages/java/core/language-basics/records).

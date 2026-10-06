@@ -1,18 +1,16 @@
 # Polymorphism
 
-> Content placeholder. Add the practical explanation, examples, commands, diagrams, common mistakes, and production notes here.
+Polymorphism lets code use a shared type while runtime implementations provide different behavior. Overridden instance methods use dynamic dispatch. Overloading is different: the compiler chooses a method using declared argument types.
 
-## What to learn
+```java
+interface Notifier { void send(String message); }
+void alert(Notifier notifier) { notifier.send("ready"); }
+```
 
-- Definition and purpose
-- How it works internally
-- Common implementation patterns
-- Failure modes and troubleshooting
-- Performance and scalability considerations
-- Security considerations
-- Testing strategy
+This supports interchangeable implementations and avoids type-switch logic. Implementations should honor the shared contract's preconditions and postconditions (the Liskov Substitution Principle). Prefer composition when inheritance would expose fragile assumptions.
 
-## References
+**Trade-offs:** polymorphism improves extensibility but can make control flow harder to trace when implementations proliferate. Use it where variation is real, not to replace every conditional.
 
-- Prefer official documentation and primary sources.
-- If this concept is covered in another CodeTrove section, add an internal reference using a new-tab HTML link.
+**Interview points:** contrast compile-time overloading with runtime overriding and explain substitutability with a concrete example.
+
+**Related:** [Abstraction](/content/tree/languages/java/core/oop/abstraction), [Classes](/content/tree/languages/java/core/oop/class).

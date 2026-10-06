@@ -1,18 +1,13 @@
-# Auditing
+# Spring Data Auditing
 
-> Content placeholder. Add the practical explanation, examples, commands, diagrams, common mistakes, and production notes here.
+Spring Data auditing records metadata such as creation time, last modification time, and the actor responsible for a change. Auditing annotations standardize this metadata across persistence operations.
 
-## What to learn
+Enable auditing and annotate fields with `@CreatedDate`, `@LastModifiedDate`, `@CreatedBy`, or `@LastModifiedBy`. An `AuditorAware` implementation can provide the current actor from the security context.
 
-- Definition and purpose
-- How it works internally
-- Common implementation patterns
-- Failure modes and troubleshooting
-- Performance and scalability considerations
-- Security considerations
-- Testing strategy
+This metadata is not a tamper-proof audit trail. Regulated or security-sensitive history may need append-only records, database controls, retention policy, and independent access monitoring.
 
-## References
+**Pitfalls:** recording an unauthenticated actor, relying on inconsistent clocks, and treating timestamps as a full history of changes.
 
-- Prefer official documentation and primary sources.
-- If this concept is covered in another CodeTrove section, add an internal reference using a new-tab HTML link.
+**Interview points:** distinguish operational metadata from an immutable audit log, and explain how background jobs identify system actors.
+
+**Related:** [Repositories](/content/tree/backend/spring-data/repositories), [Authentication](/content/tree/backend/spring-security/authentication).

@@ -1,18 +1,11 @@
 # Distributed Transactions
 
-> Content placeholder. Add the practical explanation, examples, commands, diagrams, common mistakes, and production notes here.
+A business operation spanning service-owned databases cannot usually rely on one local ACID transaction. Network partitions, timeouts, and independent commits require an explicit consistency and recovery strategy.
 
-## What to learn
+A common approach is a saga: services commit local transactions and communicate with commands or events; failures may trigger retries or compensating actions. Compensation is a new business action, not a time reversal, so it must account for partial completion. A transactional outbox prevents local state from committing while its event is lost.
 
-- Definition and purpose
-- How it works internally
-- Common implementation patterns
-- Failure modes and troubleshooting
-- Performance and scalability considerations
-- Security considerations
-- Testing strategy
+**Trade-offs:** two-phase commit can provide stronger atomicity when all participants support it, but couples coordination and availability. Eventual consistency supports service autonomy but needs idempotent handlers, reconciliation, and sometimes user-visible pending states.
 
-## References
+**Interview points:** walk through success, timeout, duplicate delivery, and compensation. Explain why exactly-once behavior across independent systems is usually an application-level guarantee.
 
-- Prefer official documentation and primary sources.
-- If this concept is covered in another CodeTrove section, add an internal reference using a new-tab HTML link.
+**Related:** [Saga Choreography](/content/tree/interview-prep/microservices/project-flow/saga-pattern/choreography/saga-choreography), [Saga Orchestration](/content/tree/interview-prep/microservices/project-flow/saga-pattern/orchestration/saga-orchestration), [Idempotency](/content/tree/api-integration/resilience/idempotency).

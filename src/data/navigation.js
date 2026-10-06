@@ -14,7 +14,12 @@ const tree = [
       { key: 'java', label: 'Java', children: [
         { key: 'core', label: 'Core', children: [
           { key: 'oop', label: 'Object-Oriented Programming', pages: ['class', 'object', 'encapsulation', 'abstraction', 'polymorphism'] },
-          { key: 'language-basics', label: 'Language Basics', pages: ['generics', 'collections', 'exceptions', 'optional', 'records', 'streams'] },
+          { key: 'language-basics', label: 'Language Basics', pages: [
+            'generics', 'collections', 'exceptions',
+            { key: 'optional', label: 'Optional', contentKey: 'java/optional' },
+            { key: 'records', label: 'Records', contentKey: 'java/records' },
+            { key: 'streams', label: 'Streams', contentKey: 'java/streams' },
+          ] },
           { key: 'concurrency', label: 'Concurrency', pages: ['threads', 'executors', 'completable-future', 'synchronization', 'locks'] },
           { key: 'jvm', label: 'JVM', pages: ['jvm-memory', 'garbage-collection', 'class-loading', 'jvm-tuning'] },
         ]},
@@ -43,7 +48,29 @@ const tree = [
       ]},
       { key: 'sql', label: 'SQL', pages: ['sql-interview-questions', 'joins-and-indexes', 'transactions-and-locking', 'query-tuning'] },
       { key: 'microservices', label: 'Microservices', children: [
-        { key: 'project-flow', label: 'Project Flow & Architecture', pages: ['microservice-project-flow-architecture'] },
+        { key: 'project-flow', label: 'Project Flow & Architecture', pages: ['microservice-project-flow-architecture', 'microservice-architecture-deep-dive'], children: [
+          { key: 'api-gateway-idempotency', label: 'API Gateway & Idempotency', pages: ['api-gateway-idempotency'] },
+          { key: 'eureka-service-discovery', label: 'Eureka Service Discovery (Registry)', children: [
+            { key: 'mechanics-client-lifecycle', label: 'Eureka Server Mechanics & Client Lifecycle', pages: ['eureka-mechanics-client-lifecycle'] },
+            { key: 'resilience-failure-scenarios', label: 'Resilience & Failure Scenarios', pages: ['eureka-resilience-failure-scenarios'] },
+            { key: 'eureka-vs-zookeeper-consul', label: 'Eureka vs Zookeeper / Consul', pages: ['eureka-vs-zookeeper-consul'] },
+          ] },
+          { key: 'zipkin-sleuth', label: 'Zipkin & Sleuth', pages: ['zipkin-sleuth'] },
+          { key: 'kafka', label: 'Kafka', children: [
+            { key: 'topic-partition-broker', label: 'Topic, Partition & Broker Relationship', pages: ['kafka-topic-partition-broker'] },
+            { key: 'producer-consumer-offsets', label: 'Producer & Consumer Mechanics / Offset Management', pages: ['kafka-producer-consumer-offsets'] },
+            { key: 'zookeeper-vs-kraft', label: 'ZooKeeper vs KRaft', pages: ['kafka-zookeeper-vs-kraft'] },
+            { key: 'sync-vs-async', label: 'Synchronous vs Asynchronous Communication', pages: ['kafka-sync-vs-async'] },
+          ] },
+          { key: 'saga-pattern', label: 'Saga Design Pattern', children: [
+            { key: 'choreography', label: 'Choreography (Decentralized)', pages: ['saga-choreography'] },
+            { key: 'orchestration', label: 'Orchestration (Centralized)', pages: ['saga-orchestration'] },
+          ] },
+          { key: 'config-server-vault', label: 'Config Server vs Vault', pages: [
+            { key: 'config-server-vs-vault', label: 'Config Server vs Vault', contentKey: 'interview-prep/microservices/project-flow/config-server-vs-vault/config-server-vs-vault' },
+          ] },
+          { key: 'circuit-breaker-fallback', label: 'Circuit Breaker & Fallback', pages: ['circuit-breaker-fallback'] },
+        ] },
         { key: 'distributed-systems', label: 'Distributed Systems', pages: ['service-discovery', 'config-server-vault', 'circuit-breaker', 'distributed-tracing', 'metrics-observability'] },
         { key: 'messaging', label: 'Messaging', pages: ['kafka', 'kafka-transactions', 'message-brokers'] },
       ]},
@@ -55,7 +82,10 @@ const tree = [
   {
     key: 'backend', label: 'Backend & Spring', children: [
       { key: 'spring', label: 'Spring Framework', pages: ['ioc-di', 'bean-lifecycle', 'application-context', 'aop', 'interceptors', 'filters'] },
-      { key: 'spring-boot', label: 'Spring Boot', pages: ['auto-configuration', 'configuration-properties', 'actuator', 'profiles'] },
+      { key: 'spring-boot', label: 'Spring Boot', pages: [
+        'auto-configuration', 'configuration-properties', 'actuator', 'profiles', 'starters',
+        { key: 'exception-handling', label: 'Exception Handling', contentKey: 'backend/spring-boot/exception-handling' },
+      ] },
       { key: 'spring-web', label: 'Spring Web', pages: ['dispatcher-servlet', 'rest-controllers', 'validation', 'global-exception-handling'] },
       { key: 'spring-security', label: 'Spring Security', pages: ['security-filters', 'authentication', 'authorization', 'preauthorize', 'oauth2-jwt'] },
       { key: 'spring-data', label: 'Spring Data', pages: ['repositories', 'transactions', 'auditing', 'specifications'] },
@@ -67,7 +97,12 @@ const tree = [
       { key: 'api-gateway', label: 'API Gateway', pages: ['gateway-pattern', 'routing', 'authentication-at-gateway', 'gateway-rate-limiting'] },
       { key: 'load-balancing', label: 'Load Balancing', pages: ['load-balancer-basics', 'client-side-load-balancing', 'health-checks'] },
       { key: 'rest', label: 'REST APIs', pages: ['rest-principles', 'http-methods', 'status-codes', 'pagination', 'versioning'] },
-      { key: 'resilience', label: 'Resilience', pages: ['timeouts-retries', 'idempotency', 'rate-limiting', 'dos-protection', 'bulkheads'] },
+      { key: 'resilience', label: 'Resilience', pages: [
+        'timeouts-retries',
+        { key: 'idempotency', label: 'Idempotency', contentKey: 'interview-prep/microservices/project-flow/api-gateway-idempotency/api-gateway-idempotency' },
+        { key: 'rate-limiting', label: 'Rate Limiting', contentKey: 'interview-prep/system-design/rate-limiting' },
+        'dos-protection', 'bulkheads',
+      ] },
       { key: 'documentation', label: 'API Documentation', pages: ['openapi-swagger', 'postman'] },
     ],
   },
@@ -125,7 +160,10 @@ const tree = [
   {
     key: 'architecture', label: 'Architecture & Design', children: [
       { key: 'software-architecture', label: 'Software Architecture', pages: ['layered-architecture', 'hexagonal-architecture', 'clean-architecture', 'modular-monolith'] },
-      { key: 'microservices', label: 'Microservices', pages: ['microservice-boundaries', 'api-composition', 'data-ownership', 'distributed-transactions', 'service-versioning'] },
+      { key: 'microservices', label: 'Microservices', pages: [
+        { key: 'architecture-deep-dive', label: 'Microservice Architecture Deep Dive', contentKey: 'interview-prep/microservices/project-flow/microservice-architecture-deep-dive' },
+        'microservice-boundaries', 'api-composition', 'data-ownership', 'distributed-transactions', 'service-versioning',
+      ] },
       { key: 'design-patterns', label: 'Design Patterns', pages: ['creational-patterns', 'structural-patterns', 'behavioral-patterns', 'enterprise-patterns'] },
       { key: 'system-design', label: 'System Design', pages: ['capacity-planning', 'consistency', 'partitioning', 'sharding', 'disaster-recovery'] },
     ],
@@ -162,7 +200,7 @@ const legacyPlatform = ['text', 'nodejs', 'json', 'jwt', 'git', 'email'].map((ca
     pages: (category?.topics || []).map((item) => ({
       key: item.slug,
       label: item.title,
-      contentKey: `${categoryKey}/${item.slug}`,
+      contentKey: item.contentKey || `${categoryKey}/${item.slug}`,
       keywords: item.tags || [],
     })),
   };

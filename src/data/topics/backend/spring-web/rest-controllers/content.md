@@ -1,18 +1,24 @@
-# Rest Controllers
+# Spring REST Controllers
 
-> Content placeholder. Add the practical explanation, examples, commands, diagrams, common mistakes, and production notes here.
+`@RestController` combines controller registration with response-body semantics. Mapping annotations bind HTTP methods and paths; Spring MVC resolves path variables, query parameters, headers, and request bodies.
 
-## What to learn
+```java
+@RestController
+@RequestMapping("/orders")
+class OrderController {
+	@PostMapping
+	ResponseEntity<OrderView> create(@Valid @RequestBody CreateOrder request) {
+		var order = service.create(request);
+		return ResponseEntity.created(URI.create("/orders/" + order.id()))
+			.body(OrderView.from(order));
+	}
+}
+```
 
-- Definition and purpose
-- How it works internally
-- Common implementation patterns
-- Failure modes and troubleshooting
-- Performance and scalability considerations
-- Security considerations
-- Testing strategy
+Keep controllers thin: map HTTP input to application commands, invoke the use case, and return response DTOs. Avoid exposing persistence entities directly as public API contracts.
 
-## References
+**Pitfalls:** ambiguous routes, unbounded list responses, internal model leakage, and missing authorization at the service boundary.
 
-- Prefer official documentation and primary sources.
-- If this concept is covered in another CodeTrove section, add an internal reference using a new-tab HTML link.
+**Interview points:** explain HTTP status/resource semantics, validation, pagination, and transport DTOs versus domain models.
+
+**Related:** [DispatcherServlet](/content/tree/backend/spring-web/dispatcher-servlet), [Validation](/content/tree/backend/spring-web/validation), [Global Exception Handling](/content/tree/backend/spring-web/global-exception-handling).

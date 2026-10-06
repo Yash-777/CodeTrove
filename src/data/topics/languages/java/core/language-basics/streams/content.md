@@ -1,18 +1,9 @@
 # Streams
 
-> Content placeholder. Add the practical explanation, examples, commands, diagrams, common mistakes, and production notes here.
+Java Streams describe a lazy pipeline of operations over a data source. Intermediate operations such as `filter` and `map` compose transformations; a terminal operation such as `toList` or `reduce` executes the pipeline.
 
-## What to learn
+This navigation entry reuses the existing detailed guide rather than maintaining a duplicate:
 
-- Definition and purpose
-- How it works internally
-- Common implementation patterns
-- Failure modes and troubleshooting
-- Performance and scalability considerations
-- Security considerations
-- Testing strategy
+[Open the Java Streams guide](/content/java/streams)
 
-## References
-
-- Prefer official documentation and primary sources.
-- If this concept is covered in another CodeTrove section, add an internal reference using a new-tab HTML link.
+Prefer ordinary loops when they make mutation, early exit, or complex control flow clearer. Parallel streams use shared runtime resources and are not automatically faster, especially for blocking work.

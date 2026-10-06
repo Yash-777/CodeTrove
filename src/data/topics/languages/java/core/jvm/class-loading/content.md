@@ -1,18 +1,11 @@
-# Class Loading
+# JVM Class Loading
 
-> Content placeholder. Add the practical explanation, examples, commands, diagrams, common mistakes, and production notes here.
+Class loading locates bytecode and creates its runtime `Class` representation. The lifecycle is commonly described as loading, linking (verification, preparation, resolution), and initialization. Initialization runs static initializers under JVM rules.
 
-## What to learn
+Parent delegation asks a parent class loader first, helping protect platform classes. Application servers, plugin systems, and test frameworks may isolate class loaders; identical class names defined by different loaders are distinct runtime types.
 
-- Definition and purpose
-- How it works internally
-- Common implementation patterns
-- Failure modes and troubleshooting
-- Performance and scalability considerations
-- Security considerations
-- Testing strategy
+**Pitfalls:** classpath conflicts, dependency-version conflicts, static initialization cycles, and class-loader leaks from long-lived references to reloadable classes or threads.
 
-## References
+**Interview points:** distinguish loading from initialization and explain class identity as the binary name plus defining class loader.
 
-- Prefer official documentation and primary sources.
-- If this concept is covered in another CodeTrove section, add an internal reference using a new-tab HTML link.
+**Related:** [JVM Memory](/content/tree/languages/java/core/jvm/jvm-memory), [JVM Tuning](/content/tree/languages/java/core/jvm/jvm-tuning).

@@ -1,18 +1,18 @@
-# Aop
+# Spring AOP
 
-> Content placeholder. Add the practical explanation, examples, commands, diagrams, common mistakes, and production notes here.
+Aspect-oriented programming modularizes cross-cutting behavior such as transactions, security checks, and metrics. Spring AOP commonly uses proxies that intercept calls to Spring-managed beans and apply advice selected by a pointcut.
 
-## What to learn
+```java
+@Around("@annotation(MeasureCall)")
+Object measure(ProceedingJoinPoint call) throws Throwable {
+	long start = System.nanoTime();
+	try { return call.proceed(); }
+	finally { record(System.nanoTime() - start); }
+}
+```
 
-- Definition and purpose
-- How it works internally
-- Common implementation patterns
-- Failure modes and troubleshooting
-- Performance and scalability considerations
-- Security considerations
-- Testing strategy
+Proxy-based AOP applies at proxy boundaries. Self-invocation through `this` typically bypasses the proxy, and final/private methods may not be advised depending on proxy type. Keep advice narrow and avoid hiding business-critical flow in broad aspects.
 
-## References
+**Interview points:** distinguish join points, pointcuts, advice, and proxying; explain why self-invocation bypasses advice; identify when compile-time or bytecode weaving differs from Spring proxy AOP.
 
-- Prefer official documentation and primary sources.
-- If this concept is covered in another CodeTrove section, add an internal reference using a new-tab HTML link.
+**Related:** [Transactions](/content/tree/backend/spring-data/transactions), [Interceptors](/content/tree/backend/spring/interceptors).

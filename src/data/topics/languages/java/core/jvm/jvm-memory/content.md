@@ -1,18 +1,11 @@
-# Jvm Memory
+# JVM Runtime Memory
 
-> Content placeholder. Add the practical explanation, examples, commands, diagrams, common mistakes, and production notes here.
+The JVM specification defines runtime areas rather than one undifferentiated heap. Each thread has a JVM stack and program counter; objects are typically allocated in the shared heap. HotSpot commonly stores class metadata in Metaspace and compiled code in a code cache.
 
-## What to learn
+`OutOfMemoryError` can come from heap, Metaspace, direct buffers, or native thread resources. Increasing `-Xmx` is not a universal fix and can exceed a container's memory limit when native allocations are ignored.
 
-- Definition and purpose
-- How it works internally
-- Common implementation patterns
-- Failure modes and troubleshooting
-- Performance and scalability considerations
-- Security considerations
-- Testing strategy
+**Diagnosis:** correlate heap usage and allocation rate with GC pauses, inspect heap dumps for retaining paths, and measure native memory and thread counts separately.
 
-## References
+**Interview points:** distinguish stack and heap, explain reachability from GC roots, and outline evidence-driven diagnosis of memory pressure.
 
-- Prefer official documentation and primary sources.
-- If this concept is covered in another CodeTrove section, add an internal reference using a new-tab HTML link.
+**Related:** [Garbage Collection](/content/tree/languages/java/core/jvm/garbage-collection), [Heap Dumps](/content/tree/languages/java/advanced/performance/heap-dumps).

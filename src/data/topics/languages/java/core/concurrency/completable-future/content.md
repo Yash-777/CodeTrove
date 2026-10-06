@@ -1,18 +1,15 @@
-# Completable Future
+# CompletableFuture
 
-> Content placeholder. Add the practical explanation, examples, commands, diagrams, common mistakes, and production notes here.
+`CompletableFuture` represents a result that may arrive later and composes asynchronous stages. Use `thenApply` to transform a value, `thenCompose` to flatten another asynchronous stage, and `thenCombine` to join independent work.
 
-## What to learn
+```java
+return loadUser(id).thenCombine(loadOrders(id), Profile::new);
+```
 
-- Definition and purpose
-- How it works internally
-- Common implementation patterns
-- Failure modes and troubleshooting
-- Performance and scalability considerations
-- Security considerations
-- Testing strategy
+Async methods without an explicit executor use the common fork-join pool. Provide a dedicated bounded executor for blocking I/O. Handle errors with `exceptionally`, `handle`, or `whenComplete` based on whether the stage recovers, transforms, or only observes. Apply deadlines deliberately; cancellation may not stop an underlying remote call.
 
-## References
+**Pitfalls:** blocking with `join()`, hidden common-pool contention, lost context, and converting failures into misleading defaults.
 
-- Prefer official documentation and primary sources.
-- If this concept is covered in another CodeTrove section, add an internal reference using a new-tab HTML link.
+**Interview points:** compare `thenApply` and `thenCompose`, explain error propagation, and discuss bounding concurrency and enforcing deadlines.
+
+**Related:** [Executors](/content/tree/languages/java/core/concurrency/executors), [Threads](/content/tree/languages/java/core/concurrency/threads).

@@ -44,6 +44,21 @@ export default function SignInPage() {
     <div className="auth-page">
       <form className="auth-card" onSubmit={handleSubmit}>
         <h1>Sign in</h1>
+        {import.meta.env.MODE === 'test' && import.meta.env.DEV && (
+          <section className="auth-card__test-users" aria-label="Development test accounts">
+            <strong>Local test accounts · UI only</strong>
+            <p>Choose an account to test role-based navigation:</p>
+            {[
+              { label: 'Yash-777', email: 'yash.777@codetrove.dev', password: 'IIayuX8v%Mci%CSf', role: 'admin' },
+              { label: 'Yash-Editor', email: 'yash.editor@codetrove.dev', password: 'Editor', role: 'editor' },
+              { label: 'Yash-Viewer', email: 'yash.viewer@codetrove.dev', password: 'Viewer', role: 'viewer' },
+            ].map((account) => (
+              <button key={account.email} type="button" className="auth-card__test-user" onClick={() => { setEmail(account.email); setPassword(account.password); }}>
+                <span><b>{account.label}</b><small>{account.email}</small></span><span className={`auth-card__role auth-card__role--${account.role}`}>{account.role}</span>
+              </button>
+            ))}
+          </section>
+        )}
 
         <label className="field">
           <span>Email</span>

@@ -1,18 +1,11 @@
-# Timeouts Retries
+# Timeouts and Retries
 
-> Content placeholder. Add the practical explanation, examples, commands, diagrams, common mistakes, and production notes here.
+A timeout bounds how long a caller waits for a downstream operation. Set connection and response deadlines within an end-to-end request deadline so work cannot consume capacity indefinitely.
 
-## What to learn
+Retry only plausibly transient failures, with a bounded attempt count, exponential backoff, and jitter. Respect the remaining deadline and avoid retries at every layer, which multiply traffic during outages. A retry is safe only when the operation is idempotent or protected by an idempotency mechanism.
 
-- Definition and purpose
-- How it works internally
-- Common implementation patterns
-- Failure modes and troubleshooting
-- Performance and scalability considerations
-- Security considerations
-- Testing strategy
+**Pitfalls:** no timeout, synchronized retry bursts, retrying validation failures, and retrying after a write may have committed but its response was lost.
 
-## References
+**Interview points:** explain deadline propagation, retry budgets, backoff, and the relationship between retries, idempotency, circuit breakers, and load shedding.
 
-- Prefer official documentation and primary sources.
-- If this concept is covered in another CodeTrove section, add an internal reference using a new-tab HTML link.
+**Related:** [Idempotency](/content/tree/api-integration/resilience/idempotency), [Rate Limiting](/content/tree/api-integration/resilience/rate-limiting), [Circuit Breaker](/content/tree/distributed-systems/resilience/circuit-breaker).

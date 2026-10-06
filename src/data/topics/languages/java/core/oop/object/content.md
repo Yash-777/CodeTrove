@@ -1,18 +1,18 @@
-# Object
+# Java Objects
 
-> Content placeholder. Add the practical explanation, examples, commands, diagrams, common mistakes, and production notes here.
+An object is a runtime instance with identity, state, and behavior. A reference variable refers to an object; it is not the object itself. Multiple references can alias one mutable object, so mutation through one reference is visible through the others.
 
-## What to learn
+```java
+var first = new StringBuilder("order");
+var alias = first;
+alias.append("-42");
+System.out.println(first); // order-42
+```
 
-- Definition and purpose
-- How it works internally
-- Common implementation patterns
-- Failure modes and troubleshooting
-- Performance and scalability considerations
-- Security considerations
-- Testing strategy
+Use `equals` for logical equality and implement `hashCode` consistently for value types. `==` compares reference identity for objects. Objects are generally heap allocated, although JIT optimizations can eliminate some allocations when safe.
 
-## References
+**Pitfalls:** aliasing can leak mutable state and create race conditions when objects are shared across threads. Prefer immutable values or defensive copies at API boundaries.
 
-- Prefer official documentation and primary sources.
-- If this concept is covered in another CodeTrove section, add an internal reference using a new-tab HTML link.
+**Interview points:** explain reference equality versus value equality, object identity, and how shared mutability affects concurrency.
+
+**Related:** [Classes](/content/tree/languages/java/core/oop/class), [Encapsulation](/content/tree/languages/java/core/oop/encapsulation), [JVM Memory](/content/tree/languages/java/core/jvm/jvm-memory).

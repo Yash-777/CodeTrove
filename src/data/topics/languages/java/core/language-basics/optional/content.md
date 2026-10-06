@@ -1,18 +1,9 @@
 # Optional
 
-> Content placeholder. Add the practical explanation, examples, commands, diagrams, common mistakes, and production notes here.
+`Optional<T>` represents a value that may be absent, making absence explicit in a return type. Use operations such as `map`, `flatMap`, `filter`, and `orElseThrow` to compose handling without unchecked null dereferences.
 
-## What to learn
+This navigation entry reuses the existing detailed guide rather than maintaining a duplicate:
 
-- Definition and purpose
-- How it works internally
-- Common implementation patterns
-- Failure modes and troubleshooting
-- Performance and scalability considerations
-- Security considerations
-- Testing strategy
+[Open the Java Optional guide](/content/java/optional)
 
-## References
-
-- Prefer official documentation and primary sources.
-- If this concept is covered in another CodeTrove section, add an internal reference using a new-tab HTML link.
+Prefer empty collections for collection results, and avoid using `Optional` as a field or method parameter without a specific serialization/API design reason.

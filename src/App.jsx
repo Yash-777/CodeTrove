@@ -35,6 +35,7 @@ export default function App() {
           <Route path="/content/:categoryKey/:topicSlug" element={<TopicPage />} />
           <Route path="/content/:sectionKey/:topicSlug/:subtopicSlug" element={<TopicPage />} />
           <Route path="/content/:sectionKey/:topicSlug/:subtopicSlug/:pageSlug" element={<TopicPage />} />
+          <Route path="/content/tree/:treeSection?/:treeTopic?/:treeSubtopic?/:treePage?" element={<NavigationPage />} />
           <Route path="/content/tree/*" element={<NavigationPage />} />
           <Route path="/learn/practice" element={<PracticePage />} />
           <Route path="/create-page" element={<RequireRole allow={['admin', 'editor']}><NewTopicPage /></RequireRole>} />

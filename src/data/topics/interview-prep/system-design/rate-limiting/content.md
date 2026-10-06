@@ -1,27 +1,22 @@
 # Rate Limiting
 
-> Content placeholder: expand this page with project-specific examples, trade-offs, diagrams, and production incidents.
+Rate limiting bounds request volume over time for a defined key, such as user, API key, tenant, IP, or route. It protects capacity, controls noisy neighbors, limits abuse, and can enforce quotas. It complements authentication and overload protection rather than replacing them.
 
-<details>
-<summary>Interview Asking question conceptual wise</summary>
+## Algorithms and placement
 
-### Question
-What is **Rate Limiting**, why is it used in a production system, and what trade-offs should a senior engineer discuss?
+- **Fixed window:** a simple counter per interval; it permits bursts at window boundaries.
+- **Sliding window:** smooths boundary behavior, with more state or computation.
+- **Token bucket:** tokens refill at a configured rate; a bounded bucket permits controlled bursts.
+- **Leaky bucket:** releases work at a steadier rate and can shape queued traffic.
 
-### Answer
-Add the concise definition first, then explain the request/data flow, failure modes, scalability implications, security considerations, observability, testing strategy, and a concrete production example.
+Enforce coarse limits at the gateway and domain quotas where identity and business context are known. In a multi-instance deployment, shared state (often Redis with atomic operations) or partitioned keys are needed for a global limit. An in-memory limiter is only per instance.
 
-> **Note — what the interviewer is expecting:**
-> Explain the concept from first principles, connect it to a real system, identify trade-offs, and describe how you would diagnose or improve it rather than only giving a textbook definition.
+## HTTP behavior and operations
 
-</details>
+Return `429 Too Many Requests` for caller-specific quota exhaustion, optionally with `Retry-After` and documented rate-limit headers. Choose fail-open or fail-closed behavior if the limiter store is unavailable based on abuse risk and availability goals. Bound key cardinality and monitor allowed/rejected counts, latency, hot keys, and store errors.
 
-## Related references
+**Pitfalls:** trusting spoofable IP headers, retrying immediately and worsening overload, inconsistent limits across replicas, and applying one quota to unrelated tenants.
 
-- Add official documentation links and architecture diagrams here. Prefer primary sources such as Spring documentation, Apache Kafka documentation, Java documentation, AWS documentation, or the relevant project documentation.
-- If the same concept is covered elsewhere in CodeTrove, link to the canonical page with a new-tab HTML link so the interview context stays open.
+**Interview points:** clarify key and scope, estimate state and throughput, explain burst semantics, distributed coordination, failure mode, and client backoff.
 
-## Notes
-
-- Add diagrams/screenshots only from sources that permit reuse or link to the original documentation.
-- Add project-specific questions and answers below this template.
+**Related:** [API Gateway & Idempotency](/content/tree/interview-prep/microservices/project-flow/api-gateway-idempotency/api-gateway-idempotency), [Service Discovery](/content/tree/distributed-systems/service-discovery/service-registry), [Idempotency](/content/tree/api-integration/resilience/idempotency).

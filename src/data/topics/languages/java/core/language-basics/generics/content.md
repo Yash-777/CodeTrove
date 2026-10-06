@@ -1,18 +1,18 @@
-# Generics
+# Java Generics
 
-> Content placeholder. Add the practical explanation, examples, commands, diagrams, common mistakes, and production notes here.
+Generics parameterize classes, interfaces, and methods to provide compile-time type safety and reduce casts. Java implements most generics with type erasure, so parameterized type arguments are generally unavailable at runtime.
 
-## What to learn
+```java
+static <T> T first(List<T> values) {
+	if (values.isEmpty()) throw new NoSuchElementException();
+	return values.get(0);
+}
+```
 
-- Definition and purpose
-- How it works internally
-- Common implementation patterns
-- Failure modes and troubleshooting
-- Performance and scalability considerations
-- Security considerations
-- Testing strategy
+Use `? extends T` when reading from a producer and `? super T` when writing to a consumer (PECS). `List<Integer>` is not a subtype of `List<Number>`, despite `Integer` extending `Number`.
 
-## References
+**Pitfalls:** raw types, unchecked casts, generic arrays, and expecting `new T()` or `instanceof List<String>` to work after erasure.
 
-- Prefer official documentation and primary sources.
-- If this concept is covered in another CodeTrove section, add an internal reference using a new-tab HTML link.
+**Interview points:** explain erasure, bounds, wildcards, and why `List<? extends Number>` can safely produce `Number` values but cannot accept an arbitrary `Number`.
+
+**Related:** [Collections](/content/tree/languages/java/core/language-basics/collections), [Streams](/content/tree/languages/java/core/language-basics/streams).

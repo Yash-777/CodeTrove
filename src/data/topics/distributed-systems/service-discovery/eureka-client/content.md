@@ -1,18 +1,15 @@
 # Eureka Client
 
-> Content placeholder. Add the practical explanation, examples, commands, diagrams, common mistakes, and production notes here.
+A Eureka client registers an instance, renews its lease, and fetches registry information. With Spring Cloud LoadBalancer, callers can use a logical service ID and choose an instance from the client's registry view.
 
-## What to learn
+```text
+orders -> resolve PAYMENT-SERVICE -> select instance -> HTTP call
+```
 
-- Definition and purpose
-- How it works internally
-- Common implementation patterns
-- Failure modes and troubleshooting
-- Performance and scalability considerations
-- Security considerations
-- Testing strategy
+Discovery is not resilience. Configure connect/read timeouts, bounded retries for safe operations, circuit breaking where useful, and observability for resolution and call failures. A cached registry can contain an instance that has already failed.
 
-## References
+**Pitfalls:** treating registration as readiness, retrying non-idempotent requests without a policy, and allowing unbounded attempts per client.
 
-- Prefer official documentation and primary sources.
-- If this concept is covered in another CodeTrove section, add an internal reference using a new-tab HTML link.
+**Interview points:** distinguish naming from load balancing, explain client-side caching, and describe behavior when the registry or chosen instance is unavailable.
+
+**Related:** [Eureka Server](/content/tree/distributed-systems/service-discovery/eureka-server), [Service Registry](/content/tree/distributed-systems/service-discovery/service-registry), [Rate Limiting](/content/tree/api-integration/resilience/rate-limiting).
