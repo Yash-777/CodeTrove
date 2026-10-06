@@ -1,18 +1,20 @@
-# Locks
+# Explicit Locks
 
-> Content placeholder. Add the practical explanation, examples, commands, diagrams, common mistakes, and production notes here.
+`java.util.concurrent.locks` offers timed and interruptible acquisition, optional fairness, and multiple conditions. `ReentrantLock` must be released in a `finally` block.
 
-## What to learn
+```java
+lock.lock();
+try {
+	updateSharedState();
+} finally {
+	lock.unlock();
+}
+```
 
-- Definition and purpose
-- How it works internally
-- Common implementation patterns
-- Failure modes and troubleshooting
-- Performance and scalability considerations
-- Security considerations
-- Testing strategy
+Use an explicit lock when timed acquisition, interruptibility, or multiple wait conditions materially help. For simple mutual exclusion, `synchronized` is less error-prone and releases automatically on exceptions. Fair locks can reduce starvation in some cases but may reduce throughput.
 
-## References
+**Pitfalls:** forgotten unlocks, inconsistent lock order, and awaiting a condition without checking its predicate in a loop. Consider atomics, semaphores, or concurrent collections when their semantics fit better.
 
-- Prefer official documentation and primary sources.
-- If this concept is covered in another CodeTrove section, add an internal reference using a new-tab HTML link.
+**Interview points:** compare monitors and `ReentrantLock`, explain `tryLock`, and discuss deadlock prevention with lock ordering or timeouts.
+
+**Related:** [Synchronization](/content/tree/languages/java/core/concurrency/synchronization), [Executors](/content/tree/languages/java/core/concurrency/executors).

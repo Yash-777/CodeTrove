@@ -1,18 +1,9 @@
 # Records
 
-> Content placeholder. Add the practical explanation, examples, commands, diagrams, common mistakes, and production notes here.
+Java records are concise, shallowly immutable data carriers. The compiler derives a canonical constructor, accessors, `equals`, `hashCode`, and `toString` from the record components. A record is implicitly final and cannot extend another class.
 
-## What to learn
+This navigation entry reuses the existing detailed guide rather than maintaining a duplicate:
 
-- Definition and purpose
-- How it works internally
-- Common implementation patterns
-- Failure modes and troubleshooting
-- Performance and scalability considerations
-- Security considerations
-- Testing strategy
+[Open the Java Records guide](/content/java/records)
 
-## References
-
-- Prefer official documentation and primary sources.
-- If this concept is covered in another CodeTrove section, add an internal reference using a new-tab HTML link.
+Choose a normal class when the type needs mutable state, inheritance, or behavior beyond a value-oriented data carrier. Mutable objects inside record components are not made immutable automatically.

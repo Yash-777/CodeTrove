@@ -10,6 +10,7 @@ const emailTopics = [
     slug: 'info',
     title: 'Email basics',
     summary: 'Overview of email protocols, ports, hosts, domains, and mail delivery flow.',
+    contentKey: 'email/content_info.md',
     tags: ['email', 'smtp', 'imap', 'pop3'],
     gifUrl: null,
     relatedTool: null,

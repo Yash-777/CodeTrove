@@ -1,18 +1,19 @@
-# Exceptions
+# Java Exception Handling
 
-> Content placeholder. Add the practical explanation, examples, commands, diagrams, common mistakes, and production notes here.
+Exceptions represent failures outside the normal result flow. Checked exceptions must be caught or declared; unchecked exceptions often represent programming errors or failures callers cannot reasonably recover from at the current layer.
 
-## What to learn
+```java
+try (var reader = Files.newBufferedReader(path)) {
+	return reader.readLine();
+} catch (IOException e) {
+	throw new ConfigReadException("Unable to read configuration", e);
+}
+```
 
-- Definition and purpose
-- How it works internally
-- Common implementation patterns
-- Failure modes and troubleshooting
-- Performance and scalability considerations
-- Security considerations
-- Testing strategy
+Use try-with-resources for `AutoCloseable` values. Catch only when you can recover, add useful context, or map the error at a boundary. Preserve the original cause and avoid exposing internal exception details to API clients.
 
-## References
+**Pitfalls:** broad catches, swallowed failures, lost causes, resource leaks, and using exceptions for ordinary branching.
 
-- Prefer official documentation and primary sources.
-- If this concept is covered in another CodeTrove section, add an internal reference using a new-tab HTML link.
+**Interview points:** compare checked and unchecked exceptions; explain propagation, suppressed exceptions, and the difference between recovery and translating an error.
+
+**Related:** [Global Exception Handling](/content/tree/backend/spring-web/global-exception-handling), [Transactions](/content/tree/backend/spring-data/transactions).

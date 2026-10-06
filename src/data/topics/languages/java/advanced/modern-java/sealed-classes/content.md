@@ -1,18 +1,17 @@
 # Sealed Classes
 
-> Content placeholder. Add the practical explanation, examples, commands, diagrams, common mistakes, and production notes here.
+Sealed classes and interfaces restrict which types may extend or implement them. The permits list makes a domain hierarchy explicit and enables exhaustive pattern matching when all permitted cases are known.
 
-## What to learn
+```java
+sealed interface Result permits Success, Failure {}
+record Success(String value) implements Result {}
+record Failure(String message) implements Result {}
+```
 
-- Definition and purpose
-- How it works internally
-- Common implementation patterns
-- Failure modes and troubleshooting
-- Performance and scalability considerations
-- Security considerations
-- Testing strategy
+Permitted implementations must follow Java's `final`, `sealed`, or `non-sealed` rules. Sealing is useful for closed domain models, protocol states, and compiler-checked case handling; it is less suitable for extension points intended for external implementations.
 
-## References
+**Trade-offs:** a closed set improves safety but makes adding implementations an intentional API change. Consider module and package constraints when defining permitted subclasses.
 
-- Prefer official documentation and primary sources.
-- If this concept is covered in another CodeTrove section, add an internal reference using a new-tab HTML link.
+**Interview points:** compare sealed types with enums and open interfaces, and explain how sealed hierarchies help exhaustive switches.
+
+**Related:** [Pattern Matching](/content/tree/languages/java/advanced/modern-java/pattern-matching), [Polymorphism](/content/tree/languages/java/core/oop/polymorphism).

@@ -1,18 +1,11 @@
-# Application Context
+# Spring ApplicationContext
 
-> Content placeholder. Add the practical explanation, examples, commands, diagrams, common mistakes, and production notes here.
+`ApplicationContext` is Spring's central container abstraction. It builds and wires beans, resolves dependencies, publishes events, exposes resources and environment properties, and integrates lifecycle and post-processing features.
 
-## What to learn
+Applications usually let Spring Boot create the context, while tests may create a smaller context with selected configuration. Context refresh performs configuration processing and singleton initialization, so expensive initialization can affect startup time.
 
-- Definition and purpose
-- How it works internally
-- Common implementation patterns
-- Failure modes and troubleshooting
-- Performance and scalability considerations
-- Security considerations
-- Testing strategy
+**Pitfalls:** using the context as a service locator hides dependencies; creating many test contexts can slow suites; and static access to the container complicates lifecycle and isolation.
 
-## References
+**Interview points:** explain how component scanning and configuration register beans, how dependency resolution occurs, and what happens during refresh at a high level.
 
-- Prefer official documentation and primary sources.
-- If this concept is covered in another CodeTrove section, add an internal reference using a new-tab HTML link.
+**Related:** [IoC / DI](/content/tree/backend/spring/ioc-di), [Bean Lifecycle](/content/tree/backend/spring/bean-lifecycle), [Spring Boot Auto-Configuration](/content/tree/backend/spring-boot/auto-configuration).

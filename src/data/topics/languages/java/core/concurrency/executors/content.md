@@ -1,18 +1,19 @@
-# Executors
+# Executors and Thread Pools
 
-> Content placeholder. Add the practical explanation, examples, commands, diagrams, common mistakes, and production notes here.
+Executors separate task submission from thread creation and lifecycle. A bounded pool limits concurrent work; an unbounded queue can turn overload into rising latency and memory pressure.
 
-## What to learn
+```java
+ExecutorService pool = new ThreadPoolExecutor(
+	8, 16, 30, TimeUnit.SECONDS,
+	new ArrayBlockingQueue<>(500),
+	new ThreadPoolExecutor.CallerRunsPolicy()
+);
+```
 
-- Definition and purpose
-- How it works internally
-- Common implementation patterns
-- Failure modes and troubleshooting
-- Performance and scalability considerations
-- Security considerations
-- Testing strategy
+Size pools for workload and downstream capacity. CPU-bound tasks often start near available processors; blocking I/O can need more concurrency, constrained by databases and remote services. Define rejection behavior, metrics, context propagation, and graceful shutdown. Separate pools can isolate unrelated workloads.
 
-## References
+**Trade-offs:** caller-runs supplies backpressure but may add latency to request threads. Larger pools help only until contention or downstream saturation dominates.
 
-- Prefer official documentation and primary sources.
-- If this concept is covered in another CodeTrove section, add an internal reference using a new-tab HTML link.
+**Interview points:** explain queueing, saturation, rejection, sizing, and how to monitor queue depth and task wait time.
+
+**Related:** [Threads](/content/tree/languages/java/core/concurrency/threads), [CompletableFuture](/content/tree/languages/java/core/concurrency/completable-future).

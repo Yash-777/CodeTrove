@@ -1,18 +1,18 @@
-# Auto Configuration
+# Spring Boot Auto-Configuration
 
-> Content placeholder. Add the practical explanation, examples, commands, diagrams, common mistakes, and production notes here.
+Spring Boot auto-configuration conditionally contributes beans based on the classpath, existing beans, and environment. It reduces repetitive setup while remaining overrideable by application configuration.
 
-## What to learn
+```java
+@AutoConfiguration
+@ConditionalOnClass(DataSource.class)
+@ConditionalOnMissingBean(DataSource.class)
+class DataSourceAutoConfiguration { /* defaults */ }
+```
 
-- Definition and purpose
-- How it works internally
-- Common implementation patterns
-- Failure modes and troubleshooting
-- Performance and scalability considerations
-- Security considerations
-- Testing strategy
+Conditions are evaluated during context configuration. When behavior is unexpected, inspect the condition evaluation report, dependency graph, active properties, and user-defined beans before adding another override. Auto-configuration is not magic: it is ordinary configuration guarded by conditions.
 
-## References
+**Pitfalls:** accidental dependency changes activating configuration, bean ambiguity, and overriding defaults without understanding their conditions.
 
-- Prefer official documentation and primary sources.
-- If this concept is covered in another CodeTrove section, add an internal reference using a new-tab HTML link.
+**Interview points:** explain conditional configuration, starter dependencies versus auto-configuration, and how to diagnose why a bean was or was not created.
+
+**Related:** [Starters](/content/tree/backend/spring-boot/starters), [ApplicationContext](/content/tree/backend/spring/application-context), [Configuration Properties](/content/tree/backend/spring-boot/configuration-properties).
