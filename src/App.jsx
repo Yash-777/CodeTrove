@@ -1,4 +1,12 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+/**
+ * src/App.jsx
+ * ------------------------------------------------------------------
+ * Main app router using HashRouter for GitHub Pages compatibility.
+ * HashRouter uses URL hashes (#/route) instead of history API,
+ * making it compatible with static GitHub Pages hosting.
+ */
+
+import { HashRouter, Routes, Route } from 'react-router-dom';
 import AppLayout from './layout/AppLayout.jsx';
 import Dashboard from './pages/Dashboard.jsx';
 import CategoryPage from './pages/content/CategoryPage.jsx';
@@ -27,7 +35,7 @@ const ANY_LOGGED_IN = ['admin', 'editor', 'viewer'];
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <HashRouter>
       <Routes>
         <Route element={<AppLayout />}>
           <Route path="/" element={<Dashboard />} />
@@ -59,6 +67,6 @@ export default function App() {
           <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>
-    </BrowserRouter>
+    </HashRouter>
   );
 }
