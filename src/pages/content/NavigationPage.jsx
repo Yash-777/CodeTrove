@@ -5,7 +5,13 @@ import MarkdownContent from '../../components/MarkdownContent.jsx';
 import './ContentPages.css';
 
 export default function NavigationPage() {
-  const { '*': pagePath = '' } = useParams();
+  const params = useParams();
+  const pagePath = params['*'] || [
+    params.treeSection,
+    params.treeTopic,
+    params.treeSubtopic,
+    params.treePage,
+  ].filter(Boolean).join('/');
   const page = getNavigationPage(pagePath);
 
   if (!page) {

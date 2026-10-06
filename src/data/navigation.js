@@ -66,7 +66,9 @@ const tree = [
             { key: 'choreography', label: 'Choreography (Decentralized)', pages: ['saga-choreography'] },
             { key: 'orchestration', label: 'Orchestration (Centralized)', pages: ['saga-orchestration'] },
           ] },
-          { key: 'config-server-vault', label: 'Config Server vs Vault', pages: ['config-server-vs-vault'] },
+          { key: 'config-server-vault', label: 'Config Server vs Vault', pages: [
+            { key: 'config-server-vs-vault', label: 'Config Server vs Vault', contentKey: 'interview-prep/microservices/project-flow/config-server-vs-vault/config-server-vs-vault' },
+          ] },
           { key: 'circuit-breaker-fallback', label: 'Circuit Breaker & Fallback', pages: ['circuit-breaker-fallback'] },
         ] },
         { key: 'distributed-systems', label: 'Distributed Systems', pages: ['service-discovery', 'config-server-vault', 'circuit-breaker', 'distributed-tracing', 'metrics-observability'] },
@@ -198,7 +200,7 @@ const legacyPlatform = ['text', 'nodejs', 'json', 'jwt', 'git', 'email'].map((ca
     pages: (category?.topics || []).map((item) => ({
       key: item.slug,
       label: item.title,
-      contentKey: `${categoryKey}/${item.slug}`,
+      contentKey: item.contentKey || `${categoryKey}/${item.slug}`,
       keywords: item.tags || [],
     })),
   };
