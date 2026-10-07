@@ -62,7 +62,7 @@ export default function SignInPage() {
 
         <label className="field">
           <span>Email</span>
-          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required placeholder="example@codetrove.com" />
         </label>
 
         <label className="field">
