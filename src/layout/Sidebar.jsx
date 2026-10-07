@@ -30,8 +30,12 @@ function pillarForPath(pathname) {
   return 'learn';
 }
 
-function nodeHasContent(node) {
+function nodeHasChildren(node) {
   return (node.children?.length || 0) > 0 || (node.pages?.length || 0) > 0;
+}
+
+function nodeHasContent(node) {
+  return node.hasContent;
 }
 
 export default function Sidebar({ open }) {
@@ -65,11 +69,23 @@ export default function Sidebar({ open }) {
   }
 
   function isNodeActive(node) {
-    return location.pathname.startsWith(`/content/tree/${node.path}/`);
+    return isActivePath(node.path) || location.pathname.startsWith(`/content/tree/${node.path}/`);
   }
 
   function toggleNode(node) {
     setExpanded((previous) => ({ ...previous, [node.path]: !(previous[node.path] ?? isNodeActive(node)) }));
+  }
+
+  function handleNodeClick(node) {
+    const hasContent = nodeHasContent(node);
+    const hasChildren = nodeHasChildren(node);
+
+    if (hasContent) {
+      navigate(`/content/tree/${node.path}`);
+    }
+    if (hasChildren) {
+      toggleNode(node);
+    }
   }
 
   function renderPage(page) {
@@ -89,6 +105,7 @@ export default function Sidebar({ open }) {
 
   function renderNode(node, depth = 0) {
     const hasContent = nodeHasContent(node);
+    const hasChildren = nodeHasChildren(node);
     const active = isNodeActive(node);
     const isOpen = expanded[node.path] ?? active;
 
@@ -97,18 +114,15 @@ export default function Sidebar({ open }) {
         <button
           type="button"
           className={`sidebar__tree-header ${depth === 0 ? 'sidebar__tree-header--topic' : ''} ${active ? 'sidebar__tree-header--active' : ''}`}
-          onClick={() => {
-            if (!hasContent) return;
-            toggleNode(node);
-          }}
-          aria-expanded={hasContent ? isOpen : undefined}
+          onClick={() => handleNodeClick(node)}
+          aria-expanded={hasChildren ? isOpen : undefined}
         >
           {depth === 0 && <span className="sidebar__dot" />}
           <span className="sidebar__tree-title">{node.label}</span>
-          {hasContent && <span className={`sidebar__chevron ${isOpen ? 'sidebar__chevron--open' : ''}`}>›</span>}
+          {hasChildren && <span className={`sidebar__chevron ${isOpen ? 'sidebar__chevron--open' : ''}`}>›</span>}
         </button>
 
-        {isOpen && hasContent && (
+        {isOpen && hasChildren && (
           <ul className="sidebar__tree-list">
             {(node.children || []).map((child) => renderNode(child, depth + 1))}
             {(node.pages || []).map(renderPage)}
@@ -210,19 +224,21 @@ export default function Sidebar({ open }) {
             <>
               {NAVIGATION_TREE.map((section) => {
                 const active = isNodeActive(section);
+                const hasContent = nodeHasContent(section);
+                const hasChildren = nodeHasChildren(section);
                 const isOpen = expanded[section.path] ?? active;
                 return (
                   <div key={section.path} className="sidebar__section">
                     <button
                       type="button"
                       className="sidebar__section-toggle"
-                      onClick={() => toggleNode(section)}
-                      aria-expanded={isOpen}
+                      onClick={() => handleNodeClick(section)}
+                      aria-expanded={hasChildren ? isOpen : undefined}
                     >
                       <span className="sidebar__section-label">{section.label}</span>
-                      <span className={`sidebar__chevron ${isOpen ? 'sidebar__chevron--open' : ''}`}>›</span>
+                      {hasChildren && <span className={`sidebar__chevron ${isOpen ? 'sidebar__chevron--open' : ''}`}>›</span>}
                     </button>
-                    {isOpen && (
+                    {isOpen && hasChildren && (
                       <ul className="sidebar__tree-list sidebar__tree-list--root">
                         {(section.children || []).map((child) => renderNode(child, 0))}
                         {(section.pages || []).map(renderPage)}
