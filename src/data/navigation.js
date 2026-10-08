@@ -28,6 +28,30 @@ const tree = [
         { key: 'language', label: 'Language', pages: {'types': 'Types', 'scope-closures': 'Scope Closures', 'prototypes': 'Prototypes', 'modules': 'Modules', 'promises': 'Promises', 'event-loop': 'Event Loop'} },
         { key: 'advanced', label: 'Advanced', pages: {'async-programming': 'Async Programming', 'memory-management': 'Memory Management', 'performance': 'Performance', 'web-workers': 'Web Workers'} },
       ]},
+      { key: 'kotlin', label: 'Kotlin', children: [
+        { key: 'language-basics', label: 'Language Basics', pages: {
+          'syntax': 'Syntax',
+          'variables-types': 'Variables & Types',
+          'null-safety': 'Null Safety',
+          'functions': 'Functions',
+          'control-flow': 'Control Flow',
+          'collections': 'Collections',
+        } },
+        { key: 'object-oriented', label: 'Object-Oriented Programming', pages: {
+          'classes-objects': 'Classes & Objects',
+          'inheritance': 'Inheritance',
+          'interfaces': 'Interfaces',
+          'data-classes': 'Data Classes',
+          'sealed-classes': 'Sealed Classes',
+        } },
+        { key: 'advanced', label: 'Advanced', pages: {
+          'extension-functions': 'Extension Functions',
+          'generics': 'Generics',
+          'coroutines': 'Coroutines',
+          'flow': 'Flow',
+          'delegation': 'Delegation',
+        } },
+      ]},
       { key: 'typescript', label: 'TypeScript', pages: {'types-generics': 'Types Generics', 'interfaces': 'Interfaces', 'utility-types': 'Utility Types', 'tsconfig': 'Tsconfig'} },
       { key: 'web', label: 'Web', children: [
         { key: 'html', label: 'HTML', pages: {'semantic-html': 'Semantic Html', 'forms': 'Forms', 'accessibility': 'Accessibility'} },
@@ -71,6 +95,77 @@ const tree = [
       { key: 'javascript', label: 'JavaScript', pages: {'javascript-interview-questions': 'Javascript Interview Questions', 'frontend-architecture-interview': 'Frontend Architecture Interview'} },
       { key: 'system-design', label: 'System Design', pages: {'system-design-fundamentals': 'System Design Fundamentals', 'scalability': 'Scalability', 'availability-reliability': 'Availability Reliability', 'caching-strategies': 'Caching Strategies', 'rate-limiting': 'Rate Limiting'} },
       { key: 'behavioral', label: 'Senior Engineer', pages: {'pr-impact-beyond-jira': 'Pr Impact Beyond Jira', 'code-review': 'Code Review', 'refactoring': 'Refactoring', 'technical-leadership': 'Technical Leadership'} },
+    ],
+  },
+  {
+    key: 'frontend-frameworks', label: 'Frontend Frameworks', children: [
+      { key: 'angularjs', label: 'AngularJS', children: [
+        { key: 'fundamentals', label: 'Fundamentals', pages: {
+          'architecture': 'Architecture',
+          'modules': 'Modules',
+          'controllers': 'Controllers',
+          'scope': 'Scope',
+          'dependency-injection': 'Dependency Injection',
+        } },
+        { key: 'templates', label: 'Templates & Data Binding', pages: {
+          'expressions': 'Expressions',
+          'directives': 'Directives',
+          'data-binding': 'Data Binding',
+          'forms': 'Forms',
+        } },
+        { key: 'services', label: 'Services & Routing', pages: {
+          'services': 'Services',
+          'routing': 'Routing',
+          'http': '$http & APIs',
+          'promises': 'Promises',
+        } },
+      ] },
+      { key: 'angular', label: 'Angular', children: [
+        { key: 'fundamentals', label: 'Fundamentals', pages: {
+          'architecture': 'Architecture',
+          'components': 'Components',
+          'modules': 'Modules',
+          'templates': 'Templates',
+          'dependency-injection': 'Dependency Injection',
+        } },
+        { key: 'core-concepts', label: 'Core Concepts', pages: {
+          'data-binding': 'Data Binding',
+          'directives': 'Directives',
+          'pipes': 'Pipes',
+          'lifecycle-hooks': 'Lifecycle Hooks',
+          'services': 'Services',
+        } },
+        { key: 'advanced', label: 'Advanced', pages: {
+          'routing': 'Routing',
+          'forms': 'Forms',
+          'http-client': 'HttpClient',
+          'rxjs-observables': 'RxJS & Observables',
+          'state-management': 'State Management',
+        } },
+      ] },
+      { key: 'react', label: 'React', children: [
+        { key: 'fundamentals', label: 'Fundamentals', pages: {
+          'jsx': 'JSX',
+          'components': 'Components',
+          'props': 'Props',
+          'state': 'State',
+          'events': 'Events',
+        } },
+        { key: 'hooks', label: 'Hooks', pages: {
+          'use-state': 'useState',
+          'use-effect': 'useEffect',
+          'use-context': 'useContext',
+          'use-reducer': 'useReducer',
+          'custom-hooks': 'Custom Hooks',
+        } },
+        { key: 'advanced', label: 'Advanced', pages: {
+          'routing': 'Routing',
+          'forms': 'Forms',
+          'api-integration': 'API Integration',
+          'state-management': 'State Management',
+          'performance': 'Performance Optimization',
+        } },
+      ] },
     ],
   },
   {
