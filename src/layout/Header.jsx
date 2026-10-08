@@ -68,7 +68,9 @@ export default function Header({ sidebarOpen, onToggleSidebar }) {
       {user ? (
         <div className="app-header__user">
           <span className="app-header__role-badge">{role}</span>
-          <span className="app-header__email" title={profile?.email}>{profile?.email}</span>
+          <span className="app-header__email" title={profile?.email}>
+            {profile?.displayName || profile?.email}
+          </span>
           <button
             type="button"
             className="app-header__icon-btn"

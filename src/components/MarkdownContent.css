@@ -82,8 +82,8 @@
 }
 
 .markdown-tr:nth-child(even) { background-color: color-mix(in srgb, var(--color-bg-secondary) 45%, transparent); }
-.markdown-a { color: var(--color-accent); text-decoration: none; border-bottom: 1px solid transparent; transition: border-color 0.2s; }
-.markdown-a:hover { border-bottom-color: var(--color-accent); }
+.markdown-a { color: var(--color-accent); text-decoration: none; }
+.markdown-a:hover { text-decoration: underline; }
 
 .markdown-blockquote {
   border-left: 4px solid var(--color-accent);

@@ -24,13 +24,19 @@ import './PasswordField.css';
 
 export default function PasswordField({ value, onChange, id = 'password' }) {
   const [visible, setVisible] = useState(false);
+  const [generationError, setGenerationError] = useState('');
   const { score, checks } = scorePassword(value);
   const level = STRENGTH_LEVELS[Math.max(score - 1, 0)]; // score 0 still shows the weakest bar/color while typing
 
   function handleGenerate() {
-    const generated = generateStrongPassword(12);
-    onChange(generated);
-    setVisible(true); // reveal it immediately so they can see/copy what was generated
+    try {
+      const generated = generateStrongPassword(12);
+      onChange(generated);
+      setVisible(true); // reveal it immediately so they can see/copy what was generated
+      setGenerationError('');
+    } catch (error) {
+      setGenerationError(error instanceof Error ? error.message : 'Unable to generate a secure password.');
+    }
   }
 
   return (
@@ -77,6 +83,8 @@ export default function PasswordField({ value, onChange, id = 'password' }) {
       <p className="password-field__level" style={{ color: value ? level.color : 'var(--color-muted)' }}>
         {value ? level.label : 'Enter a password'}
       </p>
+
+      {generationError && <p className="password-field__generation-error" role="alert">{generationError}</p>}
 
       <ul className="password-field__checklist">
         {checks.map((check) => (

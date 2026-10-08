@@ -55,10 +55,23 @@ const DIGITS = '23456789'; // no 0/1 - easy to misread
 const SPECIAL = '!@#$%^&*-_=+?';
 const ALL = UPPER + LOWER + DIGITS + SPECIAL;
 
-/** Picks one cryptographically-random character from `chars`. */
+/** Returns the browser's secure Web Crypto API or throws a clear error. */
+function getSecureCrypto() {
+  const cryptoApi = globalThis.crypto;
+  if (!cryptoApi || typeof cryptoApi.getRandomValues !== 'function') {
+    throw new Error('Secure password generation requires Web Crypto support. Please use a modern browser over HTTPS.');
+  }
+  return cryptoApi;
+}
+
+/** Picks one cryptographically-random character from `chars` without modulo bias. */
 function randomChar(chars) {
+  const cryptoApi = getSecureCrypto();
+  const maxUnbiased = Math.floor(0x100000000 / chars.length) * chars.length;
   const bytes = new Uint32Array(1);
-  crypto.getRandomValues(bytes);
+  do {
+    cryptoApi.getRandomValues(bytes);
+  } while (bytes[0] >= maxUnbiased);
   return chars[bytes[0] % chars.length];
 }
 
@@ -76,8 +89,12 @@ export function generateStrongPassword(length = 12) {
   // Fisher-Yates shuffle using the same secure random source, so the
   // guaranteed characters aren't predictably at the start.
   for (let i = combined.length - 1; i > 0; i--) {
+    const cryptoApi = getSecureCrypto();
+    const maxUnbiased = Math.floor(0x100000000 / (i + 1)) * (i + 1);
     const randArr = new Uint32Array(1);
-    crypto.getRandomValues(randArr);
+    do {
+      cryptoApi.getRandomValues(randArr);
+    } while (randArr[0] >= maxUnbiased);
     const j = randArr[0] % (i + 1);
     [combined[i], combined[j]] = [combined[j], combined[i]];
   }
