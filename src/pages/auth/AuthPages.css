@@ -123,3 +123,10 @@
 .password-confirm.is-mismatched .password-confirm__status {
   color: #ef4444;
 }
+
+.auth-card__field-error {
+  display: block;
+  margin-top: 0.35rem;
+  font-size: 0.78rem;
+  color: #dc2626;
+}

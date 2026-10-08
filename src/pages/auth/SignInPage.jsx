@@ -13,7 +13,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { paths } from '../../routes/routes.config.js';
-import { friendlyAuthError } from './SignUpPage.jsx';
+import { friendlyAuthError, isValidEmail } from './SignUpPage.jsx';
 import './AuthPages.css';
 
 export default function SignInPage() {
@@ -25,6 +25,9 @@ export default function SignInPage() {
   const [visible, setVisible] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
+
+  const emailValid = isValidEmail(email);
+  const emailInvalid = email.length > 0 && !emailValid;
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -62,7 +65,8 @@ export default function SignInPage() {
 
         <label className="field">
           <span>Email</span>
-          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required placeholder="example@codetrove.com" />
+          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required placeholder="example@codetrove.com" aria-invalid={emailInvalid} />
+          {emailInvalid && <span className="auth-card__field-error" role="alert">Enter a valid email address.</span>}
         </label>
 
         <label className="field">
@@ -87,7 +91,7 @@ export default function SignInPage() {
 
         {error && <p className="auth-card__error">{error}</p>}
 
-        <button type="submit" className="btn-primary" disabled={submitting}>
+        <button type="submit" className="btn-primary" disabled={!emailValid || submitting}>
           {submitting ? 'Signing in…' : 'Sign in'}
         </button>
 

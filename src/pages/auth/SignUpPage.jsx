@@ -32,9 +32,12 @@ export default function SignUpPage() {
   const passwordMatches = confirmPassword.length > 0 && password === confirmPassword;
   const passwordMismatch = confirmPassword.length > 0 && password !== confirmPassword;
 
+  const emailValid = isValidEmail(email);
+  const emailInvalid = email.length > 0 && !emailValid;
+
   async function handleSubmit(event) {
     event.preventDefault();
-    if (!passwordOk || !passwordMatches) return;
+    if (!emailValid || !passwordOk || !passwordMatches) return;
     setSubmitting(true);
     setError(null);
     try {
@@ -67,7 +70,8 @@ export default function SignUpPage() {
 
         <label className="field">
           <span>Email</span>
-          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required placeholder="example@codetrove.com"/>
+          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required placeholder="example@codetrove.com" aria-invalid={emailInvalid} />
+          {emailInvalid && <span className="auth-card__field-error" role="alert">Enter a valid email address.</span>}
         </label>
 
         <label className="field">
@@ -94,7 +98,7 @@ export default function SignUpPage() {
 
         {error && <p className="auth-card__error">{error}</p>}
 
-        <button type="submit" className="btn-primary" disabled={!username.trim() || !passwordOk || !passwordMatches || submitting}>
+        <button type="submit" className="btn-primary" disabled={!username.trim() || !emailValid || !passwordOk || !passwordMatches || submitting}>
           {submitting ? 'Creating account…' : 'Sign up'}
         </button>
 
@@ -104,6 +108,11 @@ export default function SignUpPage() {
       </form>
     </div>
   );
+}
+
+/** Validates the email format before authentication requests are sent. */
+export function isValidEmail(value) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
 }
 
 /** Turns Firebase's error codes into plain-English messages. */
