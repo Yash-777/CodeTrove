@@ -13,6 +13,7 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
+import RunnableCode from './CodeRunner/RunnableCode.jsx';
 import './MarkdownContent.css';
 
 function textContent(value) {
@@ -27,9 +28,15 @@ function alertType(children) {
   return match ? match[1].toLowerCase() : null;
 }
 
-function MarkdownCode({ inline, className, children, ...props }) {
+function MarkdownCode({ inline, className, children, node, ...props }) {
   const match = /language-([\w-]+)/.exec(className || '');
   const language = match ? match[1] : 'text';
+  const meta = node?.data?.meta || node?.properties?.meta || '';
+  const isRunnable = !inline && ['js', 'javascript'].includes(language) && /(?:^|\s)runnable(?:\s|$)/.test(String(meta));
+
+  if (isRunnable) {
+    return <RunnableCode initial={String(children).replace(/\n$/, '')} />;
+  }
 
   if (inline) {
     return <code className="markdown-inline-code" {...props}>{children}</code>;
@@ -48,6 +55,13 @@ function MarkdownCode({ inline, className, children, ...props }) {
 }
 
 function MarkdownPre({ node, children, ...props }) {
+  const codeNode = node?.children?.[0];
+  const codeClasses = codeNode?.properties?.className || [];
+  if (Array.isArray(codeClasses) && codeClasses.includes('runnable')) {
+    const source = (codeNode.children || []).map((child) => child.value || '').join('').replace(/\n$/, '');
+    return <RunnableCode initial={source} />;
+  }
+
   const lang = props.lang || props['data-lang'];
 
   // GitHub Wiki content commonly uses <pre lang="java">...</pre>.
@@ -68,10 +82,24 @@ function MarkdownPre({ node, children, ...props }) {
   return <pre className="markdown-pre" {...props}>{children}</pre>;
 }
 
+// Preserve the optional fenced-code meta word (e.g. ```js runnable) as a HAST property.
+function remarkRunnableCode() {
+  return (tree) => {
+    const visit = (node) => {
+      if (node?.type === 'code' && /^(js|javascript)$/i.test(node.lang || '') && /(?:^|\s)runnable(?:\s|$)/.test(node.meta || '')) {
+        node.data = node.data || {};
+        node.data.hProperties = { ...(node.data.hProperties || {}), className: [`language-${node.lang}`, 'runnable'], meta: node.meta };
+      }
+      if (Array.isArray(node?.children)) node.children.forEach(visit);
+    };
+    visit(tree);
+  };
+}
+
 export default function MarkdownContent({ children }) {
   return (
     <ReactMarkdown
-      remarkPlugins={[remarkGfm]}
+      remarkPlugins={[remarkGfm, remarkRunnableCode]}
       rehypePlugins={[rehypeRaw]}
       components={{
         code: MarkdownCode,

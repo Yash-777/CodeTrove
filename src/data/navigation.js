@@ -25,7 +25,7 @@ const tree = [
         ]},
       ]},
       { key: 'javascript', label: 'JavaScript', children: [
-        { key: 'language', label: 'Language', pages: {'types': 'Types', 'scope-closures': 'Scope Closures', 'prototypes': 'Prototypes', 'modules': 'Modules', 'promises': 'Promises', 'event-loop': 'Event Loop'} },
+        { key: 'language', label: 'Language', pages: {'types': 'Types', 'scope-closures': 'Scope Closures', 'prototypes': 'Prototypes', 'modules': 'Modules', 'promises': 'Promises', 'event-loop': 'Event Loop', 'variables-hoisting': { label: 'Variables & Hoisting (var, let, const)', contentKey: 'javascript/variables-hoisting' }} },
         { key: 'advanced', label: 'Advanced', pages: {'async-programming': 'Async Programming', 'memory-management': 'Memory Management', 'performance': 'Performance', 'web-workers': 'Web Workers'} },
       ]},
       { key: 'kotlin', label: 'Kotlin', children: [
