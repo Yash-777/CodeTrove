@@ -8,6 +8,15 @@
 
 const javascriptTopics = [
   {
+    slug: 'variables-hoisting',
+    title: 'Variables & Hoisting (var, let, const)',
+    summary: 'Understand variable declarations, scope, the temporal dead zone, and function hoisting with runnable examples.',
+    tags: ['javascript', 'variables', 'var', 'let', 'const', 'hoisting', 'scope'],
+    gifUrl: null,
+    relatedTool: null,
+    body: '',
+  },
+  {
     slug: 'promises',
     title: 'Promises & async/await',
     summary: 'Handling asynchronous operations without callback pyramids.',

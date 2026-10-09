@@ -22,6 +22,7 @@ export default function ProfilePage() {
       <h1>My Profile</h1>
 
       <div className="tool-list__item" style={{ display: 'block', maxWidth: '420px' }}>
+        <p><strong>Username:</strong> {profile?.displayName || profile?.email?.split('@')[0]}</p>
         <p><strong>Email:</strong> {profile?.email}</p>
         <p><strong>Role:</strong> {role}</p>
         <p><strong>Devices signed in:</strong> {(profile?.sessions || []).length} / 2</p>

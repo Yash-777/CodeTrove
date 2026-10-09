@@ -21,6 +21,11 @@ export function getTopicContent(categoryKey, topicSlug) {
   return `Missing content for ${categoryKey}/${topicSlug}. Create a file at src/data/topics/${categoryKey}/${topicSlug}/content.md or src/data/topics/${categoryKey}/content_info.md`;
 }
 
+export function hasNavigationContent(contentKey) {
+  const key = `./${contentKey}/content.md`;
+  const content = topicContentFiles[key];
+  return typeof content === 'string' && content.trim().length > 0;
+}
 
 export function getNavigationContent(contentKey) {
   const key = contentKey.endsWith('.md')

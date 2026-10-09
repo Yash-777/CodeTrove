@@ -20,21 +20,28 @@ export default function SignUpPage() {
   const { signUp } = useAuth();
   const navigate = useNavigate();
 
+  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
 
   const { score } = scorePassword(password);
   const passwordOk = score === 4; // all 4 rules met
+  const passwordMatches = confirmPassword.length > 0 && password === confirmPassword;
+  const passwordMismatch = confirmPassword.length > 0 && password !== confirmPassword;
+
+  const emailValid = isValidEmail(email);
+  const emailInvalid = email.length > 0 && !emailValid;
 
   async function handleSubmit(event) {
     event.preventDefault();
-    if (!passwordOk) return;
+    if (!emailValid || !passwordOk || !passwordMatches) return;
     setSubmitting(true);
     setError(null);
     try {
-      await signUp(email, password);
+      await signUp(email, password, username);
       navigate(paths.home());
     } catch (err) {
       setError(friendlyAuthError(err));
@@ -50,8 +57,21 @@ export default function SignUpPage() {
         <p className="auth-card__lede">New accounts start as viewers - an admin can promote you later.</p>
 
         <label className="field">
+          <span>Username</span>
+          <input
+            type="text"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            placeholder="Enter your username"
+            autoComplete="username"
+            required
+          />
+        </label>
+
+        <label className="field">
           <span>Email</span>
-          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required placeholder="example@codetrove.com" aria-invalid={emailInvalid} />
+          {emailInvalid && <span className="auth-card__field-error" role="alert">Enter a valid email address.</span>}
         </label>
 
         <label className="field">
@@ -59,9 +79,26 @@ export default function SignUpPage() {
           <PasswordField value={password} onChange={setPassword} />
         </label>
 
+        <label className="field">
+          <span>Confirm password</span>
+          <div className={`password-confirm ${passwordMatches ? 'is-matched' : ''} ${passwordMismatch ? 'is-mismatched' : ''}`}>
+            <input
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              placeholder="Re-enter your password"
+              autoComplete="new-password"
+              required
+              aria-invalid={passwordMismatch}
+            />
+            {passwordMatches && <span className="password-confirm__status" aria-label="Passwords match">✓</span>}
+            {passwordMismatch && <span className="password-confirm__status" aria-label="Passwords do not match">✕</span>}
+          </div>
+        </label>
+
         {error && <p className="auth-card__error">{error}</p>}
 
-        <button type="submit" className="btn-primary" disabled={!passwordOk || submitting}>
+        <button type="submit" className="btn-primary" disabled={!username.trim() || !emailValid || !passwordOk || !passwordMatches || submitting}>
           {submitting ? 'Creating account…' : 'Sign up'}
         </button>
 
@@ -71,6 +108,11 @@ export default function SignUpPage() {
       </form>
     </div>
   );
+}
+
+/** Validates the email format before authentication requests are sent. */
+export function isValidEmail(value) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
 }
 
 /** Turns Firebase's error codes into plain-English messages. */

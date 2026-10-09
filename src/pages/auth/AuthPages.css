@@ -88,3 +88,45 @@
 .auth-card__role--admin { background: #fce8e6; color: #a50e0e; }
 .auth-card__role--editor { background: #e8f0fe; color: #174ea6; }
 .auth-card__role--viewer { background: #e6f4ea; color: #137333; }
+
+
+.password-confirm {
+  position: relative;
+}
+
+.password-confirm input {
+  width: 100%;
+  padding-right: 2.4rem;
+}
+
+.password-confirm__status {
+  position: absolute;
+  top: 50%;
+  right: 0.7rem;
+  transform: translateY(-50%);
+  font-weight: 700;
+  pointer-events: none;
+}
+
+.password-confirm.is-matched input {
+  border-color: #22c55e;
+}
+
+.password-confirm.is-matched .password-confirm__status {
+  color: #22c55e;
+}
+
+.password-confirm.is-mismatched input {
+  border-color: #ef4444;
+}
+
+.password-confirm.is-mismatched .password-confirm__status {
+  color: #ef4444;
+}
+
+.auth-card__field-error {
+  display: block;
+  margin-top: 0.35rem;
+  font-size: 0.78rem;
+  color: #dc2626;
+}

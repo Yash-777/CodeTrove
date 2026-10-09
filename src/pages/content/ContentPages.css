@@ -12,7 +12,6 @@
 }
 
 .content-page__breadcrumb a {
-  text-decoration: none;
 }
 
 .content-page__grid {
@@ -27,7 +26,6 @@
   border: 1px solid var(--color-border);
   border-radius: 8px;
   background: var(--color-paper);
-  text-decoration: none;
   color: var(--color-text);
 }
 
@@ -106,7 +104,6 @@
 
 .tool-list__link {
   white-space: nowrap;
-  text-decoration: none;
   font-size: 0.85rem;
   font-weight: 600;
 }
