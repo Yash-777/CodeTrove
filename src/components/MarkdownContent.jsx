@@ -36,7 +36,10 @@ function MarkdownCode({ inline, className, children, node, ...props }) {
   const isRunnable = !inline && ['js', 'javascript', 'ts', 'typescript'].includes(language.toLowerCase()) && /(?:^|\s)runnable(?:\s|$)/.test(String(meta));
 
   if (isRunnable) {
-    return <RunnableCode initial={String(children).replace(/\n$/, '')} language={normalizedLanguage} />;
+    // key = language + source: navigating to another page must remount the box,
+    // otherwise React reuses it and shows the previous page's edited code/output.
+    const source = String(children).replace(/\n$/, '');
+    return <RunnableCode key={`${normalizedLanguage}:${source}`} initial={source} language={normalizedLanguage} />;
   }
 
   if (inline) {
@@ -62,7 +65,7 @@ function MarkdownPre({ node, children, ...props }) {
     const source = (codeNode.children || []).map((child) => child.value || '').join('').replace(/\n$/, '');
     const languageClass = codeClasses.find((name) => /^language-/.test(name)) || 'language-js';
     const language = /language-(ts|typescript)$/i.test(languageClass) ? 'typescript' : 'javascript';
-    return <RunnableCode initial={source} language={language} />;
+    return <RunnableCode key={`${language}:${source}`} initial={source} language={language} />;
   }
 
   const lang = props.lang || props['data-lang'];

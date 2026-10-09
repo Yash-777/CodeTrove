@@ -1,8 +1,8 @@
 # TypeScript Basics
 
-TypeScript adds static type syntax to JavaScript. CodeTrove transpiles each runnable TypeScript example to JavaScript in your browser, then executes it in the sandboxed playground.
+TypeScript adds static type syntax to JavaScript. CodeTrove type-checks each runnable TypeScript example in your browser, transpiles it to JavaScript, then executes it in the sandboxed playground. Type errors are underlined in the editor while you type, and **Run** prints the compiler error instead of executing code that does not compile.
 
-> Note: The playground transpiles TypeScript but does not perform full project-wide type checking or load npm packages.
+> Note: The playground checks a single self-contained file (strict mode). `import`/`export` statements and npm packages are not available.
 
 ## 1. Type annotations
 
@@ -97,10 +97,41 @@ showProfile({ name: "Yash" });
 showProfile({ name: "Yashwanth", nickname: "Yash" });
 ```
 
+## 7. Compile-time type errors
+
+In JavaScript a variable can change type freely. TypeScript infers the type from the first value and reports a **compile error** when you break it - before the code ever runs.
+
+JavaScript - perfectly valid:
+
+```js runnable
+let score = 99;          // starts as a number
+score = "Game Over";     // fine in JavaScript
+console.log(score);
+```
+
+TypeScript - the assignment is underlined in the editor; select **Run** to see the compiler message:
+
+```ts runnable
+let score = 99;          // TS infers: number
+score = "Game Over";     // ❌ COMPILE ERROR
+console.log(score);
+```
+
+Expected output: `main.ts(2,1): error TS2322: Type 'string' is not assignable to type 'number'.`
+
+Fix it by declaring the type you actually want:
+
+```ts runnable
+let score: number | string = 99;
+score = "Game Over";
+console.log(score);
+```
+
 ## Key takeaways
 
-- TypeScript is transpiled to JavaScript before browser execution.
+- TypeScript is type-checked, then transpiled to JavaScript before browser execution.
+- Type errors stop the run and are shown as `main.ts(line,col): error TSxxxx`.
 - Type annotations and interfaces are removed during transpilation.
 - Type inference reduces repetitive annotations.
 - Union types and narrowing help model values safely.
-- This playground is for self-contained examples; imports, npm packages, and full type checking are not provided.
+- This playground is for self-contained examples; imports and npm packages are not provided.
