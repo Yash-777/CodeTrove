@@ -71,6 +71,7 @@ export const DOCUMENTATION_NAVIGATION = [
         ['java']
       ),
       topic('javascript', 'JavaScript', [], pagesFromCategory('javascript'), ['javascript', 'js']),
+      topic('typescript', 'TypeScript', [], pagesFromCategory('typescript'), ['typescript', 'ts']),
     ],
   },
   {

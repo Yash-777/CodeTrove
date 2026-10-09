@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import CodeMirror from '@uiw/react-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
+import ts from 'typescript';
 import { oneDark } from '@codemirror/theme-one-dark';
 import './RunnableCode.css';
 
@@ -36,7 +37,7 @@ function buildDocument(code, id) {
 }
 
 /** Editable JavaScript playground whose code executes in a sandboxed iframe. */
-export default function RunnableCode({ initial = '' }) {
+export default function RunnableCode({ initial = '', language = 'javascript' }) {
   const [code, setCode] = useState(initial);
   const [logs, setLogs] = useState([]);
   const [execution, setExecution] = useState({ key: 0, document: null });
@@ -56,7 +57,36 @@ export default function RunnableCode({ initial = '' }) {
 
   const runCode = () => {
     setLogs([]);
-    setExecution((current) => ({ key: current.key + 1, document: buildDocument(code, instanceId) }));
+    let executableCode = code;
+
+    if (language === 'typescript') {
+      try {
+        const result = ts.transpileModule(code, {
+          reportDiagnostics: true,
+          compilerOptions: {
+            target: ts.ScriptTarget.ES2022,
+            module: ts.ModuleKind.None,
+            strict: true,
+          },
+        });
+        const errors = (result.diagnostics || []).filter((diagnostic) => diagnostic.category === ts.DiagnosticCategory.Error);
+        if (errors.length > 0) {
+          setLogs(errors.map((diagnostic) => ({
+            type: 'error',
+            text: ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n'),
+          })));
+          stopCode();
+          return;
+        }
+        executableCode = result.outputText;
+      } catch (error) {
+        setLogs([{ type: 'error', text: `TypeScript transpilation failed: ${error.message}` }]);
+        stopCode();
+        return;
+      }
+    }
+
+    setExecution((current) => ({ key: current.key + 1, document: buildDocument(executableCode, instanceId) }));
   };
 
   const stopCode = () => setExecution((current) => ({ ...current, document: null }));
@@ -67,15 +97,15 @@ export default function RunnableCode({ initial = '' }) {
   };
 
   return (
-    <section className="runnable-code" aria-label="Runnable JavaScript example">
+    <section className="runnable-code" aria-label={`Runnable ${language === 'typescript' ? 'TypeScript' : 'JavaScript'} example`}>
       <div className="runnable-code__editor">
         <CodeMirror
           value={code}
-          extensions={[javascript()]}
+          extensions={[javascript({ typescript: language === 'typescript' })]}
           theme={oneDark}
           onChange={setCode}
           basicSetup={{ lineNumbers: true, foldGutter: true, highlightActiveLine: true }}
-          aria-label="JavaScript code editor"
+          aria-label={`${language === 'typescript' ? 'TypeScript' : 'JavaScript'} code editor`}
         />
       </div>
       <div className="runnable-code__toolbar">
@@ -95,7 +125,7 @@ export default function RunnableCode({ initial = '' }) {
         <iframe
           key={execution.key}
           ref={frameRef}
-          title="JavaScript execution sandbox"
+          title={`${language === 'typescript' ? 'TypeScript' : 'JavaScript'} execution sandbox`}
           sandbox="allow-scripts"
           srcDoc={execution.document}
           className="runnable-code__frame"

@@ -32,10 +32,11 @@ function MarkdownCode({ inline, className, children, node, ...props }) {
   const match = /language-([\w-]+)/.exec(className || '');
   const language = match ? match[1] : 'text';
   const meta = node?.data?.meta || node?.properties?.meta || '';
-  const isRunnable = !inline && ['js', 'javascript'].includes(language) && /(?:^|\s)runnable(?:\s|$)/.test(String(meta));
+  const normalizedLanguage = ['ts', 'typescript'].includes(language.toLowerCase()) ? 'typescript' : 'javascript';
+  const isRunnable = !inline && ['js', 'javascript', 'ts', 'typescript'].includes(language.toLowerCase()) && /(?:^|\s)runnable(?:\s|$)/.test(String(meta));
 
   if (isRunnable) {
-    return <RunnableCode initial={String(children).replace(/\n$/, '')} />;
+    return <RunnableCode initial={String(children).replace(/\n$/, '')} language={normalizedLanguage} />;
   }
 
   if (inline) {
@@ -59,7 +60,9 @@ function MarkdownPre({ node, children, ...props }) {
   const codeClasses = codeNode?.properties?.className || [];
   if (Array.isArray(codeClasses) && codeClasses.includes('runnable')) {
     const source = (codeNode.children || []).map((child) => child.value || '').join('').replace(/\n$/, '');
-    return <RunnableCode initial={source} />;
+    const languageClass = codeClasses.find((name) => /^language-/.test(name)) || 'language-js';
+    const language = /language-(ts|typescript)$/i.test(languageClass) ? 'typescript' : 'javascript';
+    return <RunnableCode initial={source} language={language} />;
   }
 
   const lang = props.lang || props['data-lang'];
@@ -86,7 +89,7 @@ function MarkdownPre({ node, children, ...props }) {
 function remarkRunnableCode() {
   return (tree) => {
     const visit = (node) => {
-      if (node?.type === 'code' && /^(js|javascript)$/i.test(node.lang || '') && /(?:^|\s)runnable(?:\s|$)/.test(node.meta || '')) {
+      if (node?.type === 'code' && /^(js|javascript|ts|typescript)$/i.test(node.lang || '') && /(?:^|\s)runnable(?:\s|$)/.test(node.meta || '')) {
         node.data = node.data || {};
         node.data.hProperties = { ...(node.data.hProperties || {}), className: [`language-${node.lang}`, 'runnable'], meta: node.meta };
       }

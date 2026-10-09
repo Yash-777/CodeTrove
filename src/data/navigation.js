@@ -52,7 +52,7 @@ const tree = [
           'delegation': 'Delegation',
         } },
       ]},
-      { key: 'typescript', label: 'TypeScript', pages: {'types-generics': 'Types Generics', 'interfaces': 'Interfaces', 'utility-types': 'Utility Types', 'tsconfig': 'Tsconfig'} },
+      { key: 'typescript', label: 'TypeScript', pages: {'types-generics': 'Types Generics', 'interfaces': 'Interfaces', 'utility-types': 'Utility Types', 'tsconfig': 'Tsconfig', 'typescript-basics': 'TypeScript Basics'} },
       { key: 'web', label: 'Web', children: [
         { key: 'html', label: 'HTML', pages: {'semantic-html': 'Semantic Html', 'forms': 'Forms', 'accessibility': 'Accessibility'} },
         { key: 'css', label: 'CSS', pages: {'layout': 'Layout', 'flexbox': 'Flexbox', 'grid': 'Grid', 'responsive-design': 'Responsive Design'} },

@@ -34,6 +34,7 @@
 
 import javaTopics from './java.js';
 import javascriptTopics from './javascript.js';
+import typescriptTopics from './typescript.js';
 import nodejsTopics from './nodejs.js';
 import jsonTopics from './json.js';
 import jwtTopics from './jwt.js';
@@ -67,6 +68,19 @@ export const CATEGORIES = [
     })),
     tools: [
       { name: 'JS/JSON Validator', description: 'Catch syntax errors before you run the code.', internalTool: 'json-formatter', externalUrl: null },
+    ],
+  },
+  {
+    key: 'typescript',
+    label: 'TypeScript',
+    color: '#3178C6',
+    codeLang: 'typescript',
+    topics: typescriptTopics.map((topic) => ({
+      ...topic,
+      body: getTopicContent('typescript', topic.slug),
+    })),
+    tools: [
+      { name: 'TypeScript Playground', description: 'Experiment with TypeScript examples in the browser.', internalTool: null, externalUrl: 'https://www.typescriptlang.org/play' },
     ],
   },
   {
