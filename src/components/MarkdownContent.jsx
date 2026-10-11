@@ -28,11 +28,12 @@ function alertType(children) {
   return match ? match[1].toLowerCase() : null;
 }
 
-// js/javascript -> 'javascript', ts/typescript -> 'typescript', kt/kotlin -> 'kotlin'
+// js/javascript -> 'javascript', ts/typescript -> 'typescript', kt/kotlin -> 'kotlin', java -> 'java'
 function normalizeRunnableLanguage(language = '') {
   const value = language.toLowerCase();
   if (value === 'ts' || value === 'typescript') return 'typescript';
   if (value === 'kt' || value === 'kotlin') return 'kotlin';
+  if (value === 'java') return 'java';
   return 'javascript';
 }
 
@@ -41,7 +42,7 @@ function MarkdownCode({ inline, className, children, node, ...props }) {
   const language = match ? match[1] : 'text';
   const meta = node?.data?.meta || node?.properties?.meta || '';
   const normalizedLanguage = normalizeRunnableLanguage(language);
-  const isRunnable = !inline && ['js', 'javascript', 'ts', 'typescript', 'kt', 'kotlin'].includes(language.toLowerCase()) && /(?:^|\s)runnable(?:\s|$)/.test(String(meta));
+  const isRunnable = !inline && ['js', 'javascript', 'ts', 'typescript', 'kt', 'kotlin', 'java'].includes(language.toLowerCase()) && /(?:^|\s)runnable(?:\s|$)/.test(String(meta));
 
   if (isRunnable) {
     // key = language + source: navigating to another page must remount the box,
@@ -100,7 +101,7 @@ function MarkdownPre({ node, children, ...props }) {
 function remarkRunnableCode() {
   return (tree) => {
     const visit = (node) => {
-      if (node?.type === 'code' && /^(js|javascript|ts|typescript|kt|kotlin)$/i.test(node.lang || '') && /(?:^|\s)runnable(?:\s|$)/.test(node.meta || '')) {
+      if (node?.type === 'code' && /^(js|javascript|ts|typescript|kt|kotlin|java)$/i.test(node.lang || '') && /(?:^|\s)runnable(?:\s|$)/.test(node.meta || '')) {
         node.data = node.data || {};
         node.data.hProperties = { ...(node.data.hProperties || {}), className: [`language-${node.lang}`, 'runnable'], meta: node.meta };
       }

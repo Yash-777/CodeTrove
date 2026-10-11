@@ -2,14 +2,16 @@
  * src/pages/build/CompilerPage.jsx
  * ------------------------------------------------------------------
  * Route: /build/compiler   (deep link: /build/compiler?lang=kotlin)
- * Online compiler / playground for JavaScript, TypeScript and Kotlin,
+ * Online compiler / playground for JavaScript, TypeScript, Kotlin and Java,
  * built on the same RunnableCode component used by `runnable` blocks in
  * the Markdown pages (side-by-side editor and output).
  *
  * - JavaScript / TypeScript run in the browser (sandboxed iframe + Web
  *   Worker, TypeScript is type-checked first).
  * - Kotlin is compiled by JetBrains' public service (api.kotlinlang.org).
- * All three editors stay mounted so switching tabs keeps your code.
+ * - Java is compiled and run by Wandbox (open source, wandbox.org) with a
+ *   selectable OpenJDK version (utils/javaApi.js).
+ * All editors stay mounted so switching tabs keeps your code.
  */
 
 import { Link, useSearchParams } from 'react-router-dom';
@@ -87,6 +89,27 @@ console.log(\`In 5 years you will be \${person.age + 5}.\`);
     code: KOTLIN_MAIN_SAMPLE,
     targets: KOTLIN_TARGET_OPTIONS,
   },
+  {
+    key: 'java',
+    param: 'java',
+    label: 'Java',
+    learnTo: '/content/tree/languages/java',
+    docsUrl: 'https://docs.oracle.com/en/java/javase/',
+    input: 'Alice\n30',
+    code: `import java.util.Scanner;
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner in = new Scanner(System.in);
+        String name = in.hasNextLine() ? in.nextLine() : "World";
+        int age = in.hasNextInt() ? in.nextInt() : 0;
+
+        System.out.println("Hello, " + name + "!");
+        System.out.println("In 5 years you will be " + (age + 5) + ".");
+    }
+}
+`,
+  },
 ];
 
 function pickLanguage(value) {
@@ -139,6 +162,57 @@ function KotlinAbout() {
   );
 }
 
+function JavaAbout() {
+  return (
+    <section className="cp-about" aria-labelledby="cp-about-java">
+      <h2 id="cp-about-java">About the Java playground</h2>
+      <p>
+        <a href="https://openjdk.org/" target="_blank" rel="noreferrer">Java</a> is a statically typed,
+        object-oriented language that compiles to bytecode and runs on the JVM. Learn the language in the{' '}
+        <a href="https://docs.oracle.com/javase/tutorial/" target="_blank" rel="noreferrer">Oracle Java Tutorials</a>.
+      </p>
+
+      <h3>How Run works</h3>
+      <p>
+        A browser cannot run <code>javac</code> or a JVM, so this page sends your code to{' '}
+        <a href="https://wandbox.org/" target="_blank" rel="noreferrer">Wandbox</a>, an open-source
+        (<a href="https://github.com/melpon/wandbox" target="_blank" rel="noreferrer">melpon/wandbox</a>) online
+        compiler that runs real OpenJDK builds in sandboxed containers. The calls are plain CORS requests, so it works
+        on GitHub Pages with no backend of our own. Press <strong>Run</strong> (or <kbd>Ctrl/Cmd</kbd> + <kbd>Enter</kbd>):
+      </p>
+      <ol>
+        <li>The page asks <code>GET /api/list.json</code> for the available Java compilers (the runtime dropdown).</li>
+        <li>Run sends <code>POST /api/compile.json</code> with your source, the selected runtime and STDIN.</li>
+        <li>Wandbox compiles and runs it, then returns the compiler messages and the program&apos;s output, which are shown on the right.</li>
+      </ol>
+      <pre className="cp-about__code">{`POST https://wandbox.org/api/compile.json
+{"code":"public class Main { ... }","compiler":"openjdk-jdk-21+35","stdin":"Alice\n30","options":"","compiler-option-raw":"","runtime-option-raw":"","save":false}
+
+{"status":"0","compiler_error":"","program_output":"Hello, Alice!\n","program_error":""}`}</pre>
+
+      <h3>Runtime version</h3>
+      <p>
+        The <strong>Java</strong> dropdown above the editor lists the JDK versions the service offers (newest first;
+        the default is the newest LTS available). The selected id is sent as <code>compiler</code>, so you can check
+        how code behaves on, for example, Java 17 versus 21. The editor file is <code>Main.java</code> with{' '}
+        <code>public class Main</code>; because the service saves the source under its own file name, the{' '}
+        <code>public</code> modifier of top-level classes is removed from the copy that is sent (line and column
+        numbers are unchanged), so the same code also compiles on your machine.
+      </p>
+
+      <h3>Errors, input and privacy</h3>
+      <ul>
+        <li>Compile errors from <code>javac</code> are shown as <code>Main.java:5: error: ...</code> and underlined in the
+          editor after Run; runtime exceptions show the Java stack trace.</li>
+        <li>The <strong>STDIN</strong> box feeds <code>System.in</code> (for example <code>new Scanner(System.in)</code>).</li>
+        <li>Code is not compiled while you type: Run executes the program, so it only goes to the service when you press it.</li>
+        <li>Your code and STDIN are sent to wandbox.org, nothing is saved (<code>save:false</code>), an internet
+          connection is needed, and the public service may rate-limit heavy use or stop long-running programs.</li>
+      </ul>
+    </section>
+  );
+}
+
 export default function CompilerPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const active = pickLanguage(searchParams.get('lang'));
@@ -184,10 +258,11 @@ export default function CompilerPage() {
       ))}
 
       {active.key === 'kotlin' && <KotlinAbout />}
+      {active.key === 'java' && <JavaAbout />}
 
       <p className="cp-note">
         JavaScript and TypeScript run in your browser (isolated, 10&nbsp;s limit, no DOM). Kotlin is compiled by
-        JetBrains&apos; public service (api.kotlinlang.org), so the Kotlin code you run is sent to that service.
+        JetBrains&apos; public service (api.kotlinlang.org) and Java by the open-source Wandbox service (wandbox.org), so the Kotlin or Java code you run is sent to those services.
       </p>
     </div>
   );

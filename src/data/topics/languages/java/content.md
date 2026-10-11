@@ -39,3 +39,18 @@ class HelloWorldApp {
     }
 }
 ```
+
+## Try it
+
+Every example marked with **Run** is a live Java editor. Edit the code and press **Run** (or `Ctrl/Cmd + Enter`), and pick the Java version from the dropdown. Use a `public class Main` so the file is `Main.java`.
+
+```java runnable
+public class Main {
+    public static void main(String[] args) {
+        System.out.println("Hello, Java!");
+    }
+}
+```
+
+> [!NOTE]
+> Java code is compiled and run by [Wandbox](https://wandbox.org) (open source), so Java boxes need an internet connection and send the snippet text to that service. See the [Java playground](#/build/compiler?lang=java) for STDIN input and how it works.

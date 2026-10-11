@@ -35,18 +35,20 @@ import { oneDark } from '@codemirror/theme-one-dark';
 import { keymap } from '@codemirror/view';
 import { Prec } from '@codemirror/state';
 import { StreamLanguage } from '@codemirror/language';
-import { kotlin } from '@codemirror/legacy-modes/mode/clike';
+import { java, kotlin } from '@codemirror/legacy-modes/mode/clike';
 import { linter, lintGutter, setDiagnostics } from '@codemirror/lint';
 import { compileTypeScript, formatDiagnostic, preloadTypeScript } from '../../utils/tsCompiler.js';
 import { DEFAULT_KOTLIN_TARGET, getKotlinVersion, highlightKotlin, runKotlin } from '../../utils/kotlinApi.js';
+import { getJavaRuntimes, pickDefaultRuntime, runJava } from '../../utils/javaApi.js';
 import './RunnableCode.css';
 
 /** File name shown in the header, used by Save and in error messages. */
-export const FILE_NAMES = { javascript: 'index.js', typescript: 'index.ts', kotlin: 'Main.kt' };
-const LANGUAGE_LABELS = { javascript: 'JavaScript', typescript: 'TypeScript', kotlin: 'Kotlin' };
-const LANGUAGE_BADGES = { javascript: 'JS', typescript: 'TS', kotlin: 'KT' };
+export const FILE_NAMES = { javascript: 'index.js', typescript: 'index.ts', kotlin: 'Main.kt', java: 'Main.java' };
+const LANGUAGE_LABELS = { javascript: 'JavaScript', typescript: 'TypeScript', kotlin: 'Kotlin', java: 'Java' };
+const LANGUAGE_BADGES = { javascript: 'JS', typescript: 'TS', kotlin: 'KT', java: 'JV' };
 
 const TIMEOUT_MS = 10000;
+const JAVA_TIMEOUT_MS = 30000;
 
 /* Code that runs INSIDE the worker. Kept as a function so it is
    syntax-checked/linted like normal code, then stringified. */
@@ -267,12 +269,15 @@ export default function RunnableCode({
 }) {
   const isTs = language === 'typescript';
   const isKotlin = language === 'kotlin';
+  const isJava = language === 'java';
   const label = LANGUAGE_LABELS[language] || 'JavaScript';
   const displayName = fileName || FILE_NAMES[language] || 'index.js';
   const isPlayground = variant === 'playground';
 
   const [code, setCode] = useState(initial);
   const [confType, setConfType] = useState(DEFAULT_KOTLIN_TARGET);
+  const [runtimes, setRuntimes] = useState([]);
+  const [runtimeId, setRuntimeId] = useState('');
   const confTypeRef = useRef(confType);
   confTypeRef.current = confType;
   const [input, setInput] = useState(initialInput);
@@ -340,6 +345,43 @@ export default function RunnableCode({
       setStatus('done');
     };
 
+    if (isJava) {
+      // Compile + run remotely (Wandbox, open-source) with the selected JDK.
+      const controller = new AbortController();
+      abortRef.current = controller;
+      timeoutRef.current = setTimeout(() => controller.abort('timeout'), JAVA_TIMEOUT_MS);
+      try {
+        const compiler = runtimeId || pickDefaultRuntime(await getJavaRuntimes());
+        const { lines, diagnostics } = await runJava(code, controller.signal, { stdin: inputRef.current, compiler });
+        if (activeRunRef.current !== myRun) return;
+        clearTimeout(timeoutRef.current);
+        const view = editorViewRef.current;
+        if (view) {
+          const docLength = view.state.doc.length;
+          view.dispatch(setDiagnostics(view.state, diagnostics.map((d) => ({
+            from: Math.min(d.from, docLength),
+            to: Math.min(Math.max(d.to, d.from + 1), docLength),
+            severity: d.severity,
+            message: d.message,
+            source: 'javac',
+          }))));
+        }
+        finishWithoutRun(lines);
+      } catch (error) {
+        if (activeRunRef.current !== myRun) return;
+        clearTimeout(timeoutRef.current);
+        const timedOut = controller.signal.aborted;
+        finishWithoutRun([{
+          type: 'error',
+          text: timedOut
+            ? `Timed out after ${JAVA_TIMEOUT_MS / 1000}s waiting for the Java service.`
+            : `Could not reach the Java service (wandbox.org). Check your internet connection and try again. (${error.message})`,
+        }]);
+        if (timedOut) setStatus('timeout');
+      }
+      return;
+    }
+
     if (isKotlin) {
       // Compile + run remotely (JetBrains' compiler service).
       const controller = new AbortController();
@@ -402,7 +444,7 @@ export default function RunnableCode({
       setStats({ time: performance.now() - startedAtRef.current, memory: null });
       stopCode('timeout');
     }, TIMEOUT_MS);
-  }, [code, isTs, isKotlin, displayName, stopCode, confType]);
+  }, [code, isTs, isKotlin, isJava, displayName, stopCode, confType, runtimeId]);
 
   const resetCode = () => {
     stopCode('idle');
@@ -429,7 +471,7 @@ export default function RunnableCode({
 
   const extensions = useMemo(() => {
     const list = [
-      isKotlin ? StreamLanguage.define(kotlin) : javascript({ typescript: isTs }),
+      isJava ? StreamLanguage.define(java) : isKotlin ? StreamLanguage.define(kotlin) : javascript({ typescript: isTs }),
       // Ctrl/Cmd + Enter runs the snippet from inside the editor.
       Prec.highest(keymap.of([{ key: 'Mod-Enter', run: () => { document.dispatchEvent(new CustomEvent('codetrove:run-focused')); return true; } }])),
     ];
@@ -456,6 +498,12 @@ export default function RunnableCode({
         ),
         lintGutter()
       );
+    }
+    if (isJava) {
+      // javac errors are underlined after Run (setDiagnostics). Wandbox has no
+      // analysis-only endpoint and Run executes the program, so nothing is sent
+      // while typing; this linter just clears stale squiggles once you edit.
+      list.push(linter(() => [], { delay: 400 }), lintGutter());
     }
     if (isKotlin) {
       // Underline compiler errors/warnings as you type (service-side analysis).
@@ -487,7 +535,19 @@ export default function RunnableCode({
       );
     }
     return list;
-  }, [isTs, isKotlin, initial]);
+  }, [isTs, isKotlin, isJava, initial]);
+
+  // Java: load the runtime (JDK) versions offered by the service for the dropdown.
+  useEffect(() => {
+    if (!isJava) return undefined;
+    let cancelled = false;
+    getJavaRuntimes().then((list) => {
+      if (cancelled) return;
+      setRuntimes(list);
+      setRuntimeId((current) => current || pickDefaultRuntime(list));
+    });
+    return () => { cancelled = true; };
+  }, [isJava]);
 
   useEffect(() => {
     if (isTs) preloadTypeScript().catch(() => {});
@@ -519,6 +579,8 @@ export default function RunnableCode({
   const inputTitle = isKotlin ? 'Arguments' : 'STDIN';
   const inputHelp = isKotlin
     ? 'Optional program arguments passed to main(args) - separated by spaces.'
+    : isJava
+    ? 'Optional input fed to the program - read it with new Scanner(System.in).'
     : 'Optional input fed to the program - one value per line, read with readLine() or prompt().';
 
   return (
@@ -533,6 +595,15 @@ export default function RunnableCode({
           <span className="runnable-code__file-name">{displayName}</span>
         </span>
         <div className="runnable-code__actions">
+          {isJava && (
+            <label className="runnable-code__target" title="JDK used to compile and run the code (sent as `compiler` in the request)">
+              <span>Java</span>
+              <select value={runtimeId} onChange={(event) => setRuntimeId(event.target.value)} disabled={status === 'running' || runtimes.length === 0} aria-label="Java runtime version">
+                {runtimes.length === 0 && <option value="">Loading…</option>}
+                {runtimes.map((r) => <option key={r.id} value={r.id}>{r.label}</option>)}
+              </select>
+            </label>
+          )}
           {isKotlin && targets && (
             <label className="runnable-code__target" title={targets.find((t) => t.confType === confType)?.hint}>
               <span>Target</span>
@@ -601,7 +672,7 @@ export default function RunnableCode({
               {isRunning && <span className="runnable-code__meta"> · running…</span>}
             </div>
             <div className="runnable-code__stats">
-              {timeText && <span className="runnable-code__stat" title={isKotlin ? 'Round trip, including compilation on the Kotlin service' : 'Execution time of your code'}>Time: {timeText}</span>}
+              {timeText && <span className="runnable-code__stat" title={isKotlin || isJava ? 'Round trip, including compilation on the remote service' : 'Execution time of your code'}>Time: {timeText}</span>}
               {memoryText && <span className="runnable-code__stat" title="Peak JavaScript heap while the code ran (Chromium browsers)">Memory: {memoryText}</span>}
             </div>
             <button
@@ -623,6 +694,7 @@ export default function RunnableCode({
             ))}
           </div>
           {isKotlin && <div className="runnable-code__footer">Compiled by JetBrains · api.kotlinlang.org</div>}
+          {isJava && <div className="runnable-code__footer">Compiled and run by Wandbox (open source) · wandbox.org</div>}
         </div>
       </div>
 
