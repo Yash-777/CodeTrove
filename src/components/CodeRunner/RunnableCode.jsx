@@ -1,25 +1,28 @@
 /**
  * src/components/CodeRunner/RunnableCode.jsx
  * ------------------------------------------------------------------
- * Editable + runnable code box used by ```js runnable / ```ts runnable
- * blocks in Markdown pages.
+ * Editable + runnable code box used by ```js runnable / ```ts runnable /
+ * ```kotlin runnable blocks in Markdown pages and by the online compiler
+ * page (/build/compiler, variant="playground").
  *
- * - Editor: CodeMirror 6.
- * - JavaScript: runs inside a sandboxed iframe (no allow-same-origin, so
- *   no access to the app's cookies/storage) that hosts a Web Worker. Stop,
- *   or the 10 s timeout, removes the iframe and terminates the worker, so
- *   `while (true) {}` cannot freeze the page.
- * - TypeScript: type-checked with the real `typescript` compiler (lazy
- *   loaded, see utils/tsCompiler.js). Errors are underlined in the editor
- *   as you type (@codemirror/lint) and Run prints
- *   `main.ts(2,1): error TS2322: ...` instead of executing code that does
- *   not compile.
+ * Every box has:
+ *   - a header with the file name on the left (index.js / index.ts /
+ *     Main.kt) and Copy, Save (download), Reset and Run on the right;
+ *   - a collapsible input section (<details>): STDIN for JS/TS (read with
+ *     readLine() / prompt()), program arguments for Kotlin;
+ *   - an output panel with Copy output, time taken and (when the browser
+ *     exposes it) memory used.
+ * The Run button shows "Running..." while the code executes.
  *
- * - Kotlin: Kotlin cannot be compiled in the browser, so ```kotlin runnable
- *   boxes use JetBrains' public compiler service (api.kotlinlang.org, the
- *   backend of play.kotlinlang.org - see utils/kotlinApi.js). Compiler
- *   diagnostics are underlined in the editor while typing and Run prints
- *   either `File.kt:2:5: error: ...` or the program output. Needs internet.
+ * Execution
+ * - JavaScript/TypeScript: sandboxed iframe (no allow-same-origin, so no
+ *   access to the app's cookies/storage) hosting a Web Worker. Stop, or the
+ *   10 s timeout, removes the iframe and terminates the worker, so
+ *   `while (true) {}` cannot freeze the page. TypeScript is type-checked
+ *   first with the real compiler (utils/tsCompiler.js); errors are underlined
+ *   while typing and printed as `index.ts(2,1): error TS2322: ...`.
+ * - Kotlin: compiled by JetBrains' public service (api.kotlinlang.org, the
+ *   backend of play.kotlinlang.org - utils/kotlinApi.js). Needs internet.
  *
  * Limitation: JS/TS code runs in a worker, so there is no DOM
  * (`document`/`window`).
@@ -38,12 +41,27 @@ import { compileTypeScript, formatDiagnostic, preloadTypeScript } from '../../ut
 import { getKotlinVersion, highlightKotlin, runKotlin } from '../../utils/kotlinApi.js';
 import './RunnableCode.css';
 
+/** File name shown in the header, used by Save and in error messages. */
+export const FILE_NAMES = { javascript: 'index.js', typescript: 'index.ts', kotlin: 'Main.kt' };
+const LANGUAGE_LABELS = { javascript: 'JavaScript', typescript: 'TypeScript', kotlin: 'Kotlin' };
+const LANGUAGE_BADGES = { javascript: 'JS', typescript: 'TS', kotlin: 'KT' };
+
 const TIMEOUT_MS = 10000;
 
 /* Code that runs INSIDE the worker. Kept as a function so it is
    syntax-checked/linted like normal code, then stringified. */
 function workerMain() {
-  const post = (type, text) => self.postMessage({ type, text });
+  // Peak JS heap seen while the snippet ran (Chromium only: performance.memory).
+  let peakMemory = 0;
+  const sampleMemory = () => {
+    try {
+      if (self.performance && self.performance.memory) {
+        peakMemory = Math.max(peakMemory, self.performance.memory.usedJSHeapSize);
+      }
+    } catch (e) { /* not supported in this browser */ }
+  };
+  const post = (type, text) => { sampleMemory(); self.postMessage({ type, text }); };
+  let startedAt = 0;
 
   const format = (value) => {
     if (typeof value === 'string') return value;
@@ -99,7 +117,8 @@ function workerMain() {
     nativeSetTimeout(() => {
       if (pending.size === 0 && !doneSent) {
         doneSent = true;
-        post('done', '');
+        sampleMemory();
+        self.postMessage({ type: 'done', time: self.performance.now() - startedAt, memory: peakMemory || null });
       }
     }, 0);
   };
@@ -132,9 +151,18 @@ function workerMain() {
   self.clearInterval = (id) => { pending.delete(id); nativeClearInterval(id); maybeDone(); };
 
   self.onmessage = async (event) => {
+    const { code, stdin } = event.data;
     const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor;
+
+    // stdin: one value per line, read with readLine() (or prompt()).
+    const inputLines = stdin ? String(stdin).replace(/\r\n/g, '\n').split('\n') : [];
+    self.readLine = () => (inputLines.length > 0 ? inputLines.shift() : null);
+    self.prompt = () => self.readLine();
+
+    startedAt = self.performance.now();
+    sampleMemory();
     try {
-      await new AsyncFunction(event.data)();
+      await new AsyncFunction(code)();
     } catch (error) {
       post('error', `${error && error.name ? error.name : 'Error'}: ${error && error.message ? error.message : error}`);
     }
@@ -147,20 +175,20 @@ const WORKER_SOURCE = `(${workerMain.toString()})();`;
 
 /* Document loaded into the sandboxed iframe: spawns the worker, relays
    its messages to the parent page, and reports when it goes quiet. */
-function buildRunnerDocument(code, runId) {
-  const payload = JSON.stringify({ code, runId, workerSource: WORKER_SOURCE }).replace(/</g, '\\u003c');
+function buildRunnerDocument(code, runId, stdin = '') {
+  const payload = JSON.stringify({ code, stdin, runId, workerSource: WORKER_SOURCE }).replace(/</g, '\\u003c');
   return `<!doctype html><html><body><script>
 (function () {
   var cfg = ${payload};
   var blob = new Blob([cfg.workerSource], { type: 'text/javascript' });
   var worker = new Worker(URL.createObjectURL(blob));
-  function relay(type, text) { parent.postMessage({ source: 'codetrove-runner', runId: cfg.runId, type: type, text: text }, '*'); }
+  function relay(type, text, stats) { parent.postMessage({ source: 'codetrove-runner', runId: cfg.runId, type: type, text: text, time: stats && stats.time, memory: stats && stats.memory }, '*'); }
   worker.onmessage = function (e) {
-    if (e.data.type === 'done') { relay('finished', ''); return; }
+    if (e.data.type === 'done') { relay('finished', '', e.data); return; }
     relay(e.data.type, e.data.text);
   };
   worker.onerror = function (e) { relay('error', (e.message || 'Worker error')); relay('finished', ''); };
-  worker.postMessage(cfg.code);
+  worker.postMessage({ code: cfg.code, stdin: cfg.stdin });
 })();
 <\/script></body></html>`;
 }
@@ -168,16 +196,84 @@ function buildRunnerDocument(code, runId) {
 let runCounter = 0;
 const KOTLIN_TIMEOUT_MS = 30000;
 
-/** Editable playground whose code executes in a sandboxed iframe + worker. */
-export default function RunnableCode({ initial = '', language = 'javascript' }) {
+/* ---- small inline icons (no icon dependency) ---- */
+const iconProps = { width: 16, height: 16, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round', 'aria-hidden': true };
+const CopyIcon = () => (<svg {...iconProps}><rect x="9" y="9" width="11" height="11" rx="2" /><path d="M5 15V6a2 2 0 0 1 2-2h9" /></svg>);
+const CheckIcon = () => (<svg {...iconProps}><path d="M20 6 9 17l-5-5" /></svg>);
+const SaveIcon = () => (<svg {...iconProps}><path d="M12 3v12" /><path d="m7 11 5 5 5-5" /><path d="M5 21h14" /></svg>);
+const ChevronIcon = () => (<svg {...iconProps} width="14" height="14"><path d="m6 9 6 6 6-6" /></svg>);
+
+function formatMemory(bytes) {
+  if (!bytes) return null;
+  const mb = bytes / (1024 * 1024);
+  return mb >= 1 ? `${mb.toFixed(1)} MB` : `${Math.max(1, Math.round(bytes / 1024))} KB`;
+}
+
+function formatTime(ms) {
+  if (ms === null || ms === undefined) return null;
+  if (ms < 1) return '<1 ms';
+  return ms >= 1000 ? `${(ms / 1000).toFixed(2)} s` : `${Math.round(ms)} ms`;
+}
+
+async function copyToClipboard(text) {
+  try {
+    await navigator.clipboard.writeText(text);
+    return true;
+  } catch {
+    // Fallback for non-secure contexts / older browsers.
+    const area = document.createElement('textarea');
+    area.value = text;
+    area.setAttribute('readonly', '');
+    area.style.position = 'fixed';
+    area.style.opacity = '0';
+    document.body.appendChild(area);
+    area.select();
+    let ok = false;
+    try { ok = document.execCommand('copy'); } catch { ok = false; }
+    document.body.removeChild(area);
+    return ok;
+  }
+}
+
+function downloadTextFile(fileName, text) {
+  const url = URL.createObjectURL(new Blob([text], { type: 'text/plain;charset=utf-8' }));
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = fileName;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+/**
+ * Editable playground whose code executes in a sandboxed iframe + worker
+ * (JS/TS) or on JetBrains' compiler service (Kotlin).
+ *
+ * Props: initial (source), initialInput (stdin / arguments), language
+ * ('javascript' | 'typescript' | 'kotlin'), variant ('inline' | 'playground'),
+ * fileName (override the default file name).
+ */
+export default function RunnableCode({
+  initial = '',
+  initialInput = '',
+  language = 'javascript',
+  variant = 'inline',
+  fileName,
+}) {
   const isTs = language === 'typescript';
   const isKotlin = language === 'kotlin';
-  const label = isKotlin ? 'Kotlin' : isTs ? 'TypeScript' : 'JavaScript';
+  const label = LANGUAGE_LABELS[language] || 'JavaScript';
+  const displayName = fileName || FILE_NAMES[language] || 'index.js';
+  const isPlayground = variant === 'playground';
+
   const [code, setCode] = useState(initial);
+  const [input, setInput] = useState(initialInput);
   const [logs, setLogs] = useState([]);
   const [status, setStatus] = useState('idle'); // idle | running | done | timeout
-  const [elapsed, setElapsed] = useState(null);
+  const [stats, setStats] = useState({ time: null, memory: null });
   const [execution, setExecution] = useState({ key: 0, document: null });
+  const [copied, setCopied] = useState({ code: false, output: false });
   const frameRef = useRef(null);
   const rootRef = useRef(null);
   const activeRunRef = useRef(0);
@@ -185,6 +281,8 @@ export default function RunnableCode({ initial = '', language = 'javascript' }) 
   const startedAtRef = useRef(0);
   const abortRef = useRef(null);
   const editorViewRef = useRef(null);
+  const inputRef = useRef(initialInput);
+  inputRef.current = input;
 
   const stopCode = useCallback((nextStatus = 'idle') => {
     clearTimeout(timeoutRef.current);
@@ -202,7 +300,10 @@ export default function RunnableCode({ initial = '', language = 'javascript' }) 
       if (data.runId !== activeRunRef.current) return;
 
       if (data.type === 'finished') {
-        setElapsed(Math.round(performance.now() - startedAtRef.current));
+        setStats({
+          time: typeof data.time === 'number' ? data.time : performance.now() - startedAtRef.current,
+          memory: typeof data.memory === 'number' ? data.memory : null,
+        });
         stopCode('done');
         return;
       }
@@ -222,10 +323,15 @@ export default function RunnableCode({ initial = '', language = 'javascript' }) 
     const myRun = runCounter;
     activeRunRef.current = myRun;
     startedAtRef.current = performance.now();
-    setElapsed(null);
+    setStats({ time: null, memory: null });
     setLogs([]);
     setStatus('running');
     setExecution((current) => ({ ...current, document: null }));
+    const finishWithoutRun = (lines) => {
+      setLogs(lines);
+      setStats({ time: performance.now() - startedAtRef.current, memory: null });
+      setStatus('done');
+    };
 
     if (isKotlin) {
       // Compile + run remotely (JetBrains' compiler service).
@@ -233,7 +339,7 @@ export default function RunnableCode({ initial = '', language = 'javascript' }) 
       abortRef.current = controller;
       timeoutRef.current = setTimeout(() => controller.abort('timeout'), KOTLIN_TIMEOUT_MS);
       try {
-        const { lines, diagnostics } = await runKotlin(code, controller.signal);
+        const { lines, diagnostics } = await runKotlin(code, controller.signal, { args: inputRef.current.trim(), displayName });
         if (activeRunRef.current !== myRun) return;
         clearTimeout(timeoutRef.current);
         // Underline the same problems the compiler reported for this Run.
@@ -248,20 +354,18 @@ export default function RunnableCode({ initial = '', language = 'javascript' }) 
             source: 'Kotlin',
           }))));
         }
-        setLogs(lines);
-        setElapsed(Math.round(performance.now() - startedAtRef.current));
-        setStatus('done');
+        finishWithoutRun(lines);
       } catch (error) {
         if (activeRunRef.current !== myRun) return; // stopped or re-run meanwhile
         clearTimeout(timeoutRef.current);
         const timedOut = controller.signal.aborted;
-        setLogs([{
+        finishWithoutRun([{
           type: 'error',
           text: timedOut
             ? `Timed out after ${KOTLIN_TIMEOUT_MS / 1000}s waiting for the Kotlin compiler service.`
             : `Could not reach the Kotlin compiler service (api.kotlinlang.org). Check your internet connection and try again. (${error.message})`,
         }]);
-        setStatus(timedOut ? 'timeout' : 'done');
+        if (timedOut) setStatus('timeout');
       }
       return;
     }
@@ -274,33 +378,47 @@ export default function RunnableCode({ initial = '', language = 'javascript' }) 
         const { diagnostics, js } = await compileTypeScript(code);
         if (activeRunRef.current !== myRun) return; // stopped or re-run meanwhile
         if (diagnostics.length > 0) {
-          setLogs(diagnostics.map((d) => ({ type: 'error', text: formatDiagnostic(d) })));
-          setElapsed(Math.round(performance.now() - startedAtRef.current));
-          setStatus('done');
+          finishWithoutRun(diagnostics.map((d) => ({ type: 'error', text: formatDiagnostic(d, displayName) })));
           return;
         }
         executableCode = js;
       } catch (error) {
         if (activeRunRef.current !== myRun) return;
-        setLogs([{ type: 'error', text: `Could not load the TypeScript compiler: ${error.message}` }]);
-        setStatus('done');
+        finishWithoutRun([{ type: 'error', text: `Could not load the TypeScript compiler: ${error.message}` }]);
         return;
       }
     }
 
-    setExecution((current) => ({ key: current.key + 1, document: buildRunnerDocument(executableCode, myRun) }));
+    setExecution((current) => ({ key: current.key + 1, document: buildRunnerDocument(executableCode, myRun, inputRef.current) }));
     timeoutRef.current = setTimeout(() => {
       setLogs((current) => [...current, { type: 'error', text: `Timed out after ${TIMEOUT_MS / 1000}s - execution stopped (possible infinite loop).` }]);
+      setStats({ time: performance.now() - startedAtRef.current, memory: null });
       stopCode('timeout');
     }, TIMEOUT_MS);
-  }, [code, isTs, isKotlin, stopCode]);
+  }, [code, isTs, isKotlin, displayName, stopCode]);
 
   const resetCode = () => {
     stopCode('idle');
     setCode(initial);
+    setInput(initialInput);
     setLogs([]);
-    setElapsed(null);
+    setStats({ time: null, memory: null });
   };
+
+  const eraseCode = () => {
+    stopCode('idle');
+    setCode('');
+    setLogs([]);
+    setStats({ time: null, memory: null });
+  };
+
+  const flashCopied = (key) => {
+    setCopied((current) => ({ ...current, [key]: true }));
+    setTimeout(() => setCopied((current) => ({ ...current, [key]: false })), 1500);
+  };
+
+  const copyCode = async () => { if (await copyToClipboard(code)) flashCopied('code'); };
+  const copyOutput = async () => { if (await copyToClipboard(logs.map((entry) => entry.text).join('\n'))) flashCopied('output'); };
 
   const extensions = useMemo(() => {
     const list = [
@@ -379,38 +497,111 @@ export default function RunnableCode({ initial = '', language = 'javascript' }) 
   }, [runCode]);
 
   const isRunning = status === 'running';
+  const timeText = formatTime(stats.time);
+  const memoryText = formatMemory(stats.memory);
+  const inputLineCount = input === '' ? 0 : input.split('\n').length;
+  const inputTitle = isKotlin ? 'Arguments' : 'STDIN';
+  const inputHelp = isKotlin
+    ? 'Optional program arguments passed to main(args) - separated by spaces.'
+    : 'Optional input fed to the program - one value per line, read with readLine() or prompt().';
 
   return (
-    <section className="runnable-code" ref={rootRef} aria-label={`Runnable ${label} example`}>
-      <div className="runnable-code__editor">
-        <CodeMirror
-          value={code}
-          extensions={extensions}
-          theme={oneDark}
-          onChange={setCode}
-          onCreateEditor={(view) => { editorViewRef.current = view; }}
-          basicSetup={{ lineNumbers: true, foldGutter: true, highlightActiveLine: true }}
-          aria-label={`${label} code editor`}
-        />
-      </div>
-      <div className="runnable-code__toolbar">
-        <button type="button" className="runnable-code__button runnable-code__button--run" onClick={runCode} title="Run (Ctrl/Cmd + Enter)">▶ Run</button>
-        <button type="button" className="runnable-code__button" onClick={() => stopCode('idle')} disabled={!isRunning}>■ Stop</button>
-        <button type="button" className="runnable-code__button" onClick={resetCode}>Reset</button>
-        {isKotlin && <span className="runnable-code__hint">Compiled by JetBrains · api.kotlinlang.org</span>}
-      </div>
-      <div className="runnable-code__output" aria-live="polite">
-        <div className="runnable-code__output-title">
-          Output
-          {isRunning && <span className="runnable-code__meta"> · running…</span>}
-          {status === 'done' && elapsed !== null && <span className="runnable-code__meta"> · finished in {elapsed} ms</span>}
+    <section
+      className={`runnable-code${isPlayground ? ' runnable-code--playground' : ''}`}
+      ref={rootRef}
+      aria-label={`Runnable ${label} example`}
+    >
+      <div className="runnable-code__header">
+        <span className="runnable-code__file" title={`${label} file`}>
+          <span className={`runnable-code__badge runnable-code__badge--${language}`}>{LANGUAGE_BADGES[language] || 'JS'}</span>
+          <span className="runnable-code__file-name">{displayName}</span>
+        </span>
+        <div className="runnable-code__actions">
+          <button type="button" className="runnable-code__icon-button" onClick={copyCode} title="Copy code" aria-label="Copy code">
+            {copied.code ? <CheckIcon /> : <CopyIcon />}
+          </button>
+          <button type="button" className="runnable-code__icon-button" onClick={() => downloadTextFile(displayName, code)} title={`Save as ${displayName}`} aria-label={`Save as ${displayName}`}>
+            <SaveIcon />
+          </button>
+          <button type="button" className="runnable-code__button" onClick={resetCode} title="Restore the original example">Reset</button>
+          {isPlayground && <button type="button" className="runnable-code__button" onClick={eraseCode} title="Clear the editor">Erase</button>}
+          {isRunning && <button type="button" className="runnable-code__button runnable-code__button--stop" onClick={() => stopCode('idle')}>■ Stop</button>}
+          <button
+            type="button"
+            className={`runnable-code__button runnable-code__button--run${isRunning ? ' is-running' : ''}`}
+            onClick={runCode}
+            disabled={isRunning}
+            title="Run (Ctrl/Cmd + Enter)"
+          >
+            {isRunning ? (<><span className="runnable-code__spinner" aria-hidden="true" />Running…</>) : '▶ Run'}
+          </button>
         </div>
-        {logs.length === 0 ? (
-          <div className="runnable-code__placeholder">Output appears here…</div>
-        ) : logs.map((entry, index) => (
-          <div key={`${index}-${entry.type}`} className={`runnable-code__log runnable-code__log--${entry.type}`}>{entry.text}</div>
-        ))}
       </div>
+
+      <details className="runnable-code__input" open={isPlayground && initialInput !== ''}>
+        <summary>
+          <ChevronIcon />
+          <span className="runnable-code__input-title">{inputTitle}</span>
+          <span className="runnable-code__input-help">{inputHelp}</span>
+          <span className="runnable-code__count">{inputLineCount} {inputLineCount === 1 ? 'line' : 'lines'}</span>
+        </summary>
+        <textarea
+          className="runnable-code__input-area"
+          value={input}
+          onChange={(event) => setInput(event.target.value)}
+          rows={3}
+          spellCheck={false}
+          placeholder={isKotlin ? 'e.g. Kotlin 2026' : 'e.g.\nAlice\n30'}
+          aria-label={isKotlin ? 'Program arguments' : 'Standard input'}
+        />
+      </details>
+
+      <div className="runnable-code__body">
+        <div className="runnable-code__editor">
+          <CodeMirror
+            value={code}
+            extensions={extensions}
+            theme={oneDark}
+            onChange={setCode}
+            onCreateEditor={(view) => { editorViewRef.current = view; }}
+            height={isPlayground ? '420px' : undefined}
+            basicSetup={{ lineNumbers: true, foldGutter: true, highlightActiveLine: true }}
+            aria-label={`${label} code editor`}
+          />
+        </div>
+
+        <div className="runnable-code__output" aria-live="polite">
+          <div className="runnable-code__output-head">
+            <div className="runnable-code__output-title">
+              Output
+              {isRunning && <span className="runnable-code__meta"> · running…</span>}
+            </div>
+            <div className="runnable-code__stats">
+              {timeText && <span className="runnable-code__stat" title={isKotlin ? 'Round trip, including compilation on the Kotlin service' : 'Execution time of your code'}>Time: {timeText}</span>}
+              {memoryText && <span className="runnable-code__stat" title="Peak JavaScript heap while the code ran (Chromium browsers)">Memory: {memoryText}</span>}
+            </div>
+            <button
+              type="button"
+              className="runnable-code__icon-button"
+              onClick={copyOutput}
+              disabled={logs.length === 0}
+              title="Copy output"
+              aria-label="Copy output"
+            >
+              {copied.output ? <CheckIcon /> : <CopyIcon />}
+            </button>
+          </div>
+          <div className="runnable-code__logs">
+            {logs.length === 0 ? (
+              <div className="runnable-code__placeholder">{isRunning ? 'Running…' : 'Output appears here…'}</div>
+            ) : logs.map((entry, index) => (
+              <div key={`${index}-${entry.type}`} className={`runnable-code__log runnable-code__log--${entry.type}`}>{entry.text}</div>
+            ))}
+          </div>
+          {isKotlin && <div className="runnable-code__footer">Compiled by JetBrains · api.kotlinlang.org</div>}
+        </div>
+      </div>
+
       {execution.document !== null && (
         <iframe
           key={execution.key}

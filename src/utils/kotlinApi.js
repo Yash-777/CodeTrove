@@ -43,14 +43,14 @@ export function getKotlinVersion() {
   return versionPromise;
 }
 
-async function post(path, code, signal) {
+async function post(path, code, signal, args = '') {
   const version = await getKotlinVersion();
   const response = await fetch(`${KOTLIN_SERVER}/api/${version}/compiler/${path}`, {
     method: 'POST',
     signal,
     headers: { 'Content-Type': 'application/json; charset=utf-8' },
     body: JSON.stringify({
-      args: '',
+      args,
       files: [{ name: FILE_NAME, text: code, publicId: '' }],
       confType: 'java',
     }),
@@ -144,29 +144,33 @@ function formatException(exception) {
 }
 
 /**
- * Compile and run on the JVM.
+ * Compile and run on the JVM. `args` is the program-arguments string passed to
+ * main(args); `displayName` is the editor's file name (e.g. Main.kt) used in
+ * messages instead of the service's internal File.kt.
  * Returns { lines, hasErrors, diagnostics }: compiler errors
  * (File.kt:2:5: error: ...) when the code does not compile, otherwise warnings
  * followed by the program output. `diagnostics` (with editor offsets) lets the
  * editor underline the same problems.
  */
-export async function runKotlin(code, signal) {
-  const data = await post('run', code, signal);
+export async function runKotlin(code, signal, { args = '', displayName = FILE_NAME } = {}) {
+  const data = await post('run', code, signal, args);
+  // The service always sees "File.kt"; show the name of the file in the editor.
+  const rename = (text) => String(text).replace(/FileKt/g, displayName.replace(/\.kt$/, 'Kt')).replace(/File\.kt/g, displayName);
   const all = Object.values(data?.errors || {}).flatMap((list) => normalizeDiagnostics(list, code));
   const errors = all.filter((item) => item.severity === 'error');
   const warnings = all.filter((item) => item.severity !== 'error');
 
-  const format = (item) => `${FILE_NAME}:${item.line}:${item.column}: ${item.severity === 'error' ? 'error' : 'warning'}: ${item.message}`;
+  const format = (item) => `${displayName}:${item.line}:${item.column}: ${item.severity === 'error' ? 'error' : 'warning'}: ${item.message}`;
 
   if (errors.length > 0) {
     return { hasErrors: true, diagnostics: all, lines: errors.map((item) => ({ type: 'error', text: format(item) })) };
   }
 
   const lines = warnings.map((item) => ({ type: 'warn', text: format(item) }));
-  const output = parseProgramOutput(data?.text || '');
+  const output = parseProgramOutput(data?.text || '').map((line) => ({ ...line, text: rename(line.text) }));
   const outputMentionsException = data?.exception?.fullName
     && output.some((line) => line.text.includes(data.exception.fullName));
   lines.push(...output);
-  if (data?.exception && !outputMentionsException) lines.push(...formatException(data.exception));
+  if (data?.exception && !outputMentionsException) lines.push(...formatException(data.exception).map((line) => ({ ...line, text: rename(line.text) })));
   return { hasErrors: false, diagnostics: all, lines };
 }

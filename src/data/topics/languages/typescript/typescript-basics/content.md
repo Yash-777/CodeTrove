@@ -117,7 +117,7 @@ score = "Game Over";     // ❌ COMPILE ERROR
 console.log(score);
 ```
 
-Expected output: `main.ts(2,1): error TS2322: Type 'string' is not assignable to type 'number'.`
+Expected output: `index.ts(2,1): error TS2322: Type 'string' is not assignable to type 'number'.`
 
 Fix it by declaring the type you actually want:
 
@@ -130,7 +130,7 @@ console.log(score);
 ## Key takeaways
 
 - TypeScript is type-checked, then transpiled to JavaScript before browser execution.
-- Type errors stop the run and are shown as `main.ts(line,col): error TSxxxx`.
+- Type errors stop the run and are shown as `index.ts(line,col): error TSxxxx`.
 - Type annotations and interfaces are removed during transpilation.
 - Type inference reduces repetitive annotations.
 - Union types and narrowing help model values safely.

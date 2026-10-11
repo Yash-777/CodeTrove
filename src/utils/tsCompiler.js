@@ -34,6 +34,9 @@ declare function clearTimeout(id: number | undefined): void;
 declare function setInterval(handler: (...args: any[]) => void, timeout?: number, ...args: any[]): number;
 declare function clearInterval(id: number | undefined): void;
 declare function structuredClone<T>(value: T): T;
+/** stdin: next input line, or null when the input is exhausted. */
+declare function readLine(): string | null;
+declare function prompt(message?: string, defaultValue?: string): string | null;
 `;
 
 const MAIN_FILE = 'main.ts';
@@ -155,7 +158,7 @@ export async function compileTypeScript(code) {
   return { diagnostics, js };
 }
 
-/** "main.ts(2,1): error TS2322: Type 'string' is not assignable to type 'number'." */
-export function formatDiagnostic(d) {
-  return `${MAIN_FILE}(${d.line},${d.column}): error TS${d.code}: ${d.message}`;
+/** "index.ts(2,1): error TS2322: Type 'string' is not assignable to type 'number'." */
+export function formatDiagnostic(d, fileName = 'index.ts') {
+  return `${fileName}(${d.line},${d.column}): error TS${d.code}: ${d.message}`;
 }
