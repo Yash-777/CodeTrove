@@ -93,7 +93,7 @@ Super simple! Three steps:
 ```
 
 2. **Create markdown content** at `src/data/topics/java/your-topic-slug/content.md`:
-```markdown
+````markdown
 # Your Topic Title
 
 ## Section 1
@@ -114,7 +114,7 @@ public class Example {
 | Feature | Value |
 |---------|-------|
 | Row 1   | Data  |
-```
+````
 
 3. **Refresh browser** - Topic appears automatically in sidebar!
 
@@ -182,6 +182,58 @@ All markdown content automatically gets proper dark/light mode support. The styl
 - Hard refresh (Ctrl+Shift+R)
 - Check `.env` file is saved
 - Restart dev server if needed
+
+## Runnable Code Blocks (inline editor)
+
+Add `runnable` after the language of a fenced block to turn it into an editable
+code box (the same box powers the online compiler at `#/build/compiler`):
+
+````md
+```js runnable
+console.log('Hello');
+```
+
+```ts runnable
+let score = 99;
+score = 'Game Over';   // underlined in the editor, TS2322 on Run
+```
+
+```kotlin runnable
+fun main() {
+    println("Hello, Kotlin!")
+}
+```
+
+ * Compiler: Kotlin can’t be compiled in the browser, so the box calls the public service behind `play.kotlinlang.org`, `api.kotlinlang.org`. They are plain CORS requests, so it works on GitHub Pages with no backend of your own.
+ * Errors in the editor: compiler errors are underlined while you type and after Run. The output shows `File.kt:3:13: error: ...`, or the program’s output, or a Java stack trace for exceptions.
+ * Notice in the box: each Kotlin box says `“Compiled by JetBrains · api.kotlinlang.org”`, because the snippet text is sent to that service. It needs an internet connection and shows a clear message when offline.
+
+```
+Request URL: POST https://api.kotlinlang.org/api/2.4.21/compiler/run
+Payload: {"args":"","files":[{"name":"File.kt","text":"fun main() {\r\n    println(\"Hello, Kotlin!\")\r\n}","publicId":""}],"confType":"java"}
+Response: {"errors":{"File.kt":[]},"exception":null,"jvmByteCode":null,"text":"<outStream>Hello, Kotlin!\n</outStream>"}
+```
+
+````
+
+Every editor has:
+
+- **Header** - file name on the left (`index.js`, `index.ts`, `Main.kt`); on the right **Copy** code, **Save** (downloads the file), **Reset** and **Run** (`Ctrl/Cmd + Enter` also runs). While the code executes the button shows **Running...** and returns to **Run** when it finishes; **Stop** appears during a run.
+- **Input section** (collapsed `<details>`) - `STDIN` for JavaScript/TypeScript: one value per line, read in the code with `readLine()` (or `prompt()`); `Arguments` for Kotlin: program arguments passed to `main(args)`, separated by spaces.
+- **Output panel** - **Copy** output, **Time** taken and **Memory** (peak JS heap, shown only in Chromium browsers; not available for Kotlin).
+
+| Language | Fence | File | How it runs |
+|---|---|---|---|
+| JavaScript | `js` / `javascript` | `index.js` | In the browser: sandboxed iframe + Web Worker (10 s timeout, no DOM access) |
+| TypeScript | `ts` / `typescript` | `index.ts` | Type-checked in the browser with the `typescript` package (lazy-loaded); errors underlined while typing, `index.ts(2,1): error TS2322: ...` on Run |
+| Kotlin | `kotlin` / `kt` | `Main.kt` | Compiled on JetBrains' public service `api.kotlinlang.org` (same backend as play.kotlinlang.org); compiler errors underlined while typing, `Main.kt:2:5: error: ...` on Run. Needs internet; the snippet text is sent to that service. Write a full program with `fun main()`. The service has no stdin, so use the Arguments field. |
+
+
+Everything is client-side, so it works on GitHub Pages. Files:
+`src/components/CodeRunner/RunnableCode.jsx` (+ `.css`), `src/utils/tsCompiler.js`,
+`src/utils/kotlinApi.js`, `src/pages/build/CompilerPage.jsx` (the `#/build/compiler`
+page with JavaScript / TypeScript / Kotlin tabs, deep link `?lang=kotlin`), and the
+`runnable` handling in `src/components/MarkdownContent.jsx`.
 
 ## Architecture Benefits
 

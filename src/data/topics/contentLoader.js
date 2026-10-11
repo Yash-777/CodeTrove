@@ -8,7 +8,10 @@ export function getTopicContent(categoryKey, topicSlug) {
   const topicKey = `./${categoryKey}/${topicSlug}/content.md`;
   const categoryInfoKey = `./${categoryKey}/content_info.md`;
 
-  const topicContent = topicContentFiles[topicKey];
+  // Some categories (e.g. typescript) keep their markdown under languages/<category>/.
+  const languagesKey = `./languages/${categoryKey}/${topicSlug}/content.md`;
+
+  const topicContent = topicContentFiles[topicKey] ?? topicContentFiles[languagesKey];
   if (typeof topicContent === 'string' && topicContent.trim()) {
     return topicContent.trimEnd();
   }
