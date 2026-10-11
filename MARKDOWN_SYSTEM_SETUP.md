@@ -183,6 +183,51 @@ All markdown content automatically gets proper dark/light mode support. The styl
 - Check `.env` file is saved
 - Restart dev server if needed
 
+## Runnable Code Blocks (inline editor)
+
+Add `runnable` after the language of a fenced block to turn it into an editable
+code box with **Run**, **Stop** and **Reset** (`Ctrl/Cmd + Enter` also runs):
+
+````md
+```js runnable
+console.log('Hello');
+```
+
+```ts runnable
+let score = 99;
+score = 'Game Over';   // underlined in the editor, TS2322 on Run
+```
+
+
+
+```kotlin runnable
+fun main() {
+    println("Hello, Kotlin!")
+}
+```
+
+ * Compiler: Kotlin can’t be compiled in the browser, so the box calls the public service behind `play.kotlinlang.org`, `api.kotlinlang.org`. They are plain CORS requests, so it works on GitHub Pages with no backend of your own.
+ * Errors in the editor: compiler errors are underlined while you type and after Run. The output shows File.kt:3:13: error: ..., or the program’s output, or a Java stack trace for exceptions.
+ * Notice in the box: each Kotlin box says “Compiled by JetBrains · api.kotlinlang.org”, because the snippet text is sent t
+
+```
+Request URL: POST https://api.kotlinlang.org/api/2.4.21/compiler/run
+Payload: {"args":"","files":[{"name":"File.kt","text":"fun main() {\r\n    println(\"Hello, Kotlin!\")\r\n}","publicId":""}],"confType":"java"}
+Response: {"errors":{"File.kt":[]},"exception":null,"jvmByteCode":null,"text":"<outStream>Hello, Kotlin!\n</outStream>"}
+```
+
+````
+
+| Language | Fence | How it runs |
+|---|---|---|
+| JavaScript | `js` / `javascript` | In the browser: sandboxed iframe + Web Worker (10 s timeout, no DOM access) |
+| TypeScript | `ts` / `typescript` | Type-checked in the browser with the `typescript` package (lazy-loaded), errors underlined while typing, `main.ts(2,1): error TS2322: ...` on Run |
+| Kotlin | `kotlin` / `kt` | Compiled on JetBrains' public service `api.kotlinlang.org` (same backend as play.kotlinlang.org); compiler errors underlined while typing, `File.kt:2:5: error: ...` on Run. Needs internet; the snippet text is sent to that service. Write a full program with `fun main()`. |
+
+Everything is client-side, so it works on GitHub Pages. Files:
+`src/components/CodeRunner/RunnableCode.jsx`, `src/utils/tsCompiler.js`,
+`src/utils/kotlinApi.js` (and the `runnable` handling in `src/components/MarkdownContent.jsx`).
+
 ## Architecture Benefits
 
 ✅ **Separation of Concerns**

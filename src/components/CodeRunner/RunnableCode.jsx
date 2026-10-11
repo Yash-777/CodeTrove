@@ -15,7 +15,14 @@
  *   `main.ts(2,1): error TS2322: ...` instead of executing code that does
  *   not compile.
  *
- * Limitation: code runs in a worker, so there is no DOM (`document`/`window`).
+ * - Kotlin: Kotlin cannot be compiled in the browser, so ```kotlin runnable
+ *   boxes use JetBrains' public compiler service (api.kotlinlang.org, the
+ *   backend of play.kotlinlang.org - see utils/kotlinApi.js). Compiler
+ *   diagnostics are underlined in the editor while typing and Run prints
+ *   either `File.kt:2:5: error: ...` or the program output. Needs internet.
+ *
+ * Limitation: JS/TS code runs in a worker, so there is no DOM
+ * (`document`/`window`).
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -24,8 +31,11 @@ import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
 import { keymap } from '@codemirror/view';
 import { Prec } from '@codemirror/state';
-import { linter, lintGutter } from '@codemirror/lint';
+import { StreamLanguage } from '@codemirror/language';
+import { kotlin } from '@codemirror/legacy-modes/mode/clike';
+import { linter, lintGutter, setDiagnostics } from '@codemirror/lint';
 import { compileTypeScript, formatDiagnostic, preloadTypeScript } from '../../utils/tsCompiler.js';
+import { getKotlinVersion, highlightKotlin, runKotlin } from '../../utils/kotlinApi.js';
 import './RunnableCode.css';
 
 const TIMEOUT_MS = 10000;
@@ -156,11 +166,13 @@ function buildRunnerDocument(code, runId) {
 }
 
 let runCounter = 0;
+const KOTLIN_TIMEOUT_MS = 30000;
 
 /** Editable playground whose code executes in a sandboxed iframe + worker. */
 export default function RunnableCode({ initial = '', language = 'javascript' }) {
   const isTs = language === 'typescript';
-  const label = isTs ? 'TypeScript' : 'JavaScript';
+  const isKotlin = language === 'kotlin';
+  const label = isKotlin ? 'Kotlin' : isTs ? 'TypeScript' : 'JavaScript';
   const [code, setCode] = useState(initial);
   const [logs, setLogs] = useState([]);
   const [status, setStatus] = useState('idle'); // idle | running | done | timeout
@@ -171,9 +183,12 @@ export default function RunnableCode({ initial = '', language = 'javascript' }) 
   const activeRunRef = useRef(0);
   const timeoutRef = useRef(null);
   const startedAtRef = useRef(0);
+  const abortRef = useRef(null);
+  const editorViewRef = useRef(null);
 
   const stopCode = useCallback((nextStatus = 'idle') => {
     clearTimeout(timeoutRef.current);
+    abortRef.current?.abort(); // cancels a pending Kotlin request
     if (nextStatus === 'idle') activeRunRef.current = 0; // also cancels a pending TypeScript compile
     setExecution((current) => ({ ...current, document: null })); // removing the iframe terminates the worker
     setStatus(nextStatus);
@@ -212,6 +227,45 @@ export default function RunnableCode({ initial = '', language = 'javascript' }) 
     setStatus('running');
     setExecution((current) => ({ ...current, document: null }));
 
+    if (isKotlin) {
+      // Compile + run remotely (JetBrains' compiler service).
+      const controller = new AbortController();
+      abortRef.current = controller;
+      timeoutRef.current = setTimeout(() => controller.abort('timeout'), KOTLIN_TIMEOUT_MS);
+      try {
+        const { lines, diagnostics } = await runKotlin(code, controller.signal);
+        if (activeRunRef.current !== myRun) return;
+        clearTimeout(timeoutRef.current);
+        // Underline the same problems the compiler reported for this Run.
+        const view = editorViewRef.current;
+        if (view) {
+          const docLength = view.state.doc.length;
+          view.dispatch(setDiagnostics(view.state, diagnostics.map((d) => ({
+            from: Math.min(d.from, docLength),
+            to: Math.min(Math.max(d.to, d.from + 1), docLength),
+            severity: d.severity,
+            message: d.message,
+            source: 'Kotlin',
+          }))));
+        }
+        setLogs(lines);
+        setElapsed(Math.round(performance.now() - startedAtRef.current));
+        setStatus('done');
+      } catch (error) {
+        if (activeRunRef.current !== myRun) return; // stopped or re-run meanwhile
+        clearTimeout(timeoutRef.current);
+        const timedOut = controller.signal.aborted;
+        setLogs([{
+          type: 'error',
+          text: timedOut
+            ? `Timed out after ${KOTLIN_TIMEOUT_MS / 1000}s waiting for the Kotlin compiler service.`
+            : `Could not reach the Kotlin compiler service (api.kotlinlang.org). Check your internet connection and try again. (${error.message})`,
+        }]);
+        setStatus(timedOut ? 'timeout' : 'done');
+      }
+      return;
+    }
+
     let executableCode = code;
     if (isTs) {
       // Type-check first. Like tsc / the TS playgrounds, code that does not
@@ -239,7 +293,7 @@ export default function RunnableCode({ initial = '', language = 'javascript' }) 
       setLogs((current) => [...current, { type: 'error', text: `Timed out after ${TIMEOUT_MS / 1000}s - execution stopped (possible infinite loop).` }]);
       stopCode('timeout');
     }, TIMEOUT_MS);
-  }, [code, isTs, stopCode]);
+  }, [code, isTs, isKotlin, stopCode]);
 
   const resetCode = () => {
     stopCode('idle');
@@ -250,7 +304,7 @@ export default function RunnableCode({ initial = '', language = 'javascript' }) 
 
   const extensions = useMemo(() => {
     const list = [
-      javascript({ typescript: isTs }),
+      isKotlin ? StreamLanguage.define(kotlin) : javascript({ typescript: isTs }),
       // Ctrl/Cmd + Enter runs the snippet from inside the editor.
       Prec.highest(keymap.of([{ key: 'Mod-Enter', run: () => { document.dispatchEvent(new CustomEvent('codetrove:run-focused')); return true; } }])),
     ];
@@ -278,12 +332,42 @@ export default function RunnableCode({ initial = '', language = 'javascript' }) 
         lintGutter()
       );
     }
+    if (isKotlin) {
+      // Underline compiler errors/warnings as you type (service-side analysis).
+      list.push(
+        linter(
+          async (view) => {
+            const source = view.state.doc.toString();
+            // Do not analyse the untouched sample: a page can hold many Kotlin
+            // boxes and each request goes to JetBrains' free public service.
+            // Diagnostics for an unedited box appear when you press Run.
+            if (source === initial || !source.trim() || source.length > 20000) return [];
+            try {
+              const diagnostics = await highlightKotlin(source);
+              const docLength = view.state.doc.length;
+              return diagnostics.map((d) => ({
+                from: Math.min(d.from, docLength),
+                to: Math.min(Math.max(d.to, d.from + 1), docLength),
+                severity: d.severity,
+                message: d.message,
+                source: 'Kotlin',
+              }));
+            } catch {
+              return []; // offline: editing still works, Run reports the problem
+            }
+          },
+          { delay: 1000 }
+        ),
+        lintGutter()
+      );
+    }
     return list;
-  }, [isTs]);
+  }, [isTs, isKotlin, initial]);
 
   useEffect(() => {
     if (isTs) preloadTypeScript().catch(() => {});
-  }, [isTs]);
+    if (isKotlin) getKotlinVersion();
+  }, [isTs, isKotlin]);
 
   // Only the box that owns keyboard focus reacts to Ctrl/Cmd + Enter.
   useEffect(() => {
@@ -304,6 +388,7 @@ export default function RunnableCode({ initial = '', language = 'javascript' }) 
           extensions={extensions}
           theme={oneDark}
           onChange={setCode}
+          onCreateEditor={(view) => { editorViewRef.current = view; }}
           basicSetup={{ lineNumbers: true, foldGutter: true, highlightActiveLine: true }}
           aria-label={`${label} code editor`}
         />
@@ -312,6 +397,7 @@ export default function RunnableCode({ initial = '', language = 'javascript' }) 
         <button type="button" className="runnable-code__button runnable-code__button--run" onClick={runCode} title="Run (Ctrl/Cmd + Enter)">▶ Run</button>
         <button type="button" className="runnable-code__button" onClick={() => stopCode('idle')} disabled={!isRunning}>■ Stop</button>
         <button type="button" className="runnable-code__button" onClick={resetCode}>Reset</button>
+        {isKotlin && <span className="runnable-code__hint">Compiled by JetBrains · api.kotlinlang.org</span>}
       </div>
       <div className="runnable-code__output" aria-live="polite">
         <div className="runnable-code__output-title">

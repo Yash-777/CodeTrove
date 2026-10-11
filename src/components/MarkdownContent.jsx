@@ -28,12 +28,20 @@ function alertType(children) {
   return match ? match[1].toLowerCase() : null;
 }
 
+// js/javascript -> 'javascript', ts/typescript -> 'typescript', kt/kotlin -> 'kotlin'
+function normalizeRunnableLanguage(language = '') {
+  const value = language.toLowerCase();
+  if (value === 'ts' || value === 'typescript') return 'typescript';
+  if (value === 'kt' || value === 'kotlin') return 'kotlin';
+  return 'javascript';
+}
+
 function MarkdownCode({ inline, className, children, node, ...props }) {
   const match = /language-([\w-]+)/.exec(className || '');
   const language = match ? match[1] : 'text';
   const meta = node?.data?.meta || node?.properties?.meta || '';
-  const normalizedLanguage = ['ts', 'typescript'].includes(language.toLowerCase()) ? 'typescript' : 'javascript';
-  const isRunnable = !inline && ['js', 'javascript', 'ts', 'typescript'].includes(language.toLowerCase()) && /(?:^|\s)runnable(?:\s|$)/.test(String(meta));
+  const normalizedLanguage = normalizeRunnableLanguage(language);
+  const isRunnable = !inline && ['js', 'javascript', 'ts', 'typescript', 'kt', 'kotlin'].includes(language.toLowerCase()) && /(?:^|\s)runnable(?:\s|$)/.test(String(meta));
 
   if (isRunnable) {
     // key = language + source: navigating to another page must remount the box,
@@ -64,7 +72,7 @@ function MarkdownPre({ node, children, ...props }) {
   if (Array.isArray(codeClasses) && codeClasses.includes('runnable')) {
     const source = (codeNode.children || []).map((child) => child.value || '').join('').replace(/\n$/, '');
     const languageClass = codeClasses.find((name) => /^language-/.test(name)) || 'language-js';
-    const language = /language-(ts|typescript)$/i.test(languageClass) ? 'typescript' : 'javascript';
+    const language = normalizeRunnableLanguage(languageClass.replace(/^language-/, ''));
     return <RunnableCode key={`${language}:${source}`} initial={source} language={language} />;
   }
 
@@ -92,7 +100,7 @@ function MarkdownPre({ node, children, ...props }) {
 function remarkRunnableCode() {
   return (tree) => {
     const visit = (node) => {
-      if (node?.type === 'code' && /^(js|javascript|ts|typescript)$/i.test(node.lang || '') && /(?:^|\s)runnable(?:\s|$)/.test(node.meta || '')) {
+      if (node?.type === 'code' && /^(js|javascript|ts|typescript|kt|kotlin)$/i.test(node.lang || '') && /(?:^|\s)runnable(?:\s|$)/.test(node.meta || '')) {
         node.data = node.data || {};
         node.data.hProperties = { ...(node.data.hProperties || {}), className: [`language-${node.lang}`, 'runnable'], meta: node.meta };
       }
