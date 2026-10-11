@@ -14,7 +14,31 @@
 
 import { Link, useSearchParams } from 'react-router-dom';
 import RunnableCode from '../../components/CodeRunner/RunnableCode.jsx';
+import { KOTLIN_TARGETS } from '../../utils/kotlinApi.js';
 import './CompilerPage.css';
+
+const KOTLIN_MAIN_SAMPLE = `// Program arguments (above) arrive in args
+fun main(args: Array<String>) {
+    val name = args.firstOrNull() ?: "World"
+    println("Hello, $name!")
+    println("Received \${args.size} argument(s)")
+}
+`;
+
+const KOTLIN_JUNIT_SAMPLE = `import org.junit.Test
+import kotlin.test.assertEquals
+
+class SampleTest {
+    @Test
+    fun additionWorks() {
+        assertEquals(4, 2 + 2)
+    }
+}
+`;
+
+// Dropdown entries come from KOTLIN_TARGETS (utils/kotlinApi.js); each gets its sample code here.
+const KOTLIN_SAMPLES = { java: KOTLIN_MAIN_SAMPLE, junit: KOTLIN_JUNIT_SAMPLE };
+const KOTLIN_TARGET_OPTIONS = KOTLIN_TARGETS.map((target) => ({ ...target, code: KOTLIN_SAMPLES[target.confType] || KOTLIN_MAIN_SAMPLE }));
 
 const LANGUAGES = [
   {
@@ -60,19 +84,59 @@ console.log(\`In 5 years you will be \${person.age + 5}.\`);
     learnTo: '/content/tree/languages/kotlin',
     docsUrl: 'https://kotlinlang.org/docs/home.html',
     input: 'Kotlin 2026',
-    code: `// Program arguments (above) arrive in args
-fun main(args: Array<String>) {
-    val name = args.firstOrNull() ?: "World"
-    println("Hello, $name!")
-    println("Received \${args.size} argument(s)")
-}
-`,
+    code: KOTLIN_MAIN_SAMPLE,
+    targets: KOTLIN_TARGET_OPTIONS,
   },
 ];
 
 function pickLanguage(value) {
   const v = (value || '').toLowerCase();
   return LANGUAGES.find((item) => item.param === v || item.key === v || (v === 'kotlin' && item.key === 'kotlin')) || LANGUAGES[0];
+}
+
+
+function KotlinAbout() {
+  return (
+    <section className="cp-about" aria-labelledby="cp-about-kotlin">
+      <h2 id="cp-about-kotlin">About the Kotlin playground</h2>
+      <p>
+        <a href="https://kotlinlang.org/" target="_blank" rel="noreferrer">Kotlin</a> is a modern, concise,
+        statically typed language from JetBrains - the official language for Android and widely used for
+        server-side (JVM) development. Try more in the official{' '}
+        <a href="https://play.kotlinlang.org/" target="_blank" rel="noreferrer">Kotlin Playground</a> or work
+        through the interactive{' '}
+        <a href="https://play.kotlinlang.org/koans/overview" target="_blank" rel="noreferrer">Kotlin Koans</a>.
+      </p>
+
+      <h3>How Run works</h3>
+      <p>
+        Kotlin cannot be compiled in the browser, so this page calls the public compiler service behind
+        play.kotlinlang.org (<code>api.kotlinlang.org</code>). These are plain CORS requests, so it works on
+        GitHub Pages with no backend of our own. Press <strong>Run</strong> (or <kbd>Ctrl/Cmd</kbd> + <kbd>Enter</kbd>):
+      </p>
+      <pre className="cp-about__code">{`POST https://api.kotlinlang.org/api/<version>/compiler/run
+{"args":"","files":[{"name":"File.kt","text":"fun main() { println(\"Hello, Kotlin!\") }","publicId":""}],"confType":"java"}
+
+{"errors":{"File.kt":[]},"exception":null,"jvmByteCode":null,"text":"<outStream>Hello, Kotlin!\n</outStream>"}`}</pre>
+
+      <h3>Target (confType)</h3>
+      <p>
+        The <strong>Target</strong> dropdown above the editor chooses the <code>confType</code> sent in the
+        payload. <code>java</code> compiles and runs <code>main()</code> on the JVM; <code>junit</code> runs
+        <code> @Test</code> functions and lists passed/failed tests. Switching target swaps in that target&apos;s
+        sample unless you have already edited the code.
+      </p>
+
+      <h3>Errors, output and privacy</h3>
+      <ul>
+        <li>Compiler errors are underlined while you type and after Run; the output shows
+          {' '}<code>Main.kt:3:13: error: ...</code>, or the program&apos;s output, or a Java stack trace for exceptions.</li>
+        <li>Each Kotlin box says <em>Compiled by JetBrains · api.kotlinlang.org</em> because your snippet text is
+          sent to that service.</li>
+        <li>An internet connection is required; when offline the output shows a clear message.</li>
+      </ul>
+    </section>
+  );
 }
 
 export default function CompilerPage() {
@@ -114,9 +178,12 @@ export default function CompilerPage() {
             language={item.key}
             initial={item.code}
             initialInput={item.input}
+            targets={item.targets}
           />
         </div>
       ))}
+
+      {active.key === 'kotlin' && <KotlinAbout />}
 
       <p className="cp-note">
         JavaScript and TypeScript run in your browser (isolated, 10&nbsp;s limit, no DOM). Kotlin is compiled by

@@ -23,6 +23,19 @@ export const KOTLIN_SERVER = 'https://api.kotlinlang.org';
 const FALLBACK_VERSION = '2.2.20';
 const FILE_NAME = 'File.kt';
 
+/**
+ * Compile targets offered in the Kotlin dropdown. `confType` is sent as-is in
+ * the request payload ("confType": "java" | "junit" ...), exactly like the
+ * kotlin-playground widget does. Add an entry here to offer another target the
+ * service supports; the UI is driven by this list (see CompilerPage.jsx for
+ * each target's sample code).
+ */
+export const KOTLIN_TARGETS = [
+  { confType: 'java', label: 'Kotlin/JVM (java)', hint: 'Compile and run main() on the JVM' },
+  { confType: 'junit', label: 'JUnit tests (junit)', hint: 'Run @Test functions and report pass/fail' },
+];
+export const DEFAULT_KOTLIN_TARGET = 'java';
+
 let versionPromise = null;
 
 /** Latest stable Kotlin compiler version offered by the service. */
@@ -43,7 +56,7 @@ export function getKotlinVersion() {
   return versionPromise;
 }
 
-async function post(path, code, signal, args = '') {
+async function post(path, code, signal, args = '', confType = DEFAULT_KOTLIN_TARGET) {
   const version = await getKotlinVersion();
   const response = await fetch(`${KOTLIN_SERVER}/api/${version}/compiler/${path}`, {
     method: 'POST',
@@ -52,7 +65,7 @@ async function post(path, code, signal, args = '') {
     body: JSON.stringify({
       args,
       files: [{ name: FILE_NAME, text: code, publicId: '' }],
-      confType: 'java',
+      confType,
     }),
   });
   if (!response.ok) throw new Error(`Kotlin compiler service responded with HTTP ${response.status}`);
@@ -99,8 +112,8 @@ function normalizeDiagnostics(raw, code) {
 }
 
 /** Diagnostics for the editor squiggles (no execution). */
-export async function highlightKotlin(code, signal) {
-  const data = await post('highlight', code, signal);
+export async function highlightKotlin(code, signal, confType = DEFAULT_KOTLIN_TARGET) {
+  const data = await post('highlight', code, signal, '', confType);
   return normalizeDiagnostics(data?.[FILE_NAME], code);
 }
 
@@ -144,6 +157,26 @@ function formatException(exception) {
 }
 
 /**
+ * JUnit target: the service returns `testResults: { ClassName: [{ methodName,
+ * status, comparisonFailure, exception, ... }] }` next to the usual output.
+ * Parsed defensively - unknown shapes simply produce no extra lines.
+ */
+function formatTestResults(testResults) {
+  if (!testResults || typeof testResults !== 'object') return [];
+  const lines = [];
+  Object.entries(testResults).forEach(([className, tests]) => {
+    (Array.isArray(tests) ? tests : []).forEach((test) => {
+      const ok = String(test.status).toUpperCase() === 'OK';
+      const detail = test.comparisonFailure
+        ? `expected:<${decodeEntities(test.comparisonFailure.expected)}> but was:<${decodeEntities(test.comparisonFailure.actual)}>`
+        : decodeEntities(test.exception?.message || '');
+      lines.push({ type: ok ? 'log' : 'error', text: `${ok ? '✓' : '✗'} ${className}.${test.methodName}${ok || !detail ? '' : ` - ${detail}`}` });
+    });
+  });
+  return lines;
+}
+
+/**
  * Compile and run on the JVM. `args` is the program-arguments string passed to
  * main(args); `displayName` is the editor's file name (e.g. Main.kt) used in
  * messages instead of the service's internal File.kt.
@@ -152,8 +185,8 @@ function formatException(exception) {
  * followed by the program output. `diagnostics` (with editor offsets) lets the
  * editor underline the same problems.
  */
-export async function runKotlin(code, signal, { args = '', displayName = FILE_NAME } = {}) {
-  const data = await post('run', code, signal, args);
+export async function runKotlin(code, signal, { args = '', displayName = FILE_NAME, confType = DEFAULT_KOTLIN_TARGET } = {}) {
+  const data = await post('run', code, signal, args, confType);
   // The service always sees "File.kt"; show the name of the file in the editor.
   const rename = (text) => String(text).replace(/FileKt/g, displayName.replace(/\.kt$/, 'Kt')).replace(/File\.kt/g, displayName);
   const all = Object.values(data?.errors || {}).flatMap((list) => normalizeDiagnostics(list, code));
@@ -171,6 +204,7 @@ export async function runKotlin(code, signal, { args = '', displayName = FILE_NA
   const outputMentionsException = data?.exception?.fullName
     && output.some((line) => line.text.includes(data.exception.fullName));
   lines.push(...output);
+  lines.push(...formatTestResults(data?.testResults));
   if (data?.exception && !outputMentionsException) lines.push(...formatException(data.exception).map((line) => ({ ...line, text: rename(line.text) })));
   return { hasErrors: false, diagnostics: all, lines };
 }

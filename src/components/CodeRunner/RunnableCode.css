@@ -183,3 +183,10 @@
   .runnable-code__editor .cm-editor { font-size: 0.82rem; }
   .runnable-code__input-help { display: none; }
 }
+
+.runnable-code__target { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.8rem; color: var(--color-muted); }
+.runnable-code__target select {
+  padding: 0.3rem 0.5rem; border-radius: 6px; border: 1px solid var(--color-border);
+  background: var(--color-paper); color: var(--color-text); font-size: 0.82rem; cursor: pointer;
+}
+.runnable-code__target select:disabled { opacity: 0.6; cursor: not-allowed; }

@@ -205,8 +205,8 @@ fun main() {
 ```
 
  * Compiler: Kotlin can’t be compiled in the browser, so the box calls the public service behind `play.kotlinlang.org`, `api.kotlinlang.org`. They are plain CORS requests, so it works on GitHub Pages with no backend of your own.
- * Errors in the editor: compiler errors are underlined while you type and after Run. The output shows File.kt:3:13: error: ..., or the program’s output, or a Java stack trace for exceptions.
- * Notice in the box: each Kotlin box says “Compiled by JetBrains · api.kotlinlang.org”, because the snippet text is sent t
+ * Errors in the editor: compiler errors are underlined while you type and after Run. The output shows `File.kt:3:13: error: ...`, or the program’s output, or a Java stack trace for exceptions.
+ * Notice in the box: each Kotlin box says `“Compiled by JetBrains · api.kotlinlang.org”`, because the snippet text is sent to that service. It needs an internet connection and shows a clear message when offline.
 
 ```
 Request URL: POST https://api.kotlinlang.org/api/2.4.21/compiler/run

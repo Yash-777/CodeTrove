@@ -38,7 +38,7 @@ import { StreamLanguage } from '@codemirror/language';
 import { kotlin } from '@codemirror/legacy-modes/mode/clike';
 import { linter, lintGutter, setDiagnostics } from '@codemirror/lint';
 import { compileTypeScript, formatDiagnostic, preloadTypeScript } from '../../utils/tsCompiler.js';
-import { getKotlinVersion, highlightKotlin, runKotlin } from '../../utils/kotlinApi.js';
+import { DEFAULT_KOTLIN_TARGET, getKotlinVersion, highlightKotlin, runKotlin } from '../../utils/kotlinApi.js';
 import './RunnableCode.css';
 
 /** File name shown in the header, used by Save and in error messages. */
@@ -252,7 +252,10 @@ function downloadTextFile(fileName, text) {
  *
  * Props: initial (source), initialInput (stdin / arguments), language
  * ('javascript' | 'typescript' | 'kotlin'), variant ('inline' | 'playground'),
- * fileName (override the default file name).
+ * fileName (override the default file name), targets (Kotlin only: dropdown of
+ * [{ confType, label, hint, code }] - the selected confType is sent in the
+ * request payload, and `code` is the sample swapped in while the editor still
+ * holds the previous target's untouched sample).
  */
 export default function RunnableCode({
   initial = '',
@@ -260,6 +263,7 @@ export default function RunnableCode({
   language = 'javascript',
   variant = 'inline',
   fileName,
+  targets = null,
 }) {
   const isTs = language === 'typescript';
   const isKotlin = language === 'kotlin';
@@ -268,6 +272,9 @@ export default function RunnableCode({
   const isPlayground = variant === 'playground';
 
   const [code, setCode] = useState(initial);
+  const [confType, setConfType] = useState(DEFAULT_KOTLIN_TARGET);
+  const confTypeRef = useRef(confType);
+  confTypeRef.current = confType;
   const [input, setInput] = useState(initialInput);
   const [logs, setLogs] = useState([]);
   const [status, setStatus] = useState('idle'); // idle | running | done | timeout
@@ -339,7 +346,7 @@ export default function RunnableCode({
       abortRef.current = controller;
       timeoutRef.current = setTimeout(() => controller.abort('timeout'), KOTLIN_TIMEOUT_MS);
       try {
-        const { lines, diagnostics } = await runKotlin(code, controller.signal, { args: inputRef.current.trim(), displayName });
+        const { lines, diagnostics } = await runKotlin(code, controller.signal, { args: inputRef.current.trim(), displayName, confType });
         if (activeRunRef.current !== myRun) return;
         clearTimeout(timeoutRef.current);
         // Underline the same problems the compiler reported for this Run.
@@ -395,7 +402,7 @@ export default function RunnableCode({
       setStats({ time: performance.now() - startedAtRef.current, memory: null });
       stopCode('timeout');
     }, TIMEOUT_MS);
-  }, [code, isTs, isKotlin, displayName, stopCode]);
+  }, [code, isTs, isKotlin, displayName, stopCode, confType]);
 
   const resetCode = () => {
     stopCode('idle');
@@ -461,7 +468,7 @@ export default function RunnableCode({
             // Diagnostics for an unedited box appear when you press Run.
             if (source === initial || !source.trim() || source.length > 20000) return [];
             try {
-              const diagnostics = await highlightKotlin(source);
+              const diagnostics = await highlightKotlin(source, undefined, confTypeRef.current);
               const docLength = view.state.doc.length;
               return diagnostics.map((d) => ({
                 from: Math.min(d.from, docLength),
@@ -496,6 +503,15 @@ export default function RunnableCode({
     return () => document.removeEventListener('codetrove:run-focused', handler);
   }, [runCode]);
 
+  // Switching target swaps in that target's sample unless you already edited the code.
+  const changeTarget = (next) => {
+    const from = targets?.find((t) => t.confType === confType);
+    const to = targets?.find((t) => t.confType === next);
+    if (from && to && code === from.code) setCode(to.code);
+    setConfType(next);
+    setLogs([]);
+  };
+
   const isRunning = status === 'running';
   const timeText = formatTime(stats.time);
   const memoryText = formatMemory(stats.memory);
@@ -517,6 +533,14 @@ export default function RunnableCode({
           <span className="runnable-code__file-name">{displayName}</span>
         </span>
         <div className="runnable-code__actions">
+          {isKotlin && targets && (
+            <label className="runnable-code__target" title={targets.find((t) => t.confType === confType)?.hint}>
+              <span>Target</span>
+              <select value={confType} onChange={(event) => changeTarget(event.target.value)} disabled={status === 'running'} aria-label="Kotlin compile target (confType)">
+                {targets.map((t) => <option key={t.confType} value={t.confType}>{t.label}</option>)}
+              </select>
+            </label>
+          )}
           <button type="button" className="runnable-code__icon-button" onClick={copyCode} title="Copy code" aria-label="Copy code">
             {copied.code ? <CheckIcon /> : <CopyIcon />}
           </button>
