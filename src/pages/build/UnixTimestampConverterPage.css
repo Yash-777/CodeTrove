@@ -49,7 +49,7 @@
 .ut-result-card > div { display: flex; flex-direction: column; gap: .4rem; min-width: 0; }
 .ut-result-label { color: var(--color-muted); font-size: .68rem; font-weight: 800; letter-spacing: .09em; }
 .ut-result-card strong { overflow-wrap: anywhere; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .96rem; }
-.ut-about { margin-top: 1.7rem; max-width: 95ch; line-height: 1.75; }
+.ut-about { margin-top: 1.7rem; line-height: 1.75; }
 .ut-about h2 { margin-top: 1.6rem; font-size: 1.25rem; }
 .ut-about p { color: var(--color-muted); }
 .ut-pattern-table-wrap { overflow-x: auto; border: 1px solid var(--color-border); border-radius: 10px; }
