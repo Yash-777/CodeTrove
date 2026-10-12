@@ -1,0 +1,22 @@
+.prop-page { max-width: 1400px; }
+.prop-card { margin-top: 1rem; }
+.prop-toolbar { align-items: end; gap: 0.65rem; flex-wrap: wrap; }
+.prop-format-select { display: flex; flex-direction: column; gap: 0.25rem; min-width: 180px; color: var(--color-muted); font-size: 0.75rem; font-weight: 700; }
+.prop-format-select select { min-width: 180px; max-width: 100%; padding: 0.45rem 0.6rem; border: 1px solid var(--color-border); border-radius: 7px; background: var(--color-paper); color: var(--color-text); font: inherit; font-size: 0.86rem; }
+.prop-indent { margin-left: auto; }
+.prop-primary-actions { flex-wrap: wrap; }
+.prop-options { display: flex; flex-wrap: wrap; align-items: center; gap: 0.65rem; padding: 0.65rem 0.85rem; border-bottom: 1px solid var(--color-border); background: var(--color-paper); }
+.prop-options label { display: inline-flex; align-items: center; gap: 0.45rem; font-size: 0.88rem; font-weight: 600; cursor: pointer; }
+.prop-options input { accent-color: var(--color-accent); }
+.prop-options__hint { color: var(--color-muted); font-size: 0.8rem; }
+.prop-badge { background: #64748b; }
+.prop-about { max-width: 100ch; }
+.prop-about ol { padding-left: 1.3rem; }
+.prop-about li { margin: 0.35rem 0; }
+@media (max-width: 900px) {
+  .prop-toolbar { align-items: stretch; }
+  .prop-format-select, .prop-format-select select { min-width: 0; width: 100%; }
+  .prop-indent { margin-left: 0; }
+  .prop-primary-actions { width: 100%; }
+  .prop-primary-actions button { flex: 1; }
+}
