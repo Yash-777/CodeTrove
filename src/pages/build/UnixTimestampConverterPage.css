@@ -61,3 +61,7 @@
 .ut-note { display: flex; align-items: flex-start; gap: .5rem; padding: .8rem; border-radius: 8px; background: color-mix(in srgb, var(--color-accent) 7%, var(--color-paper)); font-size: .8rem; }
 @media (max-width: 780px) { .ut-convert-grid { grid-template-columns: 1fr; } .ut-live-card { grid-template-columns: minmax(0,1fr) auto; } .ut-live-divider { display: none; } .ut-live-card > div:nth-of-type(3) { grid-column: 1; } .ut-live-card > div:nth-of-type(4) { grid-column: 2; } .ut-live-time { grid-column: 1 / -1; } }
 @media (max-width: 480px) { .ut-tabs button { padding: .65rem .4rem; font-size: .8rem; } .ut-live-time span { display: block; margin: .25rem 0 0; } .ut-format-actions { flex-direction: column; } .ut-result-card { align-items: flex-start; } }
+
+.ut-timestamp-preview { display: flex; flex-direction: column; gap: 0.45rem; min-width: 0; }
+.ut-timestamp-preview > strong { font-size: clamp(1.25rem, 2vw, 1.8rem); overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
+.ut-timestamp-preview > span:not(.ut-result-label) { color: var(--text-muted, #737373); font-size: 0.82rem; margin-bottom: 0.45rem; }

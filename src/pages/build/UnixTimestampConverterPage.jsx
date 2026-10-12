@@ -44,8 +44,14 @@ function formatDate(date, pattern, zone) {
   // Validate tokens before formatting; quoted literals (for example 'T') are supported.
   const tokenPattern = /'(?:[^']|'')*'|yyyy|yy|SSS|MM|M|dd|d|HH|H|hh|h|mm|m|ss|s|a/g;
   const stripped = pattern.replace(tokenPattern, '').replace(/''/g, '');
-  if (/[A-Za-z]/.test(stripped)) throw new Error(`Unsupported pattern token: ${stripped.match(/[A-Za-z]+/)[0]}`);
-  if (!/(yyyy|yy|M|d|H|h|m|s)/.test(pattern)) throw new Error('Pattern must include at least a year, month/day, or time token.');
+  if (/[A-Za-z]/.test(stripped)) {
+    const token = stripped.match(/[A-Za-z]+/)[0];
+    const suggestion = token === token.toUpperCase() && /Y|D/.test(token)
+      ? 'Use the supported case-sensitive pattern yyyy-MM-dd HH:mm:ss (yyyy = year, MM = month, dd = day, HH = hour, mm = minute, ss = second).'
+      : 'Use supported tokens: yyyy/yy (year), MM/M (month), dd/d (day), HH/H or hh/h (hour), mm/m (minute), ss/s (second), SSS (milliseconds), and a (AM/PM).';
+    throw new Error(`Unsupported pattern token: ${token}. ${suggestion}`);
+  }
+  if (!/(yyyy|yy|M|d|H|h|m|s)/.test(pattern)) throw new Error('Pattern must include at least one supported date or time token, for example yyyy-MM-dd HH:mm:ss.');
   const p = partsFor(date, zone);
   return pattern.replace(tokenPattern, (token) => {
     if (token.startsWith("'")) return token.slice(1, -1).replace(/''/g, "'");
@@ -141,14 +147,16 @@ export default function UnixTimestampConverterPage() {
           <div className="ut-inline-actions"><CopyAction value={tab === 'timestamp' ? epoch : human} /><button type="button" className="ut-icon-action" onClick={tab === 'timestamp' ? resetEpoch : resetHuman}><RefreshCw size={15} /><span>Clear / Now</span></button></div>
         </section>
         <section className="ut-options-card">
-          <div className="ut-card-heading"><div><span className="ut-step">02</span><h2>Format &amp; timezone</h2></div></div>
+          <div className="ut-card-heading"><div><span className="ut-step">02</span><h2>{tab === 'timestamp' ? 'Format & timezone' : 'Timestamp'}</h2></div></div>
+          {tab === 'human' ? <div className="ut-timestamp-preview"><span className="ut-result-label">UNIX TIMESTAMP</span><strong>{(() => { try { return Math.floor(parseHumanDate(human, zone).getTime() / 1000); } catch { return '—'; } })()}</strong><span>Seconds</span><strong>{(() => { try { return parseHumanDate(human, zone).getTime(); } catch { return '—'; } })()}</strong><span>Milliseconds</span><p className="ut-help">Update the date and time on the left to preview the timestamp, then select Convert to confirm.</p><div className="ut-format-actions"><button type="button" className="ut-primary-button" onClick={convertHuman}><ArrowLeftRight size={16} /> Convert to timestamp</button></div></div> : <>
           <label className="ut-field-label" htmlFor="ut-pattern">Date-time format pattern</label>
           {!customPattern ? <select id="ut-pattern" className="ut-select" value={pattern} onChange={(e) => setPattern(e.target.value)}>{PATTERNS.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}</select> : <input id="ut-pattern" className="ut-text-input" value={customValue} onChange={(e) => setCustomValue(e.target.value)} placeholder="yyyy-MM-dd HH:mm:ss" />}
           <label className="ut-checkbox"><input type="checkbox" checked={customPattern} onChange={(e) => { setCustomPattern(e.target.checked); setStatus({ type: 'idle', message: '' }); }} /><span>Use custom pattern</span></label>
           <div className="ut-pattern-examples"><code>yyyy</code> year <code>MM</code> month <code>dd</code> day <code>HH</code> 24-hour <code>mm</code> minute <code>ss</code> second <code>SSS</code> milliseconds <code>a</code> AM/PM</div>
           <label className="ut-field-label">Time zone</label>
           <div className="ut-segmented"><button type="button" className={zone === 'Local' ? 'selected' : ''} onClick={() => setZone('Local')}>Local</button><button type="button" className={zone === 'GMT' ? 'selected' : ''} onClick={() => setZone('GMT')}>GMT / UTC</button></div>
-          <div className="ut-format-actions"><button type="button" className="ut-secondary-button" onClick={() => { try { formatDate(new Date(), activePattern, zone); setStatus({ type: 'ok', message: 'Format pattern is valid.' }); } catch (error) { setStatus({ type: 'error', message: error.message }); } }}>Validate format</button><button type="button" className="ut-primary-button" onClick={tab === 'timestamp' ? convertTimestamp : convertHuman}><ArrowLeftRight size={16} /> Convert</button></div>
+          <div className="ut-format-actions"><button type="button" className="ut-secondary-button" onClick={() => { try { formatDate(new Date(), activePattern, zone); setStatus({ type: 'ok', message: 'Format pattern is valid.' }); } catch (error) { setStatus({ type: 'error', message: error.message }); } }}>Validate format</button><button type="button" className="ut-primary-button" onClick={convertTimestamp}><ArrowLeftRight size={16} /> Convert</button></div>
+          </>}
         </section>
       </div>
       {status.type !== 'idle' && <div className={`ut-status ut-status--${status.type}`} role="status">{status.type === 'ok' ? <CheckCircle2 size={18} /> : <XCircle size={18} />}<span>{status.message}</span></div>}
@@ -160,9 +168,105 @@ export default function UnixTimestampConverterPage() {
       <p>A Unix timestamp (also called epoch time) is the number of elapsed seconds since <strong>1970-01-01 00:00:00 UTC</strong>, excluding leap seconds in the conventional Unix-time model. It provides a compact, timezone-independent way to represent a point in time. Millisecond, microsecond, and nanosecond timestamps express the same epoch using finer units.</p>
       <h2>What happens on January 19, 2038?</h2>
       <p>At 03:14:07 UTC on 19 January 2038, a signed 32-bit integer holding Unix seconds reaches its maximum value. The next second overflows that representation, potentially causing incorrect dates or failures in older systems that still use 32-bit time values. Modern 64-bit time representations avoid this specific limit, but legacy devices and software may need updates.</p>
-      <h2>Supported date-time patterns</h2>
+      <h2>Format reference</h2>
       <div className="ut-pattern-table-wrap"><table className="ut-pattern-table"><thead><tr><th>Pattern</th><th>Meaning</th><th>Example</th></tr></thead><tbody><tr><td><code>yyyy-MM-dd HH:mm:ss</code></td><td>Standard 24-hour</td><td>2026-10-12 16:16:05</td></tr><tr><td><code>yyyy-MM-dd hh:mm:ss a</code></td><td>12-hour with AM/PM</td><td>2026-10-12 04:16:05 PM</td></tr><tr><td><code>yyyy-MM-dd HH:mm:ss.SSS</code></td><td>Milliseconds</td><td>2026-10-12 16:16:05.342</td></tr><tr><td><code>yyyy-MM-dd'T'HH:mm:ss</code></td><td>ISO-style literal T</td><td>2026-10-12T16:16:05</td></tr><tr><td><code>yy-M-d H:m:s</code></td><td>Without zero-padding</td><td>26-10-12 16:16:5</td></tr></tbody></table></div>
-      <p className="ut-note"><AlertCircle size={16} /> The output uses two-digit fractional milliseconds when requested as <code>SSS</code>, and two-space indentation is not applicable to timestamps.</p>
+      <p className="ut-note" style={{ "white-space": 'pre-wrap' }}><AlertCircle size={16} />
+        <div className="ut-pattern-table-wrap">
+          <p>Pattern tokens are case-sensitive.</p>
+
+          <table className="ut-pattern-table">
+            <thead>
+              <tr>
+                <th colSpan={2}>Date</th>
+                <th colSpan={2}>Time</th>
+              </tr>
+              <tr>
+                <th>Pattern</th>
+                <th>Explanation</th>
+                <th>Pattern</th>
+                <th>Explanation</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr>
+                <td><code>yyyy</code></td>
+                <td>4-digit year (e.g., 2026)</td>
+                <td><code>HH</code></td>
+                <td>24-hour format, zero-padded (e.g., 00, 09, 13, 23)</td>
+              </tr>
+              <tr>
+                <td><code>yy</code></td>
+                <td>2-digit year (e.g., 26)</td>
+                <td><code>H</code></td>
+                <td>24-hour format, without leading zero (e.g., 0, 9, 13, 23)</td>
+              </tr>
+              <tr>
+                <td><code>MMMM</code></td>
+                <td>Full month name (e.g., January)</td>
+                <td><code>hh</code></td>
+                <td>12-hour format, zero-padded (e.g., 01, 09, 12)</td>
+              </tr>
+              <tr>
+                <td><code>MMM</code></td>
+                <td>Short month name (e.g., Jan, Feb)</td>
+                <td><code>h</code></td>
+                <td>12-hour format, without leading zero (e.g., 1, 9, 12)</td>
+              </tr>
+              <tr>
+                <td><code>MM</code></td>
+                <td>Month, zero-padded (e.g., 01, 12)</td>
+                <td><code>mm</code></td>
+                <td>Minutes, zero-padded (e.g., 05, 30, 59)</td>
+              </tr>
+              <tr>
+                <td><code>M</code></td>
+                <td>Month, without leading zero (e.g., 1, 12)</td>
+                <td><code>m</code></td>
+                <td>Minutes, without leading zero (e.g., 5, 30, 59)</td>
+              </tr>
+              <tr>
+                <td><code>dddd</code></td>
+                <td>Full weekday name (e.g., Monday)</td>
+                <td><code>ss</code></td>
+                <td>Seconds, zero-padded (e.g., 05, 30, 59)</td>
+              </tr>
+              <tr>
+                <td><code>ddd</code></td>
+                <td>Short weekday name (e.g., Mon, Tue)</td>
+                <td><code>s</code></td>
+                <td>Seconds, without leading zero (e.g., 5, 30, 59)</td>
+              </tr>
+              <tr>
+                <td><code>dd</code></td>
+                <td>Day of month, zero-padded (e.g., 01, 12, 31)</td>
+                <td><code>SSS</code></td>
+                <td>Milliseconds, 3 digits (e.g., 005, 050, 250)</td>
+              </tr>
+              <tr>
+                <td><code>d</code></td>
+                <td>Day of month, without leading zero (e.g., 1, 12, 31)</td>
+                <td><code>a</code></td>
+                <td>AM/PM marker (e.g., AM, PM)</td>
+              </tr>
+              <tr>
+                <td>—</td>
+                <td>—</td>
+                <td><code>hh:mm a</code></td>
+                <td>12-hour time with AM/PM (e.g., 04:30 PM)</td>
+              </tr>
+              <tr>
+                <td>—</td>
+                <td>—</td>
+                <td><code>HH:mm</code></td>
+                <td>24-hour time (e.g., 16:30)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </p>
+      <h2>Common invalid date-format patterns</h2>
+      <div className="ut-pattern-table-wrap"><table className="ut-pattern-table"><thead><tr><th>Pattern entered</th><th>Why it fails</th><th>Use instead</th></tr></thead><tbody><tr><td><code>YYYY-MM-DD hh:mm:ss</code></td><td>Uppercase <code>YYYY</code> and <code>DD</code> are unsupported tokens in this formatter.</td><td><code>yyyy-MM-dd HH:mm:ss</code></td></tr><tr><td><code>yyyy-mm-dd HH:MM:ss</code></td><td><code>mm</code> means minutes and <code>MM</code> means month; they are swapped.</td><td><code>yyyy-MM-dd HH:mm:ss</code></td></tr><tr><td><code>yyyy-MM-dd HH:mm:ss Q</code></td><td><code>Q</code> is not a supported token.</td><td><code>yyyy-MM-dd HH:mm:ss</code></td></tr><tr><td><code>yyyy-MM-dd'T HH:mm:ss</code></td><td>The quoted literal is not closed.</td><td><code>yyyy-MM-dd'T'HH:mm:ss</code></td></tr></tbody></table></div>
     </article>
   </main>;
 }
