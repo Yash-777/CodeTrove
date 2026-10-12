@@ -54,7 +54,7 @@ export const CATEGORIES = [
     })),
     tools: [
       { name: 'Java Formatter', description: 'Beautify Java source using standard style rules.', internalTool: 'java-formatter', externalUrl: null },
-      { name: 'Maven POM Formatter', description: 'One dependency per line, pretty-printed XML.', internalTool: 'pom-formatter', externalUrl: null },
+      { name: 'Maven POM Formatter', description: 'Convert dependency XML to a one-line custom build format and back, and pretty-print pom.xml (2/3/4 spaces).', internalTool: 'pom-formatter', externalUrl: null },
     ],
   },
   {
