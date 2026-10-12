@@ -153,6 +153,16 @@ export const CATEGORIES = [
     ],
   },
   {
+    key: 'data-time',
+    label: 'Data & Time',
+    color: '#0D9488',
+    codeLang: 'text',
+    topics: [],
+    tools: [
+      { name: 'Unix Timestamp ⇄ Date Time Converter', description: 'Convert epoch timestamps and human-readable dates with seconds, milliseconds, microseconds, nanoseconds, custom patterns, and local/GMT time zones.', internalTool: 'unix-timestamp-converter', externalUrl: null },
+    ],
+  },
+  {
     key: 'email',
     label: 'Email',
     color: '#06B6D4',
