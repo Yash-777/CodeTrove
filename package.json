@@ -17,6 +17,7 @@
     "react-router-dom": "^6.26.0",
     "react-syntax-highlighter": "^15.5.0",
     "lucide-react": "^0.436.0",
+    "json5": "^2.2.3",
     "react-markdown": "^8.0.7",
     "remark-gfm": "^3.0.1",
     "rehype-raw": "^7.0.0",

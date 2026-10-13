@@ -34,7 +34,7 @@ function CopyButton({ text, label, disabled }) {
       setTimeout(() => setCopied(false), 1500);
     }
   };
-  return <button type="button" className="runnable-code__icon-button" onClick={copy} disabled={disabled} title={label} aria-label={label}>{copied ? <Check size={16} /> : <Copy size={16} />}</button>;
+  return <button type="button" className={`runnable-code__icon-button${copied ? ' is-copied' : ''}`} onClick={copy} disabled={disabled} title="Copy to clipboard" aria-label={copied ? "Copied to clipboard" : label}>{copied ? <Check size={16} /> : <Copy size={16} />}</button>;
 }
 
 function FilePill({ format }) {

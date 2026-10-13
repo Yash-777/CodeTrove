@@ -59,3 +59,7 @@
 
 /* Selected operation is visually consistent with the active format tab. */
 .hxt-toolbar-actions .runnable-code__button.is-active { color: #fff; background: var(--color-accent); border-color: var(--color-accent); font-weight: 700; }
+
+/* JSON strict-mode comment remediation and format-specific examples. */
+.hxt-auto-fix { display: inline-flex; margin-left: 0.75rem; align-items: center; }
+.hxt-about__sample { max-height: 18rem; overflow: auto; padding: 0.8rem; border: 1px solid var(--color-border); border-radius: 7px; background: var(--color-bg); font-size: 0.78rem; line-height: 1.5; white-space: pre-wrap; overflow-wrap: anywhere; }

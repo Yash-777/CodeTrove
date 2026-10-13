@@ -51,7 +51,7 @@ function CopyButton({ value }) {
     setCopied(true);
     window.setTimeout(() => setCopied(false), 1200);
   };
-  return <button type="button" className={`runnable-code__icon-button${copied ? ' is-copied' : ''}`} onClick={copy} title={copied ? 'Copied to clipboard' : 'Copy to clipboard'} aria-label={copied ? 'Copied to clipboard' : 'Copy to clipboard'}>{copied ? <Check size={16} /> : <Copy size={16} />}</button>;
+  return <button type="button" className={`runnable-code__icon-button${copied ? ' is-copied' : ''}`} onClick={copy} title="Copy to clipboard" aria-label={copied ? 'Copied to clipboard' : 'Copy to clipboard'}>{copied ? <Check size={16} /> : <Copy size={16} />}</button>;
 }
 
 function JsonCard({ title, value, tone = 'header' }) {

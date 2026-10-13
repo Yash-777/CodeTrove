@@ -73,7 +73,7 @@ function CopyAction({ value, title = 'Copy' }) {
     const text = value || String(nowSeconds());
     if (await copyToClipboard(text)) { setCopied(true); window.setTimeout(() => setCopied(false), 1300); }
   };
-  return <button type="button" className="ut-icon-action" onClick={handleCopy} title={title} aria-label={title}>{copied ? <Check size={15} /> : <Copy size={15} />}<span>{copied ? 'Copied' : 'Copy'}</span></button>;
+  return <button type="button" className={`runnable-code__icon-button${copied ? ' is-copied' : ''}`} onClick={handleCopy} title="Copy to clipboard" aria-label={copied ? 'Copied to clipboard' : 'Copy to clipboard'}>{copied ? <Check size={16} /> : <Copy size={16} />}</button>;
 }
 
 export default function UnixTimestampConverterPage() {
