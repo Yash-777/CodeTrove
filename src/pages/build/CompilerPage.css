@@ -16,18 +16,6 @@
 .cp-link:hover { border-color: var(--color-accent); }
 .cp-link--primary { color: #fff; background: var(--color-accent); border-color: var(--color-accent); }
 .cp-tabs { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.75rem; }
-.cp-tab {
-  padding: 0.4rem 1rem;
-  border: 1px solid var(--color-border);
-  border-radius: 999px;
-  color: var(--color-muted);
-  background: var(--color-paper);
-  cursor: pointer;
-  font: inherit;
-  font-size: 0.9rem;
-}
-.cp-tab:hover { color: var(--color-text); border-color: var(--color-accent); }
-.cp-tab.is-active { color: #fff; background: var(--color-accent); border-color: var(--color-accent); font-weight: 600; }
 .cp-note { margin: 0.9rem 0 0; color: var(--color-muted); font-size: 0.85rem;  }
 
 .cp-about { margin-top: 1.5rem; padding: 1.1rem 1.3rem; border: 1px solid var(--color-border); border-radius: 10px; background: var(--color-paper); }

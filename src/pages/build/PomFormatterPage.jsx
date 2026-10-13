@@ -119,7 +119,7 @@ function CopyButton({ text, label, disabled }) {
     }
   };
   return (
-    <button type="button" className="runnable-code__icon-button" onClick={copy} disabled={disabled} title={label} aria-label={label}>
+    <button type="button" className={`runnable-code__icon-button${copied ? ' is-copied' : ''}`} onClick={copy} disabled={disabled} title={copied ? 'Copied to clipboard' : label} aria-label={copied ? 'Copied to clipboard' : label}>
       {copied ? <Check size={16} /> : <Copy size={16} />}
     </button>
   );

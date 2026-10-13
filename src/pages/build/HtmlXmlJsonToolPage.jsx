@@ -5,7 +5,7 @@ import { StreamLanguage } from '@codemirror/language';
 import { linter, lintGutter } from '@codemirror/lint';
 import { xml } from '@codemirror/legacy-modes/mode/xml';
 import { javascript } from '@codemirror/legacy-modes/mode/javascript';
-import { CheckCircle2, ChevronDown, ChevronRight, Clipboard, Code2, FileCode2, FileJson, FileText, Minimize2, WandSparkles } from 'lucide-react';
+import { Check, CheckCircle2, ChevronDown, ChevronRight, Clipboard, Code2, FileCode2, FileJson, FileText, Minimize2, WandSparkles } from 'lucide-react';
 import '../../components/CodeRunner/RunnableCode.css';
 import './CompilerPage.css';
 import './HtmlXmlJsonToolPage.css';
@@ -13,8 +13,8 @@ import './HtmlXmlJsonToolPage.css';
 const XML_LANGUAGE = StreamLanguage.define(xml);
 const JSON_LANGUAGE = StreamLanguage.define(javascript);
 const FORMATS = {
-  html: { label: 'HTML', file: 'index.html', language: XML_LANGUAGE, sample: '<!doctype html>\n<html lang="en">\n  <head>\n    <title>CodeTrove</title>\n    <!-- Commented info: sample page styles -->\n    <style>\n      .content {\n        padding: 16px;\n      }\n    </style>\n  </head>\n  <body>\n    <!-- Main page content -->\n    <main class="content">\n      <h1>Hello, CodeTrove!</h1>\n      <p>Format and validate markup.</p>\n    </main>\n  </body>\n</html>' },
-  xml: { label: 'XML', file: 'document.xml', language: XML_LANGUAGE, sample: '<?xml version="1.0" encoding="UTF-8"?>\n<!-- Commented info: sample book catalog -->\n<catalog>\n  <book id="bk101">\n    <title>Developer Guide</title>\n    <price currency="USD">29.99</price>\n  </book>\n</catalog>' },
+  html: { label: 'HTML', file: 'index.html', language: XML_LANGUAGE, sample: '<!doctype html>\n<html lang="en">\n  <head>\n    <title>CodeTrove</title>\n    <!-- Commented info: sample page styles -->\n    <style>\n      /* Content spacing */\n      .content {\n        padding: 16px;\n      }\n    </style>\n  </head>\n  <body>\n    <!-- Main page content -->\n    <main class="content">\n      <h1>Hello, CodeTrove!</h1>\n      <p>Format and validate markup.</p>\n    </main>\n  </body>\n</html>' },
+  xml: { label: 'XML', file: 'document.xml', language: XML_LANGUAGE, sample: '<?xml version="1.0" encoding="UTF-8"?>\n<!-- Commented info: sample book catalog -->\n<catalog>\n  <book id="bk101">\n    <title>\n      Developer Guide\n    </title>\n    <price currency="USD">29.99</price>\n  </book>\n</catalog>' },
   json: { label: 'JSON', file: 'data.json', language: JSON_LANGUAGE, sample: '{\n  "name": "CodeTrove",\n  "active": true,\n  "tools": ["HTML", "XML", "JSON"],\n  "comment": "JSON does not support comments; this field contains sample info.",\n  "metadata": { "version": 1 }\n}' },
 };
 const VOID_TAGS = new Set(['area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'param', 'source', 'track', 'wbr']);
@@ -57,8 +57,14 @@ function validateSource(kind, source) {
 }
 
 function formatMarkup(source, options = {}) {
-  const { indent = 2, minify = false, keepComments = true, unquoteAttributes = false, minifyCss = false } = options;
+  const { indent = 2, minify = false, keepComments = true, unquoteAttributes = false, minifyCss = false, trimTextNodes = false, kind = 'html' } = options;
   let text = source.replace(/\r\n?/g, '\n').trim();
+  if (kind === 'xml' && trimTextNodes) {
+    text = text.replace(/(<([A-Za-z_][\w:.-]*)(?:\s[^<>]*?)?>)([^<>]*?)(<\/\2\s*>)/gi, (_, open, _name, value, close) => `${open}${value.trim()}${close}`);
+  }
+  if (kind === 'html' && !keepComments) {
+    text = text.replace(/(<style\b[^>]*>)([\s\S]*?)(<\/style\s*>)/gi, (_, start, css, end) => `${start}${css.replace(/\/\*[\s\S]*?\*\//g, '')}${end}`);
+  }
   if (minify) {
     if (!keepComments) text = text.replace(/<!--[\s\S]*?-->/g, '');
     if (minifyCss) text = text.replace(/(<style\b[^>]*>)([\s\S]*?)(<\/style\s*>)/gi, (_, start, css, end) => { const compactCss = (keepComments ? css : css.replace(/\/\*[\s\S]*?\*\//g, '')).replace(/\s+/g, ' ').replace(/\s*([{}:;,])\s*/g, '$1').trim(); return `${start}${compactCss}${end}`; });
@@ -73,13 +79,24 @@ function formatMarkup(source, options = {}) {
   let preserveText = false;
   const indentText = options.indentText || ' '.repeat(indent);
   const pad = (level) => indentText.repeat(Math.max(0, level));
-  for (const token of tokens) {
+  for (let tokenIndex = 0; tokenIndex < tokens.length; tokenIndex += 1) {
+    const token = tokens[tokenIndex];
     const value = token.trim();
     if (!value) continue;
     if (value.startsWith('<!--') && !keepComments) continue;
     const closing = /^<\//.test(value);
     const opening = /^<[\w!?]/.test(value) && !/^<\?/.test(value) && !/^<!/.test(value);
     const name = (value.match(/^<\/?\s*([\w:-]+)/) || [])[1]?.toLowerCase();
+    if (kind === 'xml' && trimTextNodes && opening && !closing) {
+      const textToken = tokens[tokenIndex + 1] || '';
+      const closeToken = (tokens[tokenIndex + 2] || '').trim();
+      const closeName = (closeToken.match(/^<\/\s*([\w:-]+)/) || [])[1]?.toLowerCase();
+      if (textToken && !textToken.includes('<') && closeName === name) {
+        lines.push(`${pad(depth)}${value}${textToken.trim()}${closeToken}`);
+        tokenIndex += 2;
+        continue;
+      }
+    }
     if (closing) depth = Math.max(0, depth - 1);
     if (opening && ['pre', 'textarea', 'script', 'style'].includes(name)) preserveText = true;
     if (preserveText && !closing && !opening) {
@@ -143,6 +160,7 @@ export default function HtmlXmlJsonToolPage() {
   const [keepComments, setKeepComments] = useState(true);
   const [unquoteAttributes, setUnquoteAttributes] = useState(false);
   const [minifyCss, setMinifyCss] = useState(false);
+  const [trimTextNodes, setTrimTextNodes] = useState(false);
   const [error, setError] = useState('');
   const [status, setStatus] = useState('');
   const [tree, setTree] = useState(null);
@@ -151,7 +169,7 @@ export default function HtmlXmlJsonToolPage() {
   const config = FORMATS[kind];
   const language = kind === 'json' ? JSON_LANGUAGE : XML_LANGUAGE;
   const indentSize = useTabs ? 2 : Number(indent);
-  const options = { indent: indentSize, indentText: useTabs ? '\t' : ' '.repeat(Number(indent)), minify: operation === 'minify', keepComments, unquoteAttributes: kind === 'html' && unquoteAttributes, minifyCss: kind === 'html' && minifyCss };
+  const options = { indent: indentSize, indentText: useTabs ? '\t' : ' '.repeat(Number(indent)), minify: operation === 'minify', keepComments, unquoteAttributes: kind === 'html' && unquoteAttributes, minifyCss: kind === 'html' && minifyCss, trimTextNodes: kind === 'xml' && trimTextNodes, kind };
   const extensions = useMemo(() => [
     language,
     lintGutter(),
@@ -235,6 +253,7 @@ export default function HtmlXmlJsonToolPage() {
           <div className="hxt-toolbar-options">
             <label className="runnable-code__target"><span>Indent</span><select value={useTabs ? 'tabs' : indent} onChange={(event) => { const value = event.target.value; setUseTabs(value === 'tabs'); if (value !== 'tabs') setIndent(value); }} aria-label="Indentation"><option value="2">2 spaces</option><option value="3">3 spaces</option><option value="4">4 spaces</option><option value="tabs">Tabs</option></select></label>
             <label className="hxt-check"><input type="checkbox" checked={keepComments} onChange={(event) => setKeepComments(event.target.checked)} /> Keep comments</label>
+            {kind === 'xml' && <label className="hxt-check" title="Removes leading and trailing whitespace from XML text values"><input type="checkbox" checked={trimTextNodes} onChange={(event) => setTrimTextNodes(event.target.checked)} /> Trim Text Nodes</label>}
             {kind === 'html' && <>
               <label className="hxt-check"><input type="checkbox" checked={unquoteAttributes} onChange={(event) => setUnquoteAttributes(event.target.checked)} /> Unquote safe attributes</label>
               <label className="hxt-check"><input type="checkbox" checked={minifyCss} onChange={(event) => setMinifyCss(event.target.checked)} /> Minify inline CSS</label>
@@ -257,7 +276,7 @@ export default function HtmlXmlJsonToolPage() {
             <div className="hxt-pane-footer"><span>{input.length.toLocaleString()} characters</span><span>Validate runs before every conversion</span></div>
           </div>
           <div className="hxt-pane">
-            <div className="hxt-pane-header"><span><span className="hxt-format-badge hxt-format-badge--output">{tree ? 'TREE' : operation === 'format' ? 'PRETTY' : 'MINIFIED'}</span><strong>{tree ? 'Parsed structure' : 'Output'}</strong></span><div className="hxt-pane-actions">{tree ? <button type="button" className="runnable-code__button" onClick={() => setTreeExpanded((value) => !value)}>{treeExpanded ? 'Collapse all' : 'Expand all'}</button> : <button type="button" className={`runnable-code__button${copied ? ' is-copied' : ''}`} onClick={copyOutput} disabled={!output} title={copied ? 'Copied to clipboard' : 'Copy output'}><Clipboard size={14} /> {copied ? 'Copied to clipboard' : 'Copy'}</button>}</div></div>
+            <div className="hxt-pane-header"><span><span className="hxt-format-badge hxt-format-badge--output">{tree ? 'TREE' : operation === 'format' ? 'PRETTY' : 'MINIFIED'}</span><strong>{tree ? 'Parsed structure' : 'Output'}</strong></span><div className="hxt-pane-actions">{tree ? <button type="button" className="runnable-code__button" onClick={() => setTreeExpanded((value) => !value)}>{treeExpanded ? 'Collapse all' : 'Expand all'}</button> : <button type="button" className={`runnable-code__icon-button${copied ? ' is-copied' : ''}`} onClick={copyOutput} disabled={!output} title={copied ? 'Copied to clipboard' : 'Copy output'} aria-label={copied ? 'Copied to clipboard' : 'Copy output'}>{copied ? <Check size={16} /> : <Clipboard size={16} />}</button>}</div></div>
             {tree ? <div className="hxt-tree-view"><TreeNode key={treeExpanded ? 'all-open' : 'all-closed'} node={tree} expanded={treeExpanded} /></div> : <CodeMirror value={output} theme={oneDark} extensions={extensions} readOnly height="390px" basicSetup={{ lineNumbers: true, foldGutter: true, highlightActiveLine: false }} aria-label="Formatted output" />}
             <div className="hxt-pane-footer"><span>{tree ? 'XML / JSON tree' : `${output.length.toLocaleString()} characters`}</span><span>{tree ? 'Use node arrows to inspect values' : 'Output appears after a successful operation'}</span></div>
           </div>
@@ -266,7 +285,7 @@ export default function HtmlXmlJsonToolPage() {
         {(error || status) && <div className={`hxt-message${error ? ' hxt-message--error' : ' hxt-message--success'}`} role={error ? 'alert' : 'status'}>{error || status}</div>}
       </section>
 
-      <section className="hxt-about"><h2>How to use this tool</h2><ul><li><strong>Validate</strong> checks the input and shows a useful error before formatting or minifying.</li><li><strong>Beautify / Format</strong> formats code with 2, 3, or 4 spaces, or tab indentation. Inline editor diagnostics flag invalid input while you edit.</li><li><strong>Minify</strong> removes unnecessary whitespace to make markup or JSON more compact.</li><li><strong>Parse to Tree View</strong> lets you inspect JSON values or XML elements; use Expand all / Collapse all to navigate the structure.</li><li><strong>HTML options</strong> control comment retention, safe attribute quotes, and inline CSS compaction.</li></ul><p className="hxt-note">Note: HTML is parsed using browser-friendly rules; the validator checks common mismatched and unclosed tags. XML and JSON are validated with strict parsers.</p></section>
+      <section className="hxt-about"><h2>How to use this tool</h2><ul><li><strong>Validate</strong> checks the input and shows a useful error before formatting or minifying.</li><li><strong>Beautify / Format</strong> formats code with 2, 3, or 4 spaces, or tab indentation. Inline editor diagnostics flag invalid input while you edit.</li><li><strong>Minify</strong> removes unnecessary whitespace to make markup or JSON more compact.</li><li><strong>Parse to Tree View</strong> lets you inspect JSON values or XML elements; use Expand all / Collapse all to navigate the structure.</li><li><strong>HTML options</strong> control comment retention, safe attribute quotes, and inline CSS compaction.</li><li><strong>XML option</strong> trims leading and trailing whitespace from text nodes.</li></ul><p className="hxt-note">Note: HTML is parsed using browser-friendly rules; the validator checks common mismatched and unclosed tags. XML and JSON are validated with strict parsers.</p></section>
     </div>
   );
 }

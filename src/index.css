@@ -90,3 +90,72 @@ button.is-copied:hover, .is-copied:hover {
   background: #2ea043 !important;
   border-color: #2ea043 !important;
 }
+
+
+/* #RunnableCode.css -> shared icon button and CodeMirror scroller rules */
+.runnable-code__icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  color: var(--color-text);
+  background: var(--color-paper);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.85rem;
+}
+.runnable-code__icon-button:hover { border-color: var(--color-accent); }
+.runnable-code__icon-button:disabled { opacity: 0.5; cursor: default; border-color: var(--color-border); }
+.runnable-code__output-head .runnable-code__icon-button { color: #e5e7eb; background: transparent; border-color: rgba(255, 255, 255, 0.18); }
+.runnable-code__editor .cm-scroller { overflow: auto; }
+
+/* #CompilerPage.css -> shared compiler tab styles */
+.cp-tab {
+  padding: 0.4rem 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  color: var(--color-muted);
+  background: var(--color-paper);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.9rem;
+}
+.cp-tab:hover { color: var(--color-text); border-color: var(--color-accent); }
+.cp-tab.is-active { color: #fff; background: var(--color-accent); border-color: var(--color-accent); font-weight: 600; }
+
+/* #Sidebar.css -> shared sidebar pillar button styles */
+.sidebar__pillar {
+  flex: 1;
+  padding: 0.4rem 0;
+  border: none;
+  background: transparent;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--color-muted);
+  cursor: pointer;
+}
+.sidebar__pillar--active { background: var(--color-accent); color: white; }
+
+/* #PomFormatterPage.css -> shared conversion-direction switch styles */
+.pom-switch {
+  width: 2.3rem;
+  height: 2.3rem;
+  border: 1px solid var(--color-border);
+  border-radius: 50%;
+  background: var(--color-paper);
+  color: var(--color-accent);
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: transform 0.25s ease, border-color 0.15s ease;
+}
+.pom-switch:hover { border-color: var(--color-accent); }
+.pom-switch.is-flipped { transform: rotate(180deg); }
+.pom-switch:active { transform: scale(0.92); }
+.pom-switch.is-flipped:active { transform: rotate(180deg) scale(0.92); }

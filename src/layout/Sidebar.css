@@ -39,22 +39,6 @@
   border-radius: 8px;
 }
 
-.sidebar__pillar {
-  flex: 1;
-  padding: 0.4rem 0;
-  border: none;
-  background: transparent;
-  border-radius: 6px;
-  font-size: 0.82rem;
-  font-weight: 600;
-  color: var(--color-muted);
-  cursor: pointer;
-}
-
-.sidebar__pillar--active {
-  background: var(--color-accent);
-  color: white;
-}
 
 .sidebar__search {
   padding: 0.5rem 0.7rem;
