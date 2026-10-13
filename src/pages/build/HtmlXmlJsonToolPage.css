@@ -60,6 +60,35 @@
 /* Selected operation is visually consistent with the active format tab. */
 .hxt-toolbar-actions .runnable-code__button.is-active { color: #fff; background: var(--color-accent); border-color: var(--color-accent); font-weight: 700; }
 
-/* JSON strict-mode comment remediation and format-specific examples. */
-.hxt-auto-fix { display: inline-flex; margin-left: 0.75rem; align-items: center; }
-.hxt-about__sample { max-height: 18rem; overflow: auto; padding: 0.8rem; border: 1px solid var(--color-border); border-radius: 7px; background: var(--color-bg); font-size: 0.78rem; line-height: 1.5; white-space: pre-wrap; overflow-wrap: anywhere; }
+/* XML / JSON tree viewer — collapsible rows, XML DOM-style tags and typed JSON values. */
+.hxt-tree-view { padding: 0.65rem 0.8rem; background: var(--color-paper); font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.8rem; line-height: 1.65; }
+.hxt-tree-node { position: relative; }
+.hxt-tree-line { display: flex; align-items: baseline; gap: 0.22rem; min-height: 1.65rem; padding: 0.08rem 0.3rem 0.08rem calc(var(--tree-depth) * 1.1rem); border-radius: 4px; white-space: normal; overflow-wrap: anywhere; }
+.hxt-tree-line:hover { background: color-mix(in srgb, var(--color-accent) 7%, transparent); }
+.hxt-tree-line--closing { color: var(--color-muted); }
+.hxt-tree-toggle { display: inline-flex; align-items: center; justify-content: center; width: 1rem; height: 1rem; margin-right: 0.08rem; padding: 0; border: 0; border-radius: 3px; background: transparent; color: var(--color-muted); cursor: pointer; flex: 0 0 1rem; vertical-align: middle; }
+.hxt-tree-toggle:hover { background: var(--color-border); color: var(--color-text); }
+.hxt-tree-spacer { display: inline-block; width: 1rem; flex: 0 0 1rem; }
+.hxt-tree-name { color: var(--color-accent); font-size: inherit; font-weight: 600; }
+.hxt-tree-name--root { color: var(--color-text); font-weight: 750; }
+.hxt-tree-separator { color: var(--color-muted); margin-right: 0.12rem; }
+.hxt-tree-branch-summary { color: #64748b; font-size: 0.75rem; }
+.hxt-tree-branch-summary--object { color: #64748b; }
+.hxt-tree-branch-summary--array { color: #64748b; }
+.hxt-tree-value { white-space: pre-wrap; overflow-wrap: anywhere; }
+.hxt-tree-value--string { color: #16803c; }
+.hxt-tree-value--number { color: #b45309; }
+.hxt-tree-value--boolean { color: #7c3aed; font-weight: 650; }
+.hxt-tree-value--null { color: #64748b; font-style: italic; }
+.hxt-tree-count { display: inline-flex; align-items: center; margin-left: 0.3rem; color: var(--color-muted); font-family: inherit; font-size: 0.68rem; }
+.hxt-tree-xml-tag { color: #2563eb; font: inherit; font-weight: 600; }
+.hxt-tree-attribute { display: inline-flex; gap: 0; margin-left: 0.12rem; font-size: 0.78rem; }
+.hxt-tree-attribute-name { color: #7c3aed; }
+.hxt-tree-attribute-value { color: #16803c; }
+.hxt-tree-xml-text { color: var(--color-text); white-space: pre-wrap; overflow-wrap: anywhere; }
+.hxt-tree-xml-special { color: #64748b; font: inherit; font-style: italic; }
+.hxt-tree-json-bracket { color: #64748b; font: inherit; }
+.hxt-tree-children { margin-left: 0.46rem; border-left: 1px solid var(--color-border); }
+.hxt-autofix { display: inline-flex; align-items: center; gap: 0.35rem; margin: 0.65rem 0 0 0.7rem; padding: 0.35rem 0.65rem; border: 1px solid #ef444466; border-radius: 6px; background: var(--color-paper); color: #b91c1c; font: inherit; font-weight: 700; cursor: pointer; }
+.hxt-autofix:hover { border-color: #ef4444; }
+.hxt-sample { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 0.78rem; }
