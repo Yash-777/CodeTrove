@@ -92,3 +92,12 @@
 .hxt-autofix { display: inline-flex; align-items: center; gap: 0.35rem; margin: 0.65rem 0 0 0.7rem; padding: 0.35rem 0.65rem; border: 1px solid #ef444466; border-radius: 6px; background: var(--color-paper); color: #b91c1c; font: inherit; font-weight: 700; cursor: pointer; }
 .hxt-autofix:hover { border-color: #ef4444; }
 .hxt-sample { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 0.78rem; }
+
+/* Match the compact, two-space tree indentation of the reference viewers. */
+.hxt-tree-line { padding-left: calc(var(--tree-depth) * 2ch); }
+.hxt-tree-children { margin-left: 0; border-left: 0; }
+.hxt-tree-line--closing { padding-left: calc(var(--tree-depth) * 2ch); }
+.hxt-tree-xml-tag { font-weight: 500; }
+.hxt-tree-count { display: none; }
+.hxt-tree-branch-summary { color: var(--color-text); }
+.hxt-tree-branch-summary--array { color: var(--color-muted); }

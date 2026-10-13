@@ -120,6 +120,23 @@ function validateHtml(source) {
   return '';
 }
 
+function preserveJson5Comments(source, formatted) {
+  // Keep comments attached to their original line/region rather than moving all comments to the top.
+  const comments = [];
+  let quote = ''; let escaped = false;
+  for (let i = 0; i < source.length; i += 1) {
+    const ch = source[i];
+    if (quote) { if (escaped) escaped = false; else if (ch === '\\') escaped = true; else if (ch === quote) quote = ''; continue; }
+    if (ch === '\"' || ch === "'") { quote = ch; continue; }
+    if (ch === '/' && source[i + 1] === '/') { let end = source.indexOf('\n', i); if (end < 0) end = source.length; comments.push({ at: i, text: source.slice(i, end).trim(), line: source.slice(0, i).split('\n').length - 1 }); i = end - 1; }
+    else if (ch === '/' && source[i + 1] === '*') { let end = source.indexOf('*/', i + 2); end = end < 0 ? source.length - 2 : end; comments.push({ at: i, text: source.slice(i, end + 2).trim(), line: source.slice(0, i).split('\n').length - 1 }); i = end + 1; }
+  }
+  if (!comments.length) return formatted;
+  const lines = formatted.split('\n');
+  comments.forEach((comment) => { const index = Math.min(comment.line, lines.length - 1); lines[index] = `${lines[index]} ${comment.text}`.trimEnd(); });
+  return lines.join('\n');
+}
+
 function validateSource(kind, source, jsonMode = 'json') {
   if (!source.trim()) return 'Enter some code before validating or converting.';
   if (kind === 'json') {
@@ -192,7 +209,7 @@ function formatMarkup(source, options = {}) {
   return lines.join('\n');
 }
 
-function toTree(kind, source, jsonMode = 'json') {
+function toTree(kind, source, jsonMode = 'json', keepComments = true) {
   if (kind === 'json') {
     const toNode = (name, value, isRoot = false) => {
       if (Array.isArray(value)) {
@@ -234,7 +251,7 @@ function toTree(kind, source, jsonMode = 'json') {
     const meaningfulChildren = Array.from(node.childNodes).filter((child) =>
       child.nodeType === 1 ||
       (child.nodeType === 3 && child.nodeValue.trim()) ||
-      child.nodeType === 8 ||
+      (keepComments && child.nodeType === 8) ||
       child.nodeType === 4,
     );
     const elementChildren = meaningfulChildren.filter((child) => child.nodeType === 1);
@@ -261,7 +278,7 @@ function toTree(kind, source, jsonMode = 'json') {
   const declaration = source.match(/^\s*(<\?xml[^?]*\?>)/i);
   if (declaration) children.push({ name: declaration[1], format: 'xml', kind: 'declaration', value: '', children: [] });
   Array.from(doc.childNodes).forEach((child) => {
-    if (child.nodeType === 8) children.push({ name: '#comment', format: 'xml', kind: 'comment', value: child.nodeValue.trim(), children: [] });
+    if (child.nodeType === 8 && keepComments) children.push({ name: '#comment', format: 'xml', kind: 'comment', value: child.nodeValue.trim(), children: [] });
     else if (child.nodeType === 10) children.push({ name: `DOCTYPE ${child.name}`, format: 'xml', kind: 'declaration', value: '', children: [] });
     else if (child.nodeType === 1) children.push(build(child));
   });
@@ -305,12 +322,12 @@ function TreeNode({ node, depth = 0, expanded }) {
         ) : node.format === 'json' ? (
           <>
             <code className={`hxt-tree-name hxt-tree-name--json${node.name === 'root' ? ' hxt-tree-name--root' : ''}`}>
-              {node.name === 'root' ? '$' : node.name.startsWith('[') ? node.name : JSON.stringify(node.name)}
+              {node.name === 'root' ? '' : node.name.startsWith('[') ? node.name : node.name}
             </code>
             {node.name !== 'root' && <span className="hxt-tree-separator">:</span>}
             {jsonBranch ? (
               <span className={`hxt-tree-branch-summary hxt-tree-branch-summary--${node.kind}`}>
-                {isOpen ? (node.kind === 'array' ? '[' : '{') : (node.kind === 'array' ? `[ ${node.value} ]` : `{ ${node.value} }`)}
+                {isOpen ? (node.kind === 'array' ? '[' : '{') : (node.kind === 'array' ? `[${node.children.length} items]` : '{…}')}
               </span>
             ) : <span className={`hxt-tree-value hxt-tree-value--${node.kind}`}>{node.value}</span>}
           </>
@@ -331,8 +348,7 @@ function TreeNode({ node, depth = 0, expanded }) {
       {hasChildren && isOpen && (
         <div className="hxt-tree-children">
           {node.children.map((child, index) => <TreeNode key={`${child.name}-${index}`} node={child} depth={depth + 1} expanded={expanded} />)}
-          {xmlElement && <div className="hxt-tree-line hxt-tree-line--closing" style={{ '--tree-depth': depth + 1 }}><span className="hxt-tree-spacer" /><code className="hxt-tree-xml-tag">&lt;/{xmlTagName}&gt;</code></div>}
-          {jsonBranch && <div className="hxt-tree-line hxt-tree-line--closing" style={{ '--tree-depth': depth + 1 }}><span className="hxt-tree-spacer" /><code className="hxt-tree-json-bracket">{node.kind === 'array' ? ']' : '}'}</code></div>}
+          {jsonBranch && <div className="hxt-tree-line hxt-tree-line--closing" style={{ '--tree-depth': depth }}><span className="hxt-tree-spacer" /><code className="hxt-tree-json-bracket">{node.kind === 'array' ? ']' : '}'}</code></div>}
         </div>
       )}
     </div>
@@ -348,6 +364,7 @@ export default function HtmlXmlJsonToolPage() {
   const [indent, setIndent] = useState('2');
   const [useTabs, setUseTabs] = useState(false);
   const [keepComments, setKeepComments] = useState(true);
+  const [quoteJson5Keys, setQuoteJson5Keys] = useState(true);
   const [minifyCss, setMinifyCss] = useState(false);
   const [trimTextNodes, setTrimTextNodes] = useState(false);
   const [error, setError] = useState('');
@@ -391,8 +408,9 @@ export default function HtmlXmlJsonToolPage() {
       if (kind === 'json') {
         const comments = scanJsonComments(input);
         const value = (jsonMode === 'json' ? JSON : JSON5).parse(input);
-        const formatted = (jsonMode === 'json' ? JSON : JSON5).stringify(value, null, isMinify ? undefined : useTabs ? '\t' : Number(indent));
-        result = keepComments && jsonMode !== 'json' && comments.length ? `${comments.join('\n')}\n${formatted}` : formatted;
+        let formatted = (jsonMode === 'json' ? JSON : JSON5).stringify(value, null, isMinify ? undefined : useTabs ? '\t' : Number(indent));
+        if (jsonMode !== 'json' && !quoteJson5Keys) formatted = formatted.replace(/\"([A-Za-z_$][\w$]*)\"(?=\s*:)/g, '$1');
+        result = !isMinify && keepComments && jsonMode !== 'json' && comments.length ? preserveJson5Comments(input, formatted) : formatted;
       }
       else result = formatMarkup(input, { ...options, minify: isMinify });
       setOutput(result);
@@ -410,7 +428,7 @@ export default function HtmlXmlJsonToolPage() {
     setOutput('');
     setCopied(false);
     if (message) { setTree(null); return; }
-    try { setTree(toTree(kind, input, jsonMode)); setTreeExpanded(true); setStatus('Tree view ready.'); }
+    try { setTree(toTree(kind, input, jsonMode, keepComments)); setTreeExpanded(true); setStatus('Tree view ready.'); }
     catch (problem) { setTree(null); setError(problem?.message || 'Unable to parse this input.'); }
   };
   const clearOrSample = () => {
@@ -449,7 +467,8 @@ export default function HtmlXmlJsonToolPage() {
         <div className="runnable-code__header hxt-toolbar">
           <div className="hxt-toolbar-options">
             <label className="runnable-code__target"><span>Indent</span><select value={useTabs ? 'tabs' : indent} onChange={(event) => { const value = event.target.value; setUseTabs(value === 'tabs'); if (value !== 'tabs') setIndent(value); }} aria-label="Indentation"><option value="2">2 spaces</option><option value="3">3 spaces</option><option value="4">4 spaces</option><option value="tabs">Tabs</option></select></label>
-            {(kind !== 'json' || jsonMode !== 'json') && <label className="hxt-check"><input type="checkbox" checked={keepComments} onChange={(event) => setKeepComments(event.target.checked)} /> Keep comments</label>}
+            {kind !== 'json' && <label className="hxt-check"><input type="checkbox" checked={keepComments} onChange={(event) => setKeepComments(event.target.checked)} /> Keep comments</label>}
+            {kind === 'json' && jsonMode !== 'json' && <><label className="hxt-check"><input type="checkbox" checked={keepComments} onChange={(event) => setKeepComments(event.target.checked)} /> Keep comments</label><label className="hxt-check"><input type="checkbox" checked={quoteJson5Keys} onChange={(event) => setQuoteJson5Keys(event.target.checked)} /> Quote keys</label></>}
             {kind === 'json' && <label className="runnable-code__target"><span>Syntax</span><select value={jsonMode} onChange={(event) => onJsonModeChange(event.target.value)} aria-label="JSON syntax"><option value="json">JSON</option><option value="json5">JSON5 / JSONC</option></select></label>}
             {(kind === 'xml' || kind === 'html') && <label className="hxt-check" title="Removes leading and trailing whitespace from text nodes"><input type="checkbox" checked={trimTextNodes} onChange={(event) => setTrimTextNodes(event.target.checked)} /> Trim Text Nodes</label>}
             {kind === 'html' && <label className="hxt-check"><input type="checkbox" checked={minifyCss} onChange={(event) => setMinifyCss(event.target.checked)} /> Minify inline CSS</label>}
