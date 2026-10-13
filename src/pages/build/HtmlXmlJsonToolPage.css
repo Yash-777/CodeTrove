@@ -1,0 +1,61 @@
+.hxt-page { max-width: 1500px; }
+.hxt-intro { color: var(--color-muted); max-width: 95ch; margin: 0.35rem 0 1rem; line-height: 1.6; }
+.hxt-language-tabs { margin-bottom: 0.55rem; }
+.hxt-language-tabs .cp-tab { display: inline-flex; align-items: center; gap: 0.4rem; }
+.hxt-card { margin-top: 0.65rem; overflow: hidden; }
+.hxt-toolbar { align-items: center; min-height: 56px; gap: 0.75rem; flex-wrap: wrap; }
+.hxt-toolbar-options { display: flex; align-items: center; gap: 0.8rem; flex-wrap: wrap; }
+.hxt-check { display: inline-flex; align-items: center; gap: 0.35rem; color: var(--color-muted); font-size: 0.8rem; font-weight: 600; white-space: nowrap; }
+.hxt-check input { accent-color: var(--color-accent); }
+.hxt-privacy-note { margin-left: auto; color: var(--color-muted); font-size: 0.76rem; white-space: nowrap; }
+.hxt-panes { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0.8rem; padding: 0.8rem; }
+.hxt-pane { min-width: 0; border: 1px solid var(--color-border); border-radius: 9px; overflow: hidden; background: var(--color-paper); }
+.hxt-pane-header { min-height: 47px; display: flex; align-items: center; justify-content: space-between; gap: 0.6rem; padding: 0.45rem 0.65rem; border-bottom: 1px solid var(--color-border); }
+.hxt-pane-header > span, .hxt-pane-actions { display: flex; align-items: center; gap: 0.5rem; min-width: 0; }
+.hxt-pane-header strong { font-size: 0.84rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hxt-format-badge { display: inline-flex; align-items: center; padding: 0.2rem 0.4rem; border-radius: 5px; background: #2563eb22; color: var(--color-accent); font-size: 0.66rem; font-weight: 800; letter-spacing: 0.04em; }
+.hxt-format-badge--output { background: #0d948822; color: #0d9488; }
+.hxt-pane-actions { justify-content: flex-end; }
+.hxt-pane-actions .runnable-code__button { display: inline-flex; align-items: center; gap: 0.3rem; white-space: nowrap; }
+.hxt-pane .cm-editor { font-size: 0.84rem; }
+.hxt-pane-footer { display: flex; justify-content: space-between; gap: 0.5rem; padding: 0.45rem 0.65rem; color: var(--color-muted); font-size: 0.72rem; border-top: 1px solid var(--color-border); }
+.hxt-action-bar { display: flex; gap: 0.6rem; flex-wrap: wrap; padding: 0 0.8rem 0.8rem; }
+.hxt-action-bar button { display: inline-flex; align-items: center; gap: 0.35rem; }
+.hxt-message { margin: 0 0.8rem 0.8rem; padding: 0.7rem 0.85rem; border: 1px solid var(--color-border); border-radius: 7px; font-size: 0.86rem; line-height: 1.5; overflow-wrap: anywhere; }
+.hxt-message--error { color: #b91c1c; border-color: #ef444466; background: #ef444410; }
+.hxt-message--success { color: #047857; border-color: #10b98155; background: #10b98110; }
+.hxt-tree-view { min-height: 390px; max-height: 390px; overflow: auto; padding: 0.7rem; color: var(--color-text); font-size: 0.82rem; }
+.hxt-tree-line { display: flex; align-items: baseline; gap: 0.4rem; min-height: 1.7rem; padding-left: calc(var(--tree-depth) * 1.15rem); white-space: nowrap; }
+.hxt-tree-toggle { display: inline-flex; align-items: center; justify-content: center; width: 1rem; height: 1rem; padding: 0; border: 0; background: transparent; color: var(--color-muted); cursor: pointer; flex: 0 0 1rem; }
+.hxt-tree-spacer { display: inline-block; width: 1rem; flex: 0 0 1rem; }
+.hxt-tree-name { color: var(--color-accent); font-size: 0.8rem; font-weight: 700; }
+.hxt-tree-attributes { color: var(--color-muted); font-size: 0.76rem; }
+.hxt-tree-value { color: #0d9488; overflow: hidden; text-overflow: ellipsis; }
+.hxt-tree-count { color: var(--color-muted); font-size: 0.68rem; border: 1px solid var(--color-border); border-radius: 10px; padding: 0 0.3rem; }
+.hxt-about { margin-top: 1.2rem; padding: 1rem 1.1rem; border: 1px solid var(--color-border); border-radius: 10px; }
+.hxt-about h2 { margin-top: 0; font-size: 1.1rem; }
+.hxt-about li { margin: 0.4rem 0; line-height: 1.5; }
+.hxt-note { color: var(--color-muted); font-size: 0.82rem; margin-bottom: 0; }
+@media (max-width: 900px) { .hxt-panes { grid-template-columns: minmax(0, 1fr); } .hxt-toolbar-options { align-items: flex-start; } .hxt-privacy-note { width: 100%; margin-left: 0; } }
+@media (max-width: 560px) { .hxt-pane-header { align-items: flex-start; flex-direction: column; } .hxt-pane-actions { width: 100%; justify-content: flex-start; } .hxt-pane-footer { flex-direction: column; } .hxt-toolbar-options { gap: 0.6rem; } }
+
+/* Keep conversion actions on the same toolbar row as indentation controls. */
+.hxt-toolbar { justify-content: space-between; }
+.hxt-toolbar-right { display: flex; align-items: center; justify-content: flex-end; gap: 0.65rem; margin-left: auto; flex-wrap: wrap; }
+.hxt-toolbar-actions { display: flex; align-items: center; justify-content: flex-end; gap: 0.45rem; flex-wrap: wrap; }
+.hxt-toolbar-actions .runnable-code__button { display: inline-flex; align-items: center; justify-content: center; gap: 0.35rem; white-space: nowrap; }
+.hxt-privacy-note { margin-left: 0; }
+.hxt-pane .cm-diagnostic-error { border-left-color: #ef4444; }
+.hxt-pane .cm-lintRange-error { background-image: none; text-decoration: underline wavy #ef4444; text-decoration-skip-ink: none; }
+@media (max-width: 1100px) {
+  .hxt-toolbar { align-items: flex-start; }
+  .hxt-toolbar-right { width: 100%; justify-content: space-between; }
+}
+@media (max-width: 700px) {
+  .hxt-toolbar-right { align-items: flex-start; flex-direction: column; }
+  .hxt-toolbar-actions { justify-content: flex-start; width: 100%; }
+  .hxt-toolbar-actions .runnable-code__button { white-space: normal; }
+}
+
+/* Selected operation is visually consistent with the active format tab. */
+.hxt-toolbar-actions .runnable-code__button.is-active { color: #fff; background: var(--color-accent); border-color: var(--color-accent); font-weight: 700; }

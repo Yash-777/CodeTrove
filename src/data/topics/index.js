@@ -153,6 +153,16 @@ export const CATEGORIES = [
     ],
   },
   {
+    key: 'web',
+    label: 'Web',
+    color: '#F97316',
+    codeLang: 'html',
+    topics: [],
+    tools: [
+      { name: 'HTML / XML / JSON Formatter & Validator', description: 'Beautify, minify, validate, and explore JSON/XML in a tree view.', internalTool: 'html-xml-json', externalUrl: null },
+    ],
+  },
+  {
     key: 'data-time',
     label: 'Data & Time',
     color: '#0D9488',

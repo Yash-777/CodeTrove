@@ -612,7 +612,7 @@ export default function RunnableCode({
               </select>
             </label>
           )}
-          <button type="button" className="runnable-code__icon-button" onClick={copyCode} title="Copy code" aria-label="Copy code">
+          <button type="button" className={`runnable-code__icon-button${copied.code ? ' is-copied' : ''}`} onClick={copyCode} title={copied.code ? "Copied to clipboard" : "Copy code"} aria-label={copied.code ? "Copied to clipboard" : "Copy code"}>
             {copied.code ? <CheckIcon /> : <CopyIcon />}
           </button>
           <button type="button" className="runnable-code__icon-button" onClick={() => downloadTextFile(displayName, code)} title={`Save as ${displayName}`} aria-label={`Save as ${displayName}`}>
@@ -677,11 +677,11 @@ export default function RunnableCode({
             </div>
             <button
               type="button"
-              className="runnable-code__icon-button"
+              className={`runnable-code__icon-button${copied.output ? ' is-copied' : ''}`}
               onClick={copyOutput}
               disabled={logs.length === 0}
-              title="Copy output"
-              aria-label="Copy output"
+              title={copied.output ? "Copied to clipboard" : "Copy output"}
+              aria-label={copied.output ? "Copied to clipboard" : "Copy output"}
             >
               {copied.output ? <CheckIcon /> : <CopyIcon />}
             </button>

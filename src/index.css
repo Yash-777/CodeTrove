@@ -79,3 +79,14 @@ pre {
 button {
   font-family: inherit;
 }
+
+/* Shared copy feedback: use on copy buttons across the application. */
+button.is-copied, .is-copied {
+  color: #fff !important;
+  background: #238636 !important;
+  border-color: #238636 !important;
+}
+button.is-copied:hover, .is-copied:hover {
+  background: #2ea043 !important;
+  border-color: #2ea043 !important;
+}

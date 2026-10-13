@@ -296,8 +296,8 @@ export default function NewTopicPage() {
               <div className="new-topic-page__snippet-header">
                 <code>{item.fileLabel}</code>
                 <div className="new-topic-page__snippet-actions">
-                  <button type="button" onClick={() => handleCopy(index, item.code)}>
-                    {copiedIndex === index ? 'Copied!' : 'Copy'}
+                  <button type="button" className={copiedIndex === index ? 'is-copied' : ''} onClick={() => handleCopy(index, item.code)}>
+                    {copiedIndex === index ? 'Copied to clipboard' : 'Copy'}
                   </button>
                   <button type="button" onClick={() => handleDownload(item.fileLabel, item.code)}>
                     Download

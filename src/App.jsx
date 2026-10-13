@@ -23,6 +23,7 @@ import CharacterCounterPage from './pages/build/CharacterCounterPage.jsx';
 import PomFormatterPage from './pages/build/PomFormatterPage.jsx';
 import PropertiesYamlConverterPage from './pages/build/PropertiesYamlConverterPage.jsx';
 import UnixTimestampConverterPage from './pages/build/UnixTimestampConverterPage.jsx';
+import HtmlXmlJsonToolPage from './pages/build/HtmlXmlJsonToolPage.jsx';
 import ProjectsPage from './pages/build/ProjectsPage.jsx';
 import ProfilePage from './pages/store/ProfilePage.jsx';
 import ResumePage from './pages/store/ResumePage.jsx';
@@ -59,6 +60,7 @@ export default function App() {
           <Route path="/build/tools/pom-formatter" element={<PomFormatterPage />} />
           <Route path="/build/tools/properties-yaml-converter" element={<PropertiesYamlConverterPage />} />
           <Route path="/build/tools/unix-timestamp-converter" element={<UnixTimestampConverterPage />} />
+          <Route path="/build/tools/html-xml-json" element={<HtmlXmlJsonToolPage />} />
           <Route path="/build/projects" element={<RequireRole allow={ANY_LOGGED_IN}><ProjectsPage /></RequireRole>} />
 
           <Route path="/store/profile" element={<RequireRole allow={ANY_LOGGED_IN}><ProfilePage /></RequireRole>} />
