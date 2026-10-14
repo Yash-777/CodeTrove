@@ -85,6 +85,16 @@ export const CATEGORIES = [
     ],
   },
   {
+    key: 'cryptography',
+    label: 'Cryptography',
+    color: '#7C3AED',
+    codeLang: 'text',
+    topics: [],
+    tools: [
+      { name: 'Cryptography Tools', description: 'Encrypt and decrypt text, generate hashes, and create or verify HMAC signatures.', internalTool: 'cryptography', externalUrl: null },
+    ],
+  },
+  {
     key: 'text',
     label: 'Text',
     color: '#10B981',
