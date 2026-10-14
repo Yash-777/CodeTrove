@@ -92,6 +92,7 @@ export const CATEGORIES = [
     topics: [],
     tools: [
       { name: 'Character Counter', description: 'Count characters, words, lines and common platform limits.', internalTool: 'character-counter', externalUrl: null },
+      { name: 'String Utilities', description: 'Remove extra spaces, duplicate lines, and accents from text.', internalTool: 'string-utilities', externalUrl: null },
       { name: 'Compare — Diffchecker', description: 'Compare text or files in a new tab.', internalTool: null, externalUrl: 'https://www.diffchecker.com/' },
       { name: 'Compare — Text-Compare', description: 'Quick online text comparison.', internalTool: null, externalUrl: 'https://text-compare.com/' },
       { name: 'Beyond Compare', description: 'Powerful local file comparison tool (heavy files).', internalTool: null, externalUrl: 'https://www.scootersoftware.com/' },
