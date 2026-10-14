@@ -89,6 +89,26 @@ The public endpoint currently advertises **Java 17 (JDK 17.0.6)** and **Java 13 
 POST https://ce.judge0.com/submissions?base64_encoded=false&wait=true
 ```
 
-The response is read from `compile_output`, `stdout`, `stderr`, and `status.description`. A self-hosted Judge0 deployment can expose a different compatible base URL and a different set of installed JDK versions; the API adapter keeps the provider-specific request and response handling separate from the editor.
+The response is read from `compile_output`, `stdout`, `stderr`, and `status.description`. `wait=true` asks the service to return the completed result in the same response; Judge0's documentation notes that some hosts disable this option and recommends token polling for scalable deployments. A self-hosted Judge0 deployment can expose a different compatible base URL and a different set of installed JDK versions; the API adapter keeps the provider-specific request and response handling separate from the editor.
+
+### Piston — open-source self-hosted alternative
+
+[Piston](https://github.com/engineer-man/piston) is an MIT-licensed, sandboxed code execution engine designed to run untrusted code. It can be deployed with Docker and is a good option when Java execution should remain under your control. Its API documentation describes Java as a runtime selected by language name and semantic version. The current public Piston endpoint advertises **Java 15.0.2**; self-hosted installations can install and expose their own runtime versions.
+
+CodeTrove discovers Piston runtimes with:
+
+```text
+GET https://emkc.org/api/v2/piston/runtimes
+```
+
+It sends the source as a named `Main.java` file to:
+
+```text
+POST https://emkc.org/api/v2/piston/execute
+```
+
+The request contains `language: "java"`, the selected `version`, a `files` array, STDIN, and compile/run time limits. Piston returns a `compile` object when compilation produces output and a `run` object containing `stdout`, `stderr`, `output`, `code`, and `signal`. The public endpoint currently responds with `401 Unauthorized` for execution requests, so it is documented as a self-hosting candidate rather than added to the public provider selector. A self-hosted Piston endpoint is recommended for production use; it would need an endpoint/auth configuration before being enabled in CodeTrove.
+
+Sources: [Piston repository](https://github.com/engineer-man/piston) · [Piston API v2 documentation](https://github.com/engineer-man/piston/blob/master/docs/api-v2.md) · [Judge0 repository](https://github.com/judge0/judge0) · [Judge0 CE API docs](https://ce.judge0.com/)
 
 See the [Java playground](#/build/compiler?lang=java) for STDIN input and the API/version selectors.
