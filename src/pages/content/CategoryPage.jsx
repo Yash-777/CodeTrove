@@ -49,10 +49,23 @@ export default function CategoryPage() {
                   <strong>{tool.name}</strong>
                   <p>{tool.description}</p>
                 </div>
-                {tool.externalUrl ? (
+                {tool.internalTool && tool.externalUrl ? (
+                  <span className="tool-list__actions">
+                    <Link to={`/build/tools/${tool.internalTool}`} className="tool-list__link">
+                      Open in app <span className="tool-list__badge tool-list__badge--soon">internal</span>
+                    </Link>
+                    <a href={tool.externalUrl} target="_blank" rel="noopener noreferrer" className="tool-list__link">
+                      Open ↗ <span className="tool-list__badge">new tab</span>
+                    </a>
+                  </span>
+                ) : tool.externalUrl ? (
                   <a href={tool.externalUrl} target="_blank" rel="noopener noreferrer" className="tool-list__link">
                     Open ↗ <span className="tool-list__badge">new tab</span>
                   </a>
+                ) : tool.internalTool ? (
+                  <Link to={`/build/tools/${tool.internalTool}`} className="tool-list__link">
+                    Open <span className="tool-list__badge tool-list__badge--soon">tool</span>
+                  </Link>
                 ) : (
                   <span className="tool-list__badge tool-list__badge--soon">coming soon</span>
                 )}

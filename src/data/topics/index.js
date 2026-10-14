@@ -171,6 +171,7 @@ export const CATEGORIES = [
     topics: [],
     tools: [
       { name: 'HTML / XML / JSON Formatter & Validator', description: 'Beautify, minify, validate, and explore JSON/XML in a tree view.', internalTool: 'html-xml-json', externalUrl: null },
+      { name: 'JSON Crack', description: 'Open-source JSON, YAML, XML, and CSV visualization as interactive graphs.', internalTool: 'json-crack', externalUrl: 'https://jsoncrack.com/editor' },
     ],
   },
   {

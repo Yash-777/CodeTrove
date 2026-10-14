@@ -108,6 +108,13 @@
   font-weight: 600;
 }
 
+.tool-list__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
 .tool-list__badge {
   font-size: 0.7rem;
   padding: 0.15rem 0.5rem;
@@ -136,4 +143,9 @@
   gap: 0.6rem;
   justify-content: center;
   margin-top: 1rem;
+}
+
+@media (max-width: 600px) {
+  .tool-list__item { align-items: flex-start; flex-direction: column; }
+  .tool-list__actions { justify-content: flex-start; }
 }
