@@ -42,7 +42,7 @@ class HelloWorldApp {
 
 ## Try it
 
-Every example marked with **Run** is a live Java editor. Edit the code and press **Run** (or `Ctrl/Cmd + Enter`), and pick the Java version from the dropdown. Use a `public class Main` so the file is `Main.java`.
+Every example marked with **Run** is a live Java editor. Edit the code and press **Run** (or `Ctrl/Cmd + Enter`). Select the execution API first, then select the Java version offered by that API. Use a `public class Main` so the file is `Main.java`.
 
 ```java runnable
 public class Main {
@@ -53,4 +53,42 @@ public class Main {
 ```
 
 > [!NOTE]
-> Java code is compiled and run by [Wandbox](https://wandbox.org) (open source), so Java boxes need an internet connection and send the snippet text to that service. See the [Java playground](#/build/compiler?lang=java) for STDIN input and how it works.
+> Java code uses [Wandbox](https://wandbox.org) by default. The current public Wandbox compiler list advertises **Java 22 (OpenJDK 22+36)** and **Java 21 (OpenJDK 21+35)**; the dropdown is loaded from Wandbox at runtime so it does not claim versions the service no longer offers. Java boxes need an internet connection and send the snippet text and STDIN to the selected service.
+
+## Java execution APIs
+
+### Wandbox — default
+
+[Wandbox](https://wandbox.org) is an open-source public “social compilation” service. CodeTrove reads the available Java compilers with:
+
+```text
+GET https://wandbox.org/api/list.json
+```
+
+It filters entries whose language is Java, then sends code and STDIN to:
+
+```text
+POST https://wandbox.org/api/compile.json
+```
+
+The request includes the selected compiler identifier, `stdin`, compiler/runtime options, and `save: false`. The response is read from `compiler_error`, `program_output`, `program_error`, and `status`. Wandbox currently supports these Java versions in the public list: **22 and 21**. If the public list changes, CodeTrove updates the version dropdown automatically.
+
+### Judge0 — best for self-hosting
+
+[Judge0](https://github.com/judge0/judge0) is open source and provides a REST API for compiling and running Java. It supports STDIN, compiler output, execution status, CPU/wall-time limits, and memory limits. You can configure the JDK versions installed on your own service, but self-hosting requires deployment and maintenance. The hosted [online demo](https://ide.judge0.com/) is useful for trying Judge0, but public endpoints may have rate limits or availability constraints.
+
+CodeTrove reads Java runtimes from the selected Judge0-compatible endpoint:
+
+```text
+GET https://ce.judge0.com/languages
+```
+
+The public endpoint currently advertises **Java 17 (JDK 17.0.6)** and **Java 13 (OpenJDK 13.0.1)**. It then submits the source with the selected `language_id` and limits to:
+
+```text
+POST https://ce.judge0.com/submissions?base64_encoded=false&wait=true
+```
+
+The response is read from `compile_output`, `stdout`, `stderr`, and `status.description`. A self-hosted Judge0 deployment can expose a different compatible base URL and a different set of installed JDK versions; the API adapter keeps the provider-specific request and response handling separate from the editor.
+
+See the [Java playground](#/build/compiler?lang=java) for STDIN input and the API/version selectors.

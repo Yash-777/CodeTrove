@@ -39,7 +39,7 @@ import { java, kotlin } from '@codemirror/legacy-modes/mode/clike';
 import { linter, lintGutter, setDiagnostics } from '@codemirror/lint';
 import { compileTypeScript, formatDiagnostic, preloadTypeScript } from '../../utils/tsCompiler.js';
 import { DEFAULT_KOTLIN_TARGET, getKotlinVersion, highlightKotlin, runKotlin } from '../../utils/kotlinApi.js';
-import { getJavaRuntimes, pickDefaultRuntime, runJava } from '../../utils/javaApi.js';
+import { DEFAULT_JAVA_API, JAVA_APIS, getJavaRuntimes, pickDefaultRuntime, runJava } from '../../utils/javaApi.js';
 import './RunnableCode.css';
 
 /** File name shown in the header, used by Save and in error messages. */
@@ -276,6 +276,7 @@ export default function RunnableCode({
 
   const [code, setCode] = useState(initial);
   const [confType, setConfType] = useState(DEFAULT_KOTLIN_TARGET);
+  const [javaApi, setJavaApi] = useState(DEFAULT_JAVA_API);
   const [runtimes, setRuntimes] = useState([]);
   const [runtimeId, setRuntimeId] = useState('');
   const confTypeRef = useRef(confType);
@@ -346,13 +347,13 @@ export default function RunnableCode({
     };
 
     if (isJava) {
-      // Compile + run remotely (Wandbox, open-source) with the selected JDK.
+      // Compile + run remotely with the selected provider and JDK.
       const controller = new AbortController();
       abortRef.current = controller;
       timeoutRef.current = setTimeout(() => controller.abort('timeout'), JAVA_TIMEOUT_MS);
       try {
-        const compiler = runtimeId || pickDefaultRuntime(await getJavaRuntimes());
-        const { lines, diagnostics } = await runJava(code, controller.signal, { stdin: inputRef.current, compiler });
+        const compiler = runtimeId || pickDefaultRuntime(await getJavaRuntimes(javaApi));
+        const { lines, diagnostics } = await runJava(code, controller.signal, { stdin: inputRef.current, compiler, api: javaApi });
         if (activeRunRef.current !== myRun) return;
         clearTimeout(timeoutRef.current);
         const view = editorViewRef.current;
@@ -375,7 +376,7 @@ export default function RunnableCode({
           type: 'error',
           text: timedOut
             ? `Timed out after ${JAVA_TIMEOUT_MS / 1000}s waiting for the Java service.`
-            : `Could not reach the Java service (wandbox.org). Check your internet connection and try again. (${error.message})`,
+            : `Could not reach the Java service (${JAVA_APIS[javaApi].server}). Check your internet connection and try again. (${error.message})`,
         }]);
         if (timedOut) setStatus('timeout');
       }
@@ -444,7 +445,7 @@ export default function RunnableCode({
       setStats({ time: performance.now() - startedAtRef.current, memory: null });
       stopCode('timeout');
     }, TIMEOUT_MS);
-  }, [code, isTs, isKotlin, isJava, displayName, stopCode, confType, runtimeId]);
+  }, [code, isTs, isKotlin, isJava, displayName, stopCode, confType, runtimeId, javaApi]);
 
   const resetCode = () => {
     stopCode('idle');
@@ -537,17 +538,19 @@ export default function RunnableCode({
     return list;
   }, [isTs, isKotlin, isJava, initial]);
 
-  // Java: load the runtime (JDK) versions offered by the service for the dropdown.
+  // Java: load the runtime (JDK) versions offered by the selected provider.
   useEffect(() => {
     if (!isJava) return undefined;
     let cancelled = false;
-    getJavaRuntimes().then((list) => {
+    setRuntimes([]);
+    setRuntimeId('');
+    getJavaRuntimes(javaApi).then((list) => {
       if (cancelled) return;
       setRuntimes(list);
       setRuntimeId((current) => current || pickDefaultRuntime(list));
     });
     return () => { cancelled = true; };
-  }, [isJava]);
+  }, [isJava, javaApi]);
 
   useEffect(() => {
     if (isTs) preloadTypeScript().catch(() => {});
@@ -596,7 +599,15 @@ export default function RunnableCode({
         </span>
         <div className="runnable-code__actions">
           {isJava && (
-            <label className="runnable-code__target" title="JDK used to compile and run the code (sent as `compiler` in the request)">
+            <label className="runnable-code__target" title="Java execution API. Wandbox is the default; Judge0 can be public or self-hosted.">
+              <span>API</span>
+              <select value={javaApi} onChange={(event) => setJavaApi(event.target.value)} disabled={status === 'running'} aria-label="Java execution API">
+                {Object.values(JAVA_APIS).map((api) => <option key={api.id} value={api.id}>{api.label}</option>)}
+              </select>
+            </label>
+          )}
+          {isJava && (
+            <label className="runnable-code__target" title={`JDK used by ${JAVA_APIS[javaApi].label} (sent as the provider's runtime identifier)`}>
               <span>Java</span>
               <select value={runtimeId} onChange={(event) => setRuntimeId(event.target.value)} disabled={status === 'running' || runtimes.length === 0} aria-label="Java runtime version">
                 {runtimes.length === 0 && <option value="">Loading…</option>}
@@ -694,7 +705,7 @@ export default function RunnableCode({
             ))}
           </div>
           {isKotlin && <div className="runnable-code__footer">Compiled by JetBrains · api.kotlinlang.org</div>}
-          {isJava && <div className="runnable-code__footer">Compiled and run by Wandbox (open source) · wandbox.org</div>}
+          {isJava && <div className="runnable-code__footer">Compiled and run by {JAVA_APIS[javaApi].label} · {JAVA_APIS[javaApi].description}</div>}
         </div>
       </div>
 
