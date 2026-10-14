@@ -18,6 +18,12 @@ const FORMATS = {
   xml: { label: 'XML', file: 'document.xml', language: XML_LANGUAGE, sample: '<?xml version="1.0" encoding="UTF-8"?>\n<!-- Commented info: sample book catalog -->\n<catalog>\n  <book id="bk101">\n    <title>\n      Developer Guide\n    </title>\n    <price currency="USD">29.99</price>\n  </book>\n</catalog>' },
   json: { label: 'JSON', file: 'data.json', language: JSON_LANGUAGE, sample: '{\n  "active": true,\n  "comment": "JSON does not support comments; this field contains sample info.",\n  "metadata": {\n    "version": 1\n  },\n  "name": "CodeTrove",\n  "tools": ["HTML", "XML", "JSON"]\n}' },
 };
+const JSONC_SAMPLE = `{// JSONC: comments and trailing commas, but quoted keys/strings
+  // Public port for the web server
+  "port": 443,
+  /* Disable only in local development. */
+  "secure": true,
+}`;
 const JSON5_SAMPLE = `// Postman / microservice payload sample\n{\n  // Enable this feature\n  active: true,\n  /* API metadata */\n  metadata: { version: 1, },\n  name: 'CodeTrove',\n  tools: ['HTML', 'XML', 'JSON'],\n}`;
 const TOOL_DESCRIPTIONS = {
   html: 'Format and inspect HTML markup. Use Trim Text Nodes to remove leading and trailing whitespace from text values.',
@@ -97,6 +103,15 @@ function jsonCommentsError(source) {
   return scanJsonComments(source).length > 0;
 }
 
+function parseJsonByMode(source, mode) {
+  if (mode === 'json') return JSON.parse(source);
+  if (mode === 'json5') return JSON5.parse(source);
+  // JSONC accepts comments and trailing commas, but still requires quoted keys and double-quoted strings.
+  const withoutComments = stripJsonComments(source);
+  const withoutTrailingCommas = withoutComments.replace(/,\s*([}\]])/g, '$1');
+  return JSON.parse(withoutTrailingCommas);
+}
+
 function validateHtml(source) {
   const stack = [];
   const tokens = source.match(/<!--[\s\S]*?-->|<![^>]*>|<\/?[a-zA-Z][^>]*>|[^<]+|</g) || [];
@@ -121,20 +136,74 @@ function validateHtml(source) {
 }
 
 function preserveJson5Comments(source, formatted) {
-  // Keep comments attached to their original line/region rather than moving all comments to the top.
+  // Attach comments to the next property/value when they precede it, or to the
+  // previous formatted line when they trail it. Never use source line numbers:
+  // formatting changes those line numbers and causes comments to drift.
   const comments = [];
   let quote = ''; let escaped = false;
   for (let i = 0; i < source.length; i += 1) {
     const ch = source[i];
     if (quote) { if (escaped) escaped = false; else if (ch === '\\') escaped = true; else if (ch === quote) quote = ''; continue; }
-    if (ch === '\"' || ch === "'") { quote = ch; continue; }
-    if (ch === '/' && source[i + 1] === '/') { let end = source.indexOf('\n', i); if (end < 0) end = source.length; comments.push({ at: i, text: source.slice(i, end).trim(), line: source.slice(0, i).split('\n').length - 1 }); i = end - 1; }
-    else if (ch === '/' && source[i + 1] === '*') { let end = source.indexOf('*/', i + 2); end = end < 0 ? source.length - 2 : end; comments.push({ at: i, text: source.slice(i, end + 2).trim(), line: source.slice(0, i).split('\n').length - 1 }); i = end + 1; }
+    if (ch === '"' || ch === "'") { quote = ch; continue; }
+    if (ch === '/' && (source[i + 1] === '/' || source[i + 1] === '*')) {
+      const start = i; const line = source.slice(0, i).split(/\r?\n/).length - 1;
+      const lineComment = source[i + 1] === '/';
+      if (lineComment) { let end = i + 2; while (end < source.length && source[end] !== '\n' && source[end] !== '\r') end++; comments.push({ text: source.slice(start, end).trim(), line, trailing: source.slice(source.lastIndexOf('\n', start - 1) + 1, start).trim().length > 0 }); i = end - 1; }
+      else { let end = source.indexOf('*/', i + 2); if (end < 0) end = source.length - 2; comments.push({ text: source.slice(start, end + 2).trim(), line, trailing: source.slice(source.lastIndexOf('\n', start - 1) + 1, start).trim().length > 0 }); i = end + 1; }
+    }
   }
   if (!comments.length) return formatted;
+  const originalLines = source.split(/\r?\n/);
   const lines = formatted.split('\n');
-  comments.forEach((comment) => { const index = Math.min(comment.line, lines.length - 1); lines[index] = `${lines[index]} ${comment.text}`.trimEnd(); });
+  const used = new Set();
+  comments.forEach((comment) => {
+    const originalLine = originalLines[comment.line] || '';
+    const after = originalLines.slice(comment.line + 1).join('\n');
+    const before = originalLines.slice(0, comment.line).join('\n');
+    const nextKey = (comment.trailing ? '' : `${originalLine}\n${after}`).match(/(?:^|[,{]\s*)(?:"([^"\n]+)"|'([^'\n]+)'|([\w$-]+))\s*:/);
+    const previousKey = (comment.trailing ? originalLine : before).match(/(?:"([^"\n]+)"|'([^'\n]+)'|([\w$-]+))\s*:/g);
+    const key = !comment.trailing && nextKey ? (nextKey[1] || nextKey[2] || nextKey[3]) : null;
+    let target = -1;
+    if (key) target = lines.findIndex((line) => new RegExp(`^\\s*"?${key.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\$&')}"?\\s*:`).test(line));
+    if (target >= 0) {
+      lines.splice(target, 0, `${' '.repeat(Math.max(0, (lines[target].match(/^\s*/) || [''])[0].length))}${comment.text}`);
+      used.add(target);
+    } else {
+      const anchor = Math.min(Math.max(comment.line, 0), lines.length - 1);
+      const indent = (lines[anchor]?.match(/^\s*/) || [''])[0];
+      if (comment.trailing && lines[anchor]) lines[anchor] = `${lines[anchor]} ${comment.text}`;
+      else lines.splice(anchor, 0, `${indent}${comment.text}`);
+    }
+  });
   return lines.join('\n');
+}
+
+function quoteJson5SourceKeys(source, quoteKeys) {
+  // Quote/unquote identifier property names in the editor source itself while
+  // leaving strings and comments untouched.
+  let result = ''; let quote = ''; let escaped = false; let lineComment = false; let blockComment = false;
+  for (let i = 0; i < source.length; i += 1) {
+    const ch = source[i]; const next = source[i + 1];
+    if (lineComment) { result += ch; if (ch === '\n' || ch === '\r') lineComment = false; continue; }
+    if (blockComment) { result += ch; if (ch === '*' && next === '/') { result += next; i += 1; blockComment = false; } continue; }
+    if (quote) { result += ch; if (escaped) escaped = false; else if (ch === '\\') escaped = true; else if (ch === quote) quote = ''; continue; }
+    if (ch === '/' && next === '/') { result += '//'; i += 1; lineComment = true; continue; }
+    if (ch === '/' && next === '*') { result += '/*'; i += 1; blockComment = true; continue; }
+    if (ch === '"' || ch === "'") { quote = ch; result += ch; continue; }
+    if (quoteKeys && /[A-Za-z_$]/.test(ch) && (i === 0 || !/[\w$]/.test(source[i - 1]))) {
+      const match = source.slice(i).match(/^[A-Za-z_$][\w$]*/);
+      if (match) {
+        let j = i + match[0].length; while (/\s/.test(source[j] || '')) j += 1;
+        if (source[j] === ':') { result += `"${match[0]}"`; i += match[0].length - 1; continue; }
+      }
+    }
+    if (!quoteKeys && ch === '"') {
+      const match = source.slice(i).match(/^"([A-Za-z_$][\w$]*)"(?=\s*:)/);
+      if (match) { result += match[1]; i += match[0].length - 1; continue; }
+    }
+    result += ch;
+  }
+  return result;
 }
 
 function validateSource(kind, source, jsonMode = 'json') {
@@ -143,8 +212,8 @@ function validateSource(kind, source, jsonMode = 'json') {
     if (jsonMode === 'json' && jsonCommentsError(source)) {
       return 'Comments detected in JSON. Standard JSON does not support comments. Remove all // and /* */ comments.';
     }
-    try { (jsonMode === 'json' ? JSON : JSON5).parse(source); return ''; }
-    catch (error) { return `Invalid ${jsonMode === 'json' ? 'JSON' : 'JSON5 / JSONC'}: ${error.message}`; }
+    try { parseJsonByMode(source, jsonMode); return ''; }
+    catch (error) { return `Invalid ${jsonMode === 'json' ? 'JSON' : jsonMode === 'jsonc' ? 'JSONC' : 'JSON5'}: ${error.message}`; }
   }
   if (kind === 'xml') {
     const doc = new DOMParser().parseFromString(source, 'application/xml');
@@ -239,7 +308,7 @@ function toTree(kind, source, jsonMode = 'json', keepComments = true) {
         children: [],
       };
     };
-    const parsed = (jsonMode === 'json' ? JSON : JSON5).parse(source);
+    const parsed = parseJsonByMode(source, jsonMode);
     return toNode('root', parsed, true);
   }
 
@@ -322,9 +391,9 @@ function TreeNode({ node, depth = 0, expanded }) {
         ) : node.format === 'json' ? (
           <>
             <code className={`hxt-tree-name hxt-tree-name--json${node.name === 'root' ? ' hxt-tree-name--root' : ''}`}>
-              {node.name === 'root' ? '' : node.name.startsWith('[') ? node.name : node.name}
+              {node.name === 'root' || node.name.startsWith('[') ? '' : node.name}
             </code>
-            {node.name !== 'root' && <span className="hxt-tree-separator">:</span>}
+            {node.name !== 'root' && !node.name.startsWith('[') && <span className="hxt-tree-separator">:</span>}
             {jsonBranch ? (
               <span className={`hxt-tree-branch-summary hxt-tree-branch-summary--${node.kind}`}>
                 {isOpen ? (node.kind === 'array' ? '[' : '{') : (node.kind === 'array' ? `[${node.children.length} items]` : '{…}')}
@@ -364,7 +433,7 @@ export default function HtmlXmlJsonToolPage() {
   const [indent, setIndent] = useState('2');
   const [useTabs, setUseTabs] = useState(false);
   const [keepComments, setKeepComments] = useState(true);
-  const [quoteJson5Keys, setQuoteJson5Keys] = useState(true);
+  const [quoteJson5Keys, setQuoteJson5Keys] = useState(false);
   const [minifyCss, setMinifyCss] = useState(false);
   const [trimTextNodes, setTrimTextNodes] = useState(false);
   const [error, setError] = useState('');
@@ -407,9 +476,10 @@ export default function HtmlXmlJsonToolPage() {
       let result;
       if (kind === 'json') {
         const comments = scanJsonComments(input);
-        const value = (jsonMode === 'json' ? JSON : JSON5).parse(input);
+        const value = parseJsonByMode(input, jsonMode);
         let formatted = (jsonMode === 'json' ? JSON : JSON5).stringify(value, null, isMinify ? undefined : useTabs ? '\t' : Number(indent));
-        if (jsonMode !== 'json' && !quoteJson5Keys) formatted = formatted.replace(/\"([A-Za-z_$][\w$]*)\"(?=\s*:)/g, '$1');
+        if (jsonMode === 'jsonc') formatted = JSON.stringify(value, null, isMinify ? undefined : useTabs ? '\t' : Number(indent));
+        else if (jsonMode === 'json5') formatted = quoteJson5SourceKeys(formatted, quoteJson5Keys);
         result = !isMinify && keepComments && jsonMode !== 'json' && comments.length ? preserveJson5Comments(input, formatted) : formatted;
       }
       else result = formatMarkup(input, { ...options, minify: isMinify });
@@ -446,8 +516,8 @@ export default function HtmlXmlJsonToolPage() {
     } catch { setError('Clipboard access was blocked by the browser. Select and copy the output manually.'); }
   };
   const onKindChange = (next) => { setKind(next); setInput(''); setOutput(''); setTree(null); setCopied(false); setError(''); setStatus(''); };
-  const onJsonModeChange = (next) => { setJsonMode(next); setInput(next === 'json' ? FORMATS.json.sample : JSON5_SAMPLE); setOutput(''); setTree(null); setCopied(false); setError(''); setStatus(''); };
-  const sample = kind === 'json' && jsonMode !== 'json' ? JSON5_SAMPLE : FORMATS[kind].sample;
+  const onJsonModeChange = (next) => { setJsonMode(next); setQuoteJson5Keys(false); setInput(next === 'json' ? FORMATS.json.sample : next === 'jsonc' ? JSONC_SAMPLE : JSON5_SAMPLE); setOutput(''); setTree(null); setCopied(false); setError(''); setStatus(''); };
+  const sample = kind === 'json' && jsonMode === 'json5' ? JSON5_SAMPLE : kind === 'json' && jsonMode === 'jsonc' ? JSONC_SAMPLE : FORMATS[kind].sample;
   const autoFixComments = () => { setInput(stripJsonComments(input)); setError(''); setStatus('Comments removed. Validate or format the corrected JSON.'); setTree(null); };
 
   return (
@@ -463,13 +533,29 @@ export default function HtmlXmlJsonToolPage() {
       <div className="cp-tabs hxt-language-tabs" role="tablist" aria-label="Input format">
         {Object.entries(FORMATS).map(([key, item]) => <button key={key} type="button" role="tab" aria-selected={kind === key} className={`cp-tab${kind === key ? ' is-active' : ''}`} onClick={() => onKindChange(key)}>{key === 'html' ? <FileCode2 size={15} /> : key === 'xml' ? <FileText size={15} /> : <FileJson size={15} />}{item.label}</button>)}
       </div>
+      {kind === 'json' && ( 
+        <details className="hxt-json-features">
+          <summary><span className="hxt-json-eyebrow">QUICK GUIDE</span><h2 id="hxt-json-features-title">JSONC / JSON5 Features We Support</h2></summary>
+          <p>Choose a syntax mode to match the file you are editing. JSONC is closer to standard JSON; JSON5 allows more shorthand.</p>
+          <div className="hxt-json-feature-grid">
+            <div className="hxt-json-feature"><strong>Single-line comments</strong><code>// comment</code><span>JSONC and JSON5</span></div>
+            <div className="hxt-json-feature"><strong>Multi-line comments</strong><code>/* ... */</code><span>JSONC and JSON5</span></div>
+            <div className="hxt-json-feature"><strong>Trailing commas</strong><code>{'{"a": 1,}'}</code><span>JSONC and JSON5</span></div>
+            <div className="hxt-json-feature"><strong>Unquoted keys</strong><code>{'{key: "value"}'}</code><span>JSON5 only</span></div>
+            <div className="hxt-json-feature"><strong>Single quotes</strong><code>{"{'a': 'b'}"}</code><span>JSON5 only</span></div>
+            <div className="hxt-json-feature"><strong>Hexadecimal numbers</strong><code>0xFF</code><span>JSON5 only</span></div>
+          </div>
+        </details>
+      )}
+
       <section className="runnable-code runnable-code--playground hxt-card" aria-label={`${config.label} formatter`}>
         <div className="runnable-code__header hxt-toolbar">
           <div className="hxt-toolbar-options">
             <label className="runnable-code__target"><span>Indent</span><select value={useTabs ? 'tabs' : indent} onChange={(event) => { const value = event.target.value; setUseTabs(value === 'tabs'); if (value !== 'tabs') setIndent(value); }} aria-label="Indentation"><option value="2">2 spaces</option><option value="3">3 spaces</option><option value="4">4 spaces</option><option value="tabs">Tabs</option></select></label>
             {kind !== 'json' && <label className="hxt-check"><input type="checkbox" checked={keepComments} onChange={(event) => setKeepComments(event.target.checked)} /> Keep comments</label>}
-            {kind === 'json' && jsonMode !== 'json' && <><label className="hxt-check"><input type="checkbox" checked={keepComments} onChange={(event) => setKeepComments(event.target.checked)} /> Keep comments</label><label className="hxt-check"><input type="checkbox" checked={quoteJson5Keys} onChange={(event) => setQuoteJson5Keys(event.target.checked)} /> Quote keys</label></>}
-            {kind === 'json' && <label className="runnable-code__target"><span>Syntax</span><select value={jsonMode} onChange={(event) => onJsonModeChange(event.target.value)} aria-label="JSON syntax"><option value="json">JSON</option><option value="json5">JSON5 / JSONC</option></select></label>}
+            {kind === 'json' && jsonMode !== 'json' && <label className="hxt-check"><input type="checkbox" checked={keepComments} onChange={(event) => setKeepComments(event.target.checked)} /> Keep comments</label>}
+            {kind === 'json' && jsonMode === 'json5' && <label className="hxt-check"><input type="checkbox" checked={quoteJson5Keys} onChange={(event) => { const checked = event.target.checked; setQuoteJson5Keys(checked); setInput((current) => quoteJson5SourceKeys(current, checked)); setOutput(''); setTree(null); setError(''); setStatus('JSON5 source keys updated.'); }} /> Quote keys</label>}
+            {kind === 'json' && <label className="runnable-code__target"><span>Syntax</span><select value={jsonMode} onChange={(event) => onJsonModeChange(event.target.value)} aria-label="JSON syntax"><option value="json">JSON</option><option value="jsonc">JSONC</option><option value="json5">JSON5</option></select></label>}
             {(kind === 'xml' || kind === 'html') && <label className="hxt-check" title="Removes leading and trailing whitespace from text nodes"><input type="checkbox" checked={trimTextNodes} onChange={(event) => setTrimTextNodes(event.target.checked)} /> Trim Text Nodes</label>}
             {kind === 'html' && <label className="hxt-check"><input type="checkbox" checked={minifyCss} onChange={(event) => setMinifyCss(event.target.checked)} /> Minify inline CSS</label>}
           </div>
@@ -500,7 +586,18 @@ export default function HtmlXmlJsonToolPage() {
 
       </section>
 
-      <section className="hxt-about"><h2>{kind === 'html' ? 'About the HTML formatter' : kind === 'xml' ? 'About the XML viewer' : jsonMode === 'json' ? 'About the JSON formatter and tree viewer' : 'About JSON5 / JSONC'}</h2><p>{kind === 'json' ? jsonMode === 'json' ? TOOL_DESCRIPTIONS.json : 'JSON5 / JSONC mode supports // and /* */ comments for Postman and microservice payloads. Keep comments checked to retain extracted comments in formatted output.' : TOOL_DESCRIPTIONS[kind]}</p><ul><li><strong>Validate</strong> checks the input and shows an error before formatting or minifying.</li><li><strong>Beautify / Format</strong> formats the source with your selected indentation.</li><li><strong>Minify</strong> removes unnecessary whitespace to make the payload more compact.</li>{kind !== 'html' && <li><strong>Parse to Tree View</strong> displays the nested structure with expandable and collapsible nodes.</li>}{kind === 'json' && <li><strong>JSON Schema</strong> validation is recommended when working with structured API payloads. Standard JSON does not support comments.</li>}{kind === 'html' && <li><strong>Trim Text Nodes</strong> removes leading and trailing whitespace from HTML text values.</li>}{kind === 'xml' && <li><strong>Trim Text Nodes</strong> removes leading and trailing whitespace from XML text values.</li>}</ul><h3>Sample</h3><pre className="hxt-sample">{sample}</pre><p className="hxt-note">Processing stays in your browser. HTML uses browser parsing rules; XML is checked for well-formedness. JSON uses strict syntax unless JSON5 / JSONC is selected.</p></section>
+      <section className="hxt-about"><h2>{kind === 'html' ? 'About the HTML formatter' : kind === 'xml' ? 'About the XML viewer' : jsonMode === 'json' ? 'About the JSON formatter and tree viewer' : 'About JSON5 / JSONC'}</h2><p>{kind === 'json' ? jsonMode === 'json' ? TOOL_DESCRIPTIONS.json : jsonMode === 'jsonc' ? 'JSONC supports // and /* */ comments and trailing commas while keeping standard JSON keys and double-quoted strings.' : 'JSON5 supports comments, trailing commas, unquoted keys, single-quoted strings, and hexadecimal numbers. Keep comments checked to retain comments during Beautify.' : TOOL_DESCRIPTIONS[kind]}</p><ul><li><strong>Validate</strong> checks the input and shows an error before formatting or minifying.</li><li><strong>Beautify / Format</strong> formats the source with your selected indentation.</li><li><strong>Minify</strong> removes unnecessary whitespace to make the payload more compact.</li>{kind !== 'html' && <li><strong>Parse to Tree View</strong> displays the nested structure with expandable and collapsible nodes.</li>}{kind === 'json' && <li><strong>JSON Schema</strong> validation is recommended when working with structured API payloads. Standard JSON does not support comments.</li>}{kind === 'html' && <li><strong>Trim Text Nodes</strong> removes leading and trailing whitespace from HTML text values.</li>}{kind === 'xml' && <li><strong>Trim Text Nodes</strong> removes leading and trailing whitespace from XML text values.</li>}</ul><h3>Sample</h3><pre className="hxt-sample">{sample}</pre><p className="hxt-note">Processing stays in your browser. HTML uses browser parsing rules; XML is checked for well-formedness. JSON uses strict syntax unless JSONC or JSON5 is selected.</p></section>
+      {kind === 'json' && <section className="hxt-json-learning"><h2>JSON vs JSONC vs JSON5 — when should I use each?</h2><p className="hxt-json-learning__intro">The important difference is what the tool consuming your file understands. A file can look correct here and still be rejected by an API that expects standard JSON.</p><div className="hxt-json-table-wrap"><table className="hxt-json-table"><thead><tr><th>Feature</th><th>Standard JSON</th><th>JSONC</th><th>JSON5</th></tr></thead><tbody><tr><td><code>//</code> and <code>/* */</code> comments</td><td>No</td><td>Yes</td><td>Yes</td></tr><tr><td>Trailing commas</td><td>No</td><td>Yes in common JSONC tooling</td><td>Yes</td></tr><tr><td>Unquoted property names</td><td>No</td><td>No</td><td>Yes</td></tr><tr><td>Single-quoted strings</td><td>No</td><td>No</td><td>Yes</td></tr><tr><td>Hexadecimal numbers</td><td>No</td><td>No</td><td>Yes</td></tr><tr><td>Best fit</td><td>APIs, network payloads, broad compatibility</td><td>Human-edited configuration</td><td>Configuration where you control the parser</td></tr></tbody></table></div><div className="hxt-json-learning__cards"><article><h3>Use JSON for APIs and data exchange</h3><p>Use double-quoted keys and strings, no comments, and no trailing commas. This is the safest format when sending request bodies to REST APIs or sharing data between different languages.</p></article><article><h3>Use JSONC for comments in configuration</h3><pre>{`{
+  // Public web server port
+  "port": 443,
+  /* Enable secure mode */
+  "secure": true,
+}`}</pre><p>Common examples include Visual Studio Code settings and TypeScript configuration. Support depends on the tool reading the file; remove comments and trailing commas before sending it to a strict JSON API.</p></article><article><h3>Use JSON5 for more human-friendly syntax</h3><pre>{`{
+  // Service configuration
+  serviceName: 'catalog',
+  retries: 3,
+}`}</pre><p>JSON5 additionally permits unquoted keys, single-quoted strings, hexadecimal numbers, and other conveniences. Use it when the application on the other end explicitly supports JSON5.</p></article></div><p className="hxt-json-learning__note"><strong>Remember:</strong> JSONC and JSON5 are not interchangeable with standard JSON. Convert to standard JSON before deployment or API requests unless the receiving tool explicitly supports the extended syntax.</p><p className="hxt-json-sources">
+  </p></section>}
     </div>
   );
 }
