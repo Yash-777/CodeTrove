@@ -54,7 +54,8 @@ export const CATEGORIES = [
     })),
     tools: [
       { name: 'Java Formatter', description: 'Beautify Java source using standard style rules.', internalTool: 'java-formatter', externalUrl: null },
-      { name: 'Maven POM Formatter', description: 'One dependency per line, pretty-printed XML.', internalTool: 'pom-formatter', externalUrl: null },
+      { name: 'Maven POM Formatter', description: 'Convert dependency XML to a one-line custom build format and back, and pretty-print pom.xml (2/3/4 spaces).', internalTool: 'pom-formatter', externalUrl: null },
+      { name: 'Properties ⇄ YAML ⇄ JSON Converter', description: 'Validate, format, and convert application.properties, application.yml, and application.json in all six directions.', internalTool: 'properties-yaml-converter', externalUrl: null },
     ],
   },
   {
@@ -149,6 +150,26 @@ export const CATEGORIES = [
     })),
     tools: [
       { name: 'Live Coding Interview Tool', description: 'Real-time collaborative coding sandbox.', internalTool: null, externalUrl: 'https://codeinterview.io/' },
+    ],
+  },
+  {
+    key: 'web',
+    label: 'Web',
+    color: '#F97316',
+    codeLang: 'html',
+    topics: [],
+    tools: [
+      { name: 'HTML / XML / JSON Formatter & Validator', description: 'Beautify, minify, validate, and explore JSON/XML in a tree view.', internalTool: 'html-xml-json', externalUrl: null },
+    ],
+  },
+  {
+    key: 'data-time',
+    label: 'Data & Time',
+    color: '#0D9488',
+    codeLang: 'text',
+    topics: [],
+    tools: [
+      { name: 'Unix Timestamp ⇄ Date Time Converter', description: 'Convert epoch timestamps and human-readable dates with seconds, milliseconds, microseconds, nanoseconds, custom patterns, and local/GMT time zones.', internalTool: 'unix-timestamp-converter', externalUrl: null },
     ],
   },
   {

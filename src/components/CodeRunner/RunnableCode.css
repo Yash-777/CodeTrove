@@ -51,8 +51,7 @@
 .runnable-code__badge--kotlin { background: #7f52ff; }
 .runnable-code__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem; }
 
-.runnable-code__button,
-.runnable-code__icon-button {
+.runnable-code__button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -66,11 +65,8 @@
   font-size: 0.85rem;
 }
 .runnable-code__button { padding: 0.35rem 0.75rem; }
-.runnable-code__icon-button { width: 2rem; height: 2rem; padding: 0; }
-.runnable-code__button:hover,
-.runnable-code__icon-button:hover { border-color: var(--color-accent); }
-.runnable-code__button:disabled,
-.runnable-code__icon-button:disabled { opacity: 0.5; cursor: default; border-color: var(--color-border); }
+.runnable-code__button:hover { border-color: var(--color-accent); }
+.runnable-code__button:disabled { opacity: 0.5; cursor: default; border-color: var(--color-border); }
 .runnable-code__button--run { color: #fff; background: #238636; border-color: #238636; font-weight: 600; min-width: 6.4rem; }
 .runnable-code__button--run:hover { border-color: #2ea043; filter: brightness(1.08); }
 .runnable-code__button--run:disabled { opacity: 1; filter: none; background: #2f6f3e; border-color: #2f6f3e; cursor: progress; }
@@ -128,7 +124,6 @@
 .runnable-code__body { display: block; }
 .runnable-code__editor { min-width: 0; font-size: 0.9rem; }
 .runnable-code__editor .cm-editor { min-height: 150px; }
-.runnable-code__editor .cm-scroller { overflow: auto; }
 .runnable-code__editor .cm-editor.cm-focused { outline: none; }
 
 /* ---- output ---- */
@@ -149,7 +144,6 @@
   padding: 0.4rem 0.6rem 0.4rem 0.9rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
-.runnable-code__output-head .runnable-code__icon-button { color: #e5e7eb; background: transparent; border-color: rgba(255, 255, 255, 0.18); }
 .runnable-code__output-title { color: #9ca3af; font: 600 0.75rem/1.4 system-ui, sans-serif; text-transform: uppercase; letter-spacing: 0.05em; }
 .runnable-code__meta { font-weight: 400; text-transform: none; letter-spacing: 0; }
 .runnable-code__stats { display: flex; flex: 1; flex-wrap: wrap; gap: 0.35rem 0.5rem; justify-content: flex-end; }

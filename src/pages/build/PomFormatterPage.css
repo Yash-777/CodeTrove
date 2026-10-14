@@ -1,0 +1,55 @@
+/* src/pages/build/PomFormatterPage.css - layout for the POM formatter; header,
+   buttons and select come from RunnableCode.css, tabs/about from CompilerPage.css */
+
+.pom-card { margin: 0; }
+.pom-direction { display: inline-flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
+.pom-direction__label {
+  padding: 0.25rem 0.7rem;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-paper);
+  font-weight: 600;
+  font-size: 0.82rem;
+}
+.pom-direction__arrow { color: var(--color-muted); }
+
+.pom-panes { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+.pom-pane { min-width: 0; }
+.pom-pane--output { border-left: 1px solid var(--color-border); }
+.pom-pane__bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  min-height: 3.1rem;
+  box-sizing: border-box;
+  padding: 0.4rem 0.75rem;
+  background: var(--color-paper);
+  border-bottom: 1px solid var(--color-border);
+}
+.pom-badge { background: #6b7280; }
+.pom-sample { color: #fff; background: var(--color-accent); border-color: var(--color-accent); font-weight: 600; }
+.pom-sample:hover { filter: brightness(1.08); }
+.pom-pane .cm-editor { font-size: 0.86rem; }
+.pom-pane .cm-editor.cm-focused { outline: none; }
+.pom-pane--output .cm-content { cursor: default; }
+.pom-placeholder { color: #7d8590; white-space: pre; font: inherit; pointer-events: none; }
+
+.pom-status { padding: 0.55rem 0.9rem; border-top: 1px solid var(--color-border); background: var(--color-paper); font-size: 0.85rem; min-height: 2.4rem; }
+.pom-status--ok { color: #1a7f37; }
+.pom-status--error { color: #c0392b; font-weight: 600; }
+.pom-status__idle { color: var(--color-muted); }
+.pom-status__warn { margin-top: 0.2rem; color: #9a6700; font-weight: 400; }
+[data-theme='dark'] .pom-status--ok { color: #3fb950; }
+[data-theme='dark'] .pom-status--error { color: #ff7b72; }
+[data-theme='dark'] .pom-status__warn { color: #e3b341; }
+
+.pom-map { width: 100%; border-collapse: collapse; margin: 0.6rem 0; font-size: 0.86rem; }
+.pom-map th, .pom-map td { padding: 0.45rem 0.6rem; border: 1px solid var(--color-border); text-align: left; vertical-align: top; }
+.pom-map th { background: var(--color-sidebar-bg); }
+
+@media (max-width: 800px) {
+  .pom-panes { grid-template-columns: minmax(0, 1fr); }
+  .pom-pane--output { border-left: 0; border-top: 1px solid var(--color-border); }
+}
