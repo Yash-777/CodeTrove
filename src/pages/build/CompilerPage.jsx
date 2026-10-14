@@ -100,12 +100,29 @@ console.log(\`In 5 years you will be \${person.age + 5}.\`);
 
 public class Main {
     public static void main(String[] args) {
+        // Display the Java version used by the selected runtime.
+        printJavaVersion();
+
         Scanner in = new Scanner(System.in);
         String name = in.hasNextLine() ? in.nextLine() : "World";
         int age = in.hasNextInt() ? in.nextInt() : 0;
 
         System.out.println("Hello, " + name + "!");
         System.out.println("In 5 years you will be " + (age + 5) + ".");
+    }
+
+    /**
+     * Detects Java 9+ with reflection, while remaining compilable on Java 8.
+     */
+    public static void printJavaVersion() {
+        String version;
+        try {
+            version = java.lang.Runtime.class.getMethod("version").invoke(null).toString();
+        } catch (Exception e) {
+            // Runtime.version() does not exist on Java 8 and earlier.
+            version = System.getProperty("java.version");
+        }
+        System.out.println("Running Java Version: " + version);
     }
 }
 `,
@@ -192,9 +209,11 @@ function JavaAbout() {
 
       <h3>Runtime version</h3>
       <p>
-        The <strong>Java</strong> dropdown above the editor lists the JDK versions the service offers (newest first;
-        the default is the newest LTS available). The selected id is sent as <code>compiler</code>, so you can check
-        how code behaves on, for example, Java 17 versus 21. The editor file is <code>Main.java</code> with{' '}
+        The <strong>Java</strong> dropdown above the editor lists the Java 8 and newer JDK versions advertised by
+        Wandbox (newest first; the default is the newest LTS available). Java 5 is included only if the public
+        service currently offers a compatible compiler; unavailable versions are not simulated or added manually.
+        The selected compiler id is sent to the service, so you can compare language and runtime behavior across
+        versions. The editor file is <code>Main.java</code> with{' '}
         <code>public class Main</code>; because the service saves the source under its own file name, the{' '}
         <code>public</code> modifier of top-level classes is removed from the copy that is sent (line and column
         numbers are unchanged), so the same code also compiles on your machine.

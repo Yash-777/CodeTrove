@@ -33,14 +33,31 @@ const FALLBACK_RUNTIMES = [{ id: 'openjdk-jdk-21+35', label: 'Java 21', major: 2
 
 let runtimesPromise = null;
 
-function toRuntime(item) {
+function parseJavaMajor(item) {
   const name = String(item.name || '');
-  const major = Number((/jdk-?(\d+)/i.exec(name) || /^(\d+)/.exec(String(item.version || '')) || [])[1]) || 0;
-  const detail = item.version ? ` · ${item.version}` : '';
-  return { id: name, label: major ? `Java ${major}${detail}` : `${item['display-name'] || name}${detail}`, major };
+  const version = String(item.version || '');
+  const displayName = String(item['display-name'] || '');
+  const text = `${name} ${displayName} ${version}`;
+
+  // Older JDKs commonly use the legacy 1.x version scheme (1.8 = Java 8,
+  // 1.5 = Java 5); newer JDKs use 9, 11, 17, 21, etc.
+  const legacy = /(?:jdk|java)?[-_ ]*1\.(\d+)(?:[._+\-]|\b)/i.exec(text);
+  if (legacy) return Number(legacy[1]);
+
+  const modern = /(?:jdk|java)[-_ ]*(\d{1,2})(?:[.+_\-]|\b)/i.exec(text)
+    || /^(\d{1,2})(?:[.+_\-]|\b)/.exec(version);
+  return modern ? Number(modern[1]) : 0;
 }
 
-/** Runtime versions for the dropdown: [{ id, label, major }], newest first. */
+function toRuntime(item) {
+  const name = String(item.name || '');
+  const major = parseJavaMajor(item);
+  const detail = item.version ? ` · ${item.version}` : '';
+  const label = major ? `Java ${major}${detail}` : `${item['display-name'] || name}${detail}`;
+  return { id: name, label, major };
+}
+
+/** Available Java 8+ runtimes (plus Java 5 if Wandbox offers it), newest first. */
 export function getJavaRuntimes() {
   if (!runtimesPromise) {
     runtimesPromise = fetch(`${JAVA_SERVER}/api/list.json`)
@@ -52,7 +69,10 @@ export function getJavaRuntimes() {
         const runtimes = list
           .filter((item) => String(item.language).toLowerCase() === 'java' && !/head|raw/i.test(item.name))
           .map(toRuntime)
-          .sort((a, b) => b.major - a.major);
+          // Show supported modern runtimes (Java 8+) and Java 5 only when the
+          // public service actually advertises it. Do not fabricate old JDKs.
+          .filter((runtime) => runtime.major >= 8 || runtime.major === 5)
+          .sort((a, b) => b.major - a.major || a.label.localeCompare(b.label));
         return runtimes.length ? runtimes : FALLBACK_RUNTIMES;
       })
       .catch(() => {
