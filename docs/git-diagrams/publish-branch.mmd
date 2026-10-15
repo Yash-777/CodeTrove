@@ -1,0 +1,5 @@
+flowchart LR
+  C[Local feature branch] -->|git push -u origin feature/x| R[Hosted origin/feature/x]
+  R -->|open PR or MR in host UI/API| P[Review request]
+  P -->|review and checks| M[Merge to target branch]
+  C -->|local-only until push| C

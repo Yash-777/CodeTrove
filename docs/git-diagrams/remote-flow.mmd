@@ -1,0 +1,4 @@
+flowchart LR
+  H[Hosted repository] -->|git fetch| T[Local remote-tracking ref<br/>origin/main]
+  T -->|merge or rebase| L[Local main branch]
+  L -->|git push| H

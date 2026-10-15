@@ -1,0 +1,8 @@
+flowchart TD
+  L[Local rewritten history] --> P{Normal push is fast-forward?}
+  P -->|yes| U[Remote can update]
+  P -->|no| R[Rejected to protect remote commits]
+  R --> F[force-with-lease checks expected remote tip]
+  F -->|tip matches| C[Replacement permitted by Git]
+  F -->|tip moved| X[Push rejected; inspect new commits]
+  C -. still confirm shared-branch policy .-> S[Coordinate before rewriting shared history]

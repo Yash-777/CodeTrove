@@ -1,0 +1,15 @@
+flowchart LR
+  subgraph Local[Your computer]
+    W[Working tree]
+    D[.git database]
+    O[origin alias URL in config]
+    T[origin/main last fetched view]
+    L[Local main branch]
+    W --> D
+    O --> T
+  end
+  subgraph Hosted[Hosted repository service]
+    H[main branch on GitHub GitLab Bitbucket]
+  end
+  H -->|git fetch downloads objects| T
+  L -->|git push publishes commits| H

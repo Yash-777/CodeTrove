@@ -1,0 +1,7 @@
+flowchart LR
+  W[Working tree<br/>edit files] -->|git add| I[Index / staging area]
+  I -->|git commit| C[Local commit]
+  C --> L[Local branch ref]
+  L -->|git push over network| R[Hosted repository]
+  R -->|git fetch over network| T[Local remote-tracking refs]
+  T -->|merge or rebase locally| L

@@ -161,6 +161,7 @@ export const CATEGORIES = [
     })),
     tools: [
       { name: 'Live Coding Interview Tool', description: 'Real-time collaborative coding sandbox.', internalTool: null, externalUrl: 'https://codeinterview.io/' },
+      { name: 'Learn Git Branching', description: 'Open-source visual Git simulator with interactive lessons for commits, branches, merges, and remotes. Runs in its own browser sandbox and does not access your local repository.', internalTool: null, externalUrl: 'https://learngitbranching.js.org/' },
     ],
   },
   {

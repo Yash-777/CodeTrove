@@ -1,0 +1,7 @@
+flowchart LR
+  H[HEAD] --> M[main branch ref]
+  M --> C3[commit c3<br/>current tip]
+  C3 --> C2[commit c2]
+  C2 --> C1[commit c1]
+  F[feature branch ref] --> C2
+  D[Detached HEAD] -. points directly to .-> C2

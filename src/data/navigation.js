@@ -248,7 +248,35 @@ const tree = [
   },
   {
     key: 'git-collaboration', label: 'Git & Collaboration', children: [
-      { key: 'git', label: 'Git', pages: {'branching': 'Branching', 'merge-rebase': 'Merge Rebase', 'cherry-pick': 'Cherry Pick', 'reset-revert': 'Reset Revert', 'bisect': 'Bisect'} },
+      { key: 'git', label: 'Git', children: [
+        { key: 'foundations', label: 'Foundations', pages: {
+          'init-clone': 'Create or Clone a Repository',
+          'staging-commits': 'Working Tree, Staging, and Commits',
+          'head-refs': 'HEAD, Refs, and Commit Hashes',
+        } },
+        { key: 'branching', label: 'Branching and History', pages: {
+          'branch-switch': 'Create and Switch Branches',
+          'merge-conflicts': 'Merge and Resolve Conflicts',
+          'rebase': 'Rebase',
+          'cherry-pick': 'Cherry-pick',
+        } },
+        { key: 'remotes', label: 'Remote Collaboration', pages: {
+          'fetch-pull-push': 'Fetch, Pull, and Push',
+          'publish-branch': 'Publish a Branch and Set Upstream',
+          'force-push': 'Force-push Safely',
+        } },
+        { key: 'recovery', label: 'Stash, Patches, and Recovery', pages: {
+          'stash': 'Stash Local Work',
+          'patches': 'Create and Apply Patches',
+          'undo-reset-revert': 'Undo: Restore, Reset, Revert',
+          'debugging': 'Conflict Recovery and Bisect',
+        } },
+      ], pages: {
+        'merge-rebase': { label: 'Branching and History', contentKey: 'git-collaboration/git/branching' },
+        'cherry-pick': { label: 'Cherry-pick', contentKey: 'git-collaboration/git/branching/cherry-pick' },
+        'reset-revert': { label: 'Reset and Revert', contentKey: 'git-collaboration/git/recovery/undo-reset-revert' },
+        'bisect': { label: 'Bisect and Conflict Recovery', contentKey: 'git-collaboration/git/recovery/debugging' },
+      } },
       { key: 'pull-requests', label: 'Pull Requests', pages: {'pr-review': 'Pr Review', 'review-checklist': 'Review Checklist', 'commit-strategy': 'Commit Strategy'} },
       { key: 'source-control', label: 'Source Control', pages: {'release-branching': 'Release Branching', 'semantic-versioning': 'Semantic Versioning'} },
     ],

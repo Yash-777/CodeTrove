@@ -1,0 +1,7 @@
+flowchart LR
+  W[Working tree and index changes] -->|git stash push| S[Local stash entry]
+  S -->|git stash show| D[Review diff]
+  S -->|git stash apply| A[Restore; keep stash]
+  S -->|git stash pop| P[Restore; drop on success]
+  S -->|git stash export| E[Transferable commit chain]
+  E -->|git stash import| R[Stash in destination repository]
