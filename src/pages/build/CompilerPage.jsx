@@ -2,7 +2,8 @@
  * src/pages/build/CompilerPage.jsx
  * ------------------------------------------------------------------
  * Route: /build/compiler   (deep link: /build/compiler?lang=kotlin)
- * Online compiler / playground for JavaScript, TypeScript, Kotlin and Java,
+ * Online compiler / playground for JavaScript, TypeScript, Kotlin, Java, C,
+ * C++ and Python,
  * built on the same RunnableCode component used by `runnable` blocks in
  * the Markdown pages (side-by-side editor and output).
  *
@@ -11,6 +12,8 @@
  * - Kotlin is compiled by JetBrains' public service (api.kotlinlang.org).
  * - Java is compiled and run by Wandbox by default, or Judge0, with a
  *   provider-specific selectable Java runtime (utils/javaApi.js).
+ * - C, C++ and Python are compiled and run by Judge0 with a selectable
+ *   language runtime (utils/judge0Api.js).
  * All editors stay mounted so switching tabs keeps your code.
  */
 
@@ -88,6 +91,58 @@ console.log(\`In 5 years you will be \${person.age + 5}.\`);
     input: 'Kotlin 2026',
     code: KOTLIN_MAIN_SAMPLE,
     targets: KOTLIN_TARGET_OPTIONS,
+  },
+  {
+    key: 'c',
+    param: 'c',
+    label: 'C',
+    learnTo: '/build/compiler?lang=c',
+    docsUrl: 'https://en.cppreference.com/w/c',
+    input: 'Alice\n30',
+    code: `#include <stdio.h>
+
+int main(void) {
+    char name[50];
+    int age;
+    scanf("%49s %d", name, &age);
+    printf("Hello, %s!\\n", name);
+    printf("In 5 years you will be %d.\\n", age + 5);
+    return 0;
+}
+`,
+  },
+  {
+    key: 'cpp',
+    param: 'cpp',
+    label: 'C++',
+    learnTo: '/build/compiler?lang=cpp',
+    docsUrl: 'https://en.cppreference.com/w/cpp',
+    input: 'Alice\n30',
+    code: `#include <iostream>
+#include <string>
+
+int main() {
+    std::string name;
+    int age;
+    std::cin >> name >> age;
+    std::cout << "Hello, " << name << "!\\n";
+    std::cout << "In 5 years you will be " << age + 5 << ".\\n";
+}
+`,
+  },
+  {
+    key: 'python',
+    param: 'python',
+    label: 'Python',
+    learnTo: '/build/compiler?lang=python',
+    docsUrl: 'https://docs.python.org/3/tutorial/',
+    input: 'Alice\n30',
+    code: `name = input().strip() or "World"
+age = int(input() or 0)
+
+print(f"Hello, {name}!")
+print(f"In 5 years you will be {age + 5}.")
+`,
   },
   {
     key: 'java',
@@ -252,6 +307,42 @@ POST https://ce.judge0.com/submissions?base64_encoded=false&wait=true
   );
 }
 
+const NATIVE_ABOUT = {
+  c: { label: 'C', file: 'main.c', pattern: 'C (GCC or Clang)' },
+  cpp: { label: 'C++', file: 'main.cpp', pattern: 'C++ (GCC or Clang)' },
+  python: { label: 'Python', file: 'main.py', pattern: 'Python (3.x)' },
+};
+
+function NativeAbout({ language }) {
+  const info = NATIVE_ABOUT[language];
+  return (
+    <section className="cp-about" aria-labelledby={`cp-about-${language}`}>
+      <h2 id={`cp-about-${language}`}>About the {info.label} playground</h2>
+      <p>
+        This editor sends <code>{info.file}</code> to the open-source{' '}
+        <a href="https://github.com/judge0/judge0" target="_blank" rel="noreferrer">Judge0</a> execution API.
+        Choose a discovered <strong>Runtime</strong> above, enter optional standard input, and press <strong>Run</strong>.
+      </p>
+      <h3>Runtime discovery and execution flow</h3>
+      <ol>
+        <li>CodeTrove calls <code>GET https://ce.judge0.com/languages</code> and keeps {info.pattern} entries.</li>
+        <li>The Runtime dropdown displays the available versions, newest first where the service provides version information.</li>
+        <li>Run submits the source and selected language ID to Judge0:</li>
+      </ol>
+      <pre className="cp-about__code">{`POST https://ce.judge0.com/submissions?base64_encoded=false&wait=true
+{"source_code":"...","language_id":109,"stdin":"Alice\\n30","cpu_time_limit":5,"wall_time_limit":10,"memory_limit":256000}
+
+{"stdout":"Hello, Alice!\\n","stderr":"","compile_output":null,"status":{"id":3,"description":"Accepted"}}`}</pre>
+      <p>
+        CodeTrove displays <code>compile_output</code> for compiler messages, <code>stdout</code> for normal output,
+        <code>stderr</code> for runtime errors, and <code>status.description</code> for execution status. The selected
+        runtime ID and source are sent to the public service, so an internet connection is required and public rate
+        limits may apply. A self-hosted Judge0-compatible endpoint can provide different runtime versions.
+      </p>
+    </section>
+  );
+}
+
 export default function CompilerPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const active = pickLanguage(searchParams.get('lang'));
@@ -298,10 +389,12 @@ export default function CompilerPage() {
 
       {active.key === 'kotlin' && <KotlinAbout />}
       {active.key === 'java' && <JavaAbout />}
+      {NATIVE_ABOUT[active.key] && <NativeAbout language={active.key} />}
 
       <p className="cp-note">
         JavaScript and TypeScript run in your browser (isolated, 10&nbsp;s limit, no DOM). Kotlin is compiled by
-        JetBrains&apos; public service (api.kotlinlang.org) and Java by the selected Wandbox or Judge0 service, so the Kotlin or Java code you run is sent to those services.
+        JetBrains&apos; public service (api.kotlinlang.org), Java by the selected Wandbox or Judge0 service, and C,
+        C++ and Python by Judge0, so those snippets are sent to external services.
       </p>
     </div>
   );
