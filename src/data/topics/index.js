@@ -209,6 +209,16 @@ export const CATEGORIES = [
       { name: 'Temp Mail IO', description: 'Alternative disposable inbox for email verification.', internalTool: null, externalUrl: 'https://temp-mail.io/en' },
     ],
   },
+  {
+    key: 'networking',
+    label: 'Networking',
+    color: '#0EA5E9',
+    codeLang: 'text',
+    topics: [],
+    tools: [
+      { name: 'Network', description: 'Explore public connection details, DNS records, TCP setup, and TLS certificates with local command guides.', internalTool: 'network', externalUrl: null },
+    ],
+  },
 ];
 
 export function getCategory(categoryKey) {
