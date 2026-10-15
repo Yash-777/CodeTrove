@@ -1,0 +1,17 @@
+sequenceDiagram
+    autonumber
+    participant Client as Browser
+    participant Server as HTTPS server
+    participant Root as OS / browser trust store
+    Client->>Server: ClientHello (versions, key share, SNI)
+    Server-->>Client: ServerHello + certificate chain
+    Client->>Client: Check validity, SAN hostname, signatures, usage
+    Client->>Root: Is chain anchored in a trusted root?
+    Root-->>Client: Trusted / not trusted
+    alt Checks succeed
+        Client->>Server: Finish key agreement and establish a secure channel
+        Client->>Server: Encrypted HTTP request
+        Server-->>Client: Encrypted HTTP response
+    else Certificate warning
+        Client->>Client: Stop and report mismatch, expiry or untrusted issuer
+    end

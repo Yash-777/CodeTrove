@@ -1,0 +1,12 @@
+flowchart LR
+    U[https://user:secret@shop.example.co.uk:8443/products/42?color=blue&tag=a%3Db#reviews]
+    U --> S[Scheme: https]
+    U --> UI[User information: user:secret]
+    U --> H[Hostname: shop.example.co.uk]
+    U --> P[Port: 8443]
+    U --> PA[Path: /products/42]
+    U --> Q[Query: color=blue and tag=a=b]
+    U --> F[Fragment: reviews]
+    H --> O[Origin = scheme + host + port]
+    F -. client-side only; not sent in HTTP request .-> B[Browser]
+    H --> DNS[Hostname is the DNS lookup name]

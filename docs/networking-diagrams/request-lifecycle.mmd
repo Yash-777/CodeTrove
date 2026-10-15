@@ -1,0 +1,26 @@
+sequenceDiagram
+    autonumber
+    actor User
+    participant Browser
+    participant Local as Browser / OS cache + hosts
+    participant DNS as Recursive DNS resolver
+    participant Web as Server / edge proxy
+    User->>Browser: Open https://example.com/path?q=1
+    Browser->>Local: Resolve hostname
+    alt Cache or hosts entry exists
+        Local-->>Browser: Cached address
+    else Needs DNS answer
+        Local->>DNS: Query A / AAAA
+        DNS-->>Local: Address + TTL (or negative answer)
+        Local-->>Browser: Address
+    end
+    Browser->>Web: Open transport to destination port 443
+    Browser->>Web: TLS ClientHello with SNI
+    Web-->>Browser: Certificate + handshake messages
+    Browser->>Browser: Validate hostname and trusted certificate chain
+    Browser->>Web: Send encrypted HTTP request
+    Web-->>Browser: HTTP response (200 or 3xx Location)
+    opt Redirect to another hostname
+        Browser->>Local: Resolve new hostname if needed
+        Browser->>Web: Open/reuse connection and repeat applicable phases
+    end

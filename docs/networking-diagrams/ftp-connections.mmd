@@ -1,0 +1,10 @@
+sequenceDiagram
+    autonumber
+    participant Client
+    participant Server
+    Client->>Server: TCP control connection to port 21
+    Client->>Server: USER / PASS / PASV / RETR or STOR
+    Server-->>Client: Reply on control channel
+    Client->>Server: TCP data connection in passive mode
+    Server-->>Client: File bytes or directory listing on data channel
+    Note over Client,Server: Classic FTP sends credentials and content without TLS by default

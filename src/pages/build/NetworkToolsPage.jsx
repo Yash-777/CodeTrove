@@ -6,8 +6,10 @@ import './NetworkToolsPage.css';
 const SECTIONS = [
   { id: 'connection', label: 'Your Connection', icon: Globe2 },
   { id: 'dns', label: 'Domain Name System (DNS)', icon: Network },
-  { id: 'transport', label: 'Transport Layer', icon: Network },
+  { id: 'transport', label: 'Sockets & Protocols', icon: Network },
   { id: 'tls', label: 'Security Layer (TLS/SSL)', icon: ShieldCheck },
+  { id: 'flow', label: 'Browser Request Flow', icon: Globe2 },
+  { id: 'proxy', label: 'Proxy Servers', icon: Network },
 ];
 
 const SUBSECTIONS = {
@@ -24,10 +26,24 @@ const SUBSECTIONS = {
   transport: [
     { id: 'handshake', label: 'TCP handshake' },
     { id: 'connect-time', label: 'Connection timing' },
+    { id: 'socket', label: 'Socket connections' },
+    { id: 'http', label: 'HTTP / HTTPS' },
+    { id: 'ftp', label: 'FTP' },
+    { id: 'mail-udp', label: 'SMTP / UDP' },
   ],
   tls: [
     { id: 'authorities', label: 'Certificate authorities' },
     { id: 'checker', label: 'Certificate checker' },
+    { id: 'local-testing', label: 'Local testing' },
+  ],
+  flow: [
+    { id: 'overview', label: 'Client → DNS → TLS → server' },
+    { id: 'redirects', label: 'Exact redirect examples' },
+  ],
+  proxy: [
+    { id: 'compare', label: 'Forward vs reverse' },
+    { id: 'forward', label: 'Forward proxy' },
+    { id: 'reverse', label: 'Reverse proxy' },
   ],
 };
 
@@ -236,9 +252,154 @@ function DnsPanel({ hostname, setHostname, resolver, setResolver, dnsResults, dn
   );
 }
 
+function DiagramImage({ name, alt }) {
+  return (
+    <figure className="network-diagram">
+      <img src={`${import.meta.env.BASE_URL}networking/${name}.png`} alt={alt} loading="lazy" />
+      <figcaption>{alt}</figcaption>
+    </figure>
+  );
+}
+
+const GITHUB_REDIRECT_TRACE = `URL: -> GET https://windows.github.com/
+     <- Status Code: 301 Moved Permanently (from disk cache)
+     <- Response headers
+          location: https://desktop.github.com/
+          server: GitHub.com
+
+     -> Request URL: GET https://desktop.github.com/
+     <- Status code: 301 Moved Permanently (from disk cache)
+     <- Response headers
+          location: https://github.com/apps/desktop
+          server: GitHub.com
+
+Request URL: GET https://github.com/apps/desktop
+Status code: 200 OK
+server: github.com`;
+
+const JAVA_REDIRECT_TRACE = `Request URL: GET http://java.com/
+Status code: 307 Temporary Redirect
+Referrer policy: strict-origin-when-cross-origin
+location: https://java.com/
+non-authoritative-reason: HttpsUpgrades
+
+Request URL: GET https://java.com/
+Status code: 301 Moved Permanently
+location: https://www.java.com/
+
+Request URL: GET https://www.java.com/
+Status code: 302 Found
+location: https://www.java.com/en/
+server: cloudflare
+
+Request URL: GET https://www.java.com/en/
+Status code: 200 OK
+server: cloudflare`;
+
+function RequestFlowPanel({ mode }) {
+  if (mode === 'redirects') {
+    return (
+      <div className="network-panel">
+        <h2>Redirects: request, Location, follow-up request</h2>
+        <p className="network-lead">Each 3xx response describes a next URL; it does not mean DNS found a different IP for the original hostname. The GitHub entries marked “from disk cache” may not have reached the server during that page load.</p>
+        <div className="network-flow-grid">
+          <section><h3>GitHub Desktop</h3><pre><code>{GITHUB_REDIRECT_TRACE}</code></pre></section>
+          <section><h3>Java.com</h3><pre><code>{JAVA_REDIRECT_TRACE}</code></pre></section>
+        </div>
+        <div className="network-concept-grid network-concept-grid--three">
+          <article><h3>301 Moved Permanently</h3><p>Permanent redirect; browsers and intermediaries may cache it.</p></article>
+          <article><h3>302 Found</h3><p>Temporary redirect. Use 307/308 when a non-GET method and body must be preserved.</p></article>
+          <article><h3>307 Temporary Redirect</h3><p>Temporary redirect that preserves the method and body under HTTP semantics. “HttpsUpgrades” is browser-specific metadata in the supplied trace.</p></article>
+        </div>
+        <Link className="network-inline-link" to="/content/tree/networking/protocols/http-https">Open the detailed HTTP and redirect lesson</Link>
+      </div>
+    );
+  }
+  return (
+    <div className="network-panel">
+      <h2>One HTTPS request, phase by phase</h2>
+      <p className="network-lead">For a fresh request, the browser resolves the name before opening transport, authenticates the server during TLS, then sends HTTP inside the protected channel. Reuse and caches can skip phases on later requests.</p>
+      <DiagramImage name="request-lifecycle" alt="Browser URL, DNS lookup, transport connection, TLS, and HTTP response sequence" />
+      <ol className="network-lifecycle-list">
+        <li><strong>Client parses the URL.</strong> It separates scheme, hostname, port, path, query, and fragment. The fragment remains client-side.</li>
+        <li><strong>Local lookup first.</strong> Browser/OS caches and hosts configuration may answer; otherwise a stub resolver asks its configured recursive DNS resolver.</li>
+        <li><strong>DNS resolves or fails.</strong> On cache miss the recursive resolver follows referrals. Timeouts can trigger policy-based retries; valid NXDOMAIN is negative data, not a request to ask every DNS service.</li>
+        <li><strong>Client opens transport.</strong> Classic HTTPS uses TCP to port 443; HTTP/3 uses QUIC over UDP. The application obtains a socket to a selected IP.</li>
+        <li><strong>TLS validates the service.</strong> Server identity and certificate chain are checked before HTTP is sent.</li>
+        <li><strong>HTTP runs, then a response returns.</strong> A 200 supplies the result; a 3xx may give a new Location. Redirects can cause a new hostname lookup or connection.</li>
+      </ol>
+      <p className="network-flow-note"><strong>Local hosts file:</strong> commonly <code>C:\\Windows\\System32\\drivers\\etc\\hosts</code> on Windows and <code>/etc/hosts</code> on Unix-like systems. Exact resolution order depends on OS, browser, VPN, and policy.</p>
+      <Link className="network-inline-link" to="/content/tree/networking/browser-request-flow">Read the full browser request walkthrough</Link>
+    </div>
+  );
+}
+
+function TransportConceptPanel({ mode }) {
+  if (mode === 'socket') return (
+    <div className="network-panel">
+      <h2>Socket connection: listener and client endpoints</h2>
+      <p className="network-lead">A server binds a local address and port, listens, and accepts a connection. The client connects to the server IP and port using an ephemeral local port. The accepted connection is separate from the server's listening socket.</p>
+      <DiagramImage name="socket-lifecycle" alt="TCP client connect, server listen and accept, exchange bytes, and close" />
+      <div className="network-callout">TCP carries an ordered byte stream, not messages. Your application still needs framing (for example, a length prefix or newline) and must handle EOF, timeouts, and errors.</div>
+      <Link className="network-inline-link" to="/content/tree/networking/socket-connections">Open the local Node.js socket example</Link>
+    </div>
+  );
+  if (mode === 'http') return (
+    <div className="network-panel">
+      <h2>HTTP and HTTPS: application request over a connection</h2>
+      <p className="network-lead">A compact HTTP request carries a method, target and headers. HTTPS places that HTTP exchange inside TLS after the browser has resolved the hostname and connected.</p>
+      <pre><code>{`GET /guide?topic=dns HTTP/1.1
+Host: example.com
+Accept: text/html
+Connection: keep-alive`}</code></pre>
+      <pre><code>{`HTTP/1.1 200 OK
+Content-Type: text/html
+Cache-Control: max-age=60
+
+<!doctype html> ...`}</code></pre>
+      <p>A redirect response would instead include a 3xx status and a <code>Location</code> header. The browser performs a follow-up request according to the status and its security policy.</p>
+      <Link className="network-inline-link" to="/content/tree/networking/protocols/http-https">See the exact GitHub and Java redirect traces</Link>
+    </div>
+  );
+  if (mode === 'ftp') return (
+    <div className="network-panel">
+      <h2>FTP: separate control and file data</h2>
+      <p className="network-lead">Classic FTP uses a control connection for commands and a separate data connection for listings/files. It is not encrypted by default, including credentials.</p>
+      <DiagramImage name="ftp-connections" alt="FTP control channel, separate data channel, and protocol comparisons" />
+      <p>Prefer SFTP over SSH or a managed HTTPS transfer. **FTPS** means FTP protected with TLS; **SFTP** is a different SSH subsystem, not “FTP with an S”.</p>
+      <Link className="network-inline-link" to="/content/tree/networking/protocols/ftp">Read FTP, FTPS, and SFTP details</Link>
+    </div>
+  );
+  if (mode === 'mail-udp') return (
+    <div className="network-panel">
+      <h2>SMTP mail transfer and UDP datagrams</h2>
+      <p className="network-lead">SMTP relays email using destination-domain MX records and server-to-server transfer. UDP instead transports independent datagrams without guaranteed delivery or ordering.</p>
+      <DiagramImage name="protocol-transfers" alt="SMTP mail path, classic FTP channels, and UDP datagram behavior" />
+      <p>“UUD” is not a commonly standardized Internet transport term; this lesson covers UDP, likely the intended protocol. SMTP is not the mailbox reading protocol; mail clients commonly use IMAP or POP3 for access.</p>
+      <Link className="network-inline-link" to="/content/tree/networking/protocols/smtp">SMTP lesson</Link>{' · '}
+      <Link className="network-inline-link" to="/content/tree/networking/protocols/tcp-udp">TCP vs UDP lesson</Link>
+    </div>
+  );
+  return null;
+}
+
+function ProxyConceptPanel({ mode }) {
+  return (
+    <div className="network-panel">
+      <h2>{mode === 'compare' ? 'Forward proxy vs reverse proxy' : mode === 'forward' ? 'Forward proxy: represents clients' : 'Reverse proxy: represents servers'}</h2>
+      <p className="network-lead">The direction describes which side the intermediary stands in for. Neither proxy automatically provides privacy or encryption; its actual guarantees depend on trust boundaries and configuration.</p>
+      <DiagramImage name="proxy-comparison" alt="Forward proxy represents an outbound client; reverse proxy represents backend services" />
+      {mode === 'forward' ? <div className="network-callout">Client → configured forward proxy → Internet destination → proxy → client. Common uses: controlled egress, authentication, policy enforcement, audit, and shared cache.</div>
+        : mode === 'reverse' ? <div className="network-callout">Visitor → public reverse proxy/edge → selected backend → reverse proxy → visitor. Common uses: TLS termination, routing, load balancing, WAF rules, cache, and centralized logs.</div>
+          : <div className="network-concept-grid network-concept-grid--three"><article><h3>Forward</h3><p>Client-side choice; mediates requests leaving users or an organization.</p></article><article><h3>Reverse</h3><p>Server-side entry point; routes traffic from visitors to origin services.</p></article><article><h3>Trust</h3><p>Forwarded IP headers are trusted only from known proxies. A proxy is not inherently anonymous.</p></article></div>}
+      <Link className="network-inline-link" to={`/content/tree/networking/proxy-server${mode === 'forward' || mode === 'reverse' ? `/${mode}-proxy` : ''}`}>Open the detailed proxy lesson</Link>
+    </div>
+  );
+}
+
 function NetworkToolsPage() {
   const [section, setSection] = useState('connection');
-  const [subsection, setSubsection] = useState({ connection: 'ip', dns: 'roles', transport: 'handshake', tls: 'authorities' });
+  const [subsection, setSubsection] = useState({ connection: 'ip', dns: 'roles', transport: 'handshake', tls: 'authorities', flow: 'overview', proxy: 'compare' });
   const [hostname, setHostname] = useState(DEFAULT_HOST);
   const [resolver, setResolver] = useState('cloudflare');
   const [ipDetails, setIpDetails] = useState(null);
@@ -314,9 +475,13 @@ function NetworkToolsPage() {
         <div className="network-heading-row">
           <div>
             <h1><Network size={29} aria-hidden="true" /> Network</h1>
-            <p>Explore connection details, DNS records, TCP connection setup, and TLS certificates with browser-based diagnostics and practical local commands.</p>
+            <p>Explore DNS, sockets, HTTP/HTTPS, FTP, SMTP, TLS certificates, redirects, and proxy flows—with practical explanations and local commands.</p>
           </div>
-          <Link className="network-back-link" to="/build/tools">Back to Tools</Link>
+          <div className="network-intro-links">
+            <Link className="network-back-link" to="/content/tree/networking">Learn: Networking</Link>
+            <a className="network-back-link" href="https://markdown.org/tools/" target="_blank" rel="noopener noreferrer">Markdown.org tools</a>
+            <Link className="network-back-link" to="/build/tools">Back to Tools</Link>
+          </div>
         </div>
         <div className="network-safety"><strong>Privacy note:</strong> Network checks may send the hostname or public IP to a selected third-party resolver or lookup service. DNS and IP results are fetched only when you request them. The speed-test and certificate-checker panels are hosted by their respective providers.</div>
       </header>
@@ -422,6 +587,26 @@ function NetworkToolsPage() {
             <details className="network-explainer"><summary>Limits of local browser checks</summary><p>A static browser page cannot inspect a separate server's live TLS certificate chain using ordinary web APIs. The embedded service performs that remote check. OpenSSL can show the chain from your local computer; confirm hostname, dates, verification output, and the certificate's intended use.</p></details>
           </div>
         )}
+        {section === 'tls' && currentSubsection === 'local-testing' && (
+          <div className="network-panel">
+            <h2>Use a locally trusted TLS certificate for development</h2>
+            <p className="network-lead">For localhost, use mkcert to create a local development CA and a leaf certificate with the correct hostnames. Installing the local CA trusts certificates it signs, so keep its private key protected and use it only on your own development machine.</p>
+            <CommandCard title="Local certificate commands" explanation="Install mkcert for your operating system first, then run these commands in your development terminal." commands={[
+              { id: 'mkcert-install', label: 'Install the local development CA', command: 'mkcert -install' },
+              { id: 'mkcert-issue', label: 'Issue a localhost certificate and key', command: 'mkcert localhost 127.0.0.1 ::1' },
+            ]} />
+            <div className="network-callout">If a browser warns, check SAN hostname, dates, issuer, trust store, server configuration, and device clock. Do not install an unknown CA or bypass a warning for an unknown public site.</div>
+            <Link className="network-inline-link" to="/content/tree/networking/tls-ssl/local-testing">Open full local certificate instructions</Link>
+          </div>
+        )}
+
+        {section === 'transport' && currentSubsection === 'socket' && <TransportConceptPanel mode="socket" />}
+        {section === 'transport' && currentSubsection === 'http' && <TransportConceptPanel mode="http" />}
+        {section === 'transport' && currentSubsection === 'ftp' && <TransportConceptPanel mode="ftp" />}
+        {section === 'transport' && currentSubsection === 'mail-udp' && <TransportConceptPanel mode="mail-udp" />}
+
+        {section === 'flow' && <RequestFlowPanel mode={currentSubsection} />}
+        {section === 'proxy' && <ProxyConceptPanel mode={currentSubsection} />}
       </section>
     </main>
   );

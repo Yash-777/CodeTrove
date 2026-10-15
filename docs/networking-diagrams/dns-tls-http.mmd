@@ -1,0 +1,13 @@
+sequenceDiagram
+    autonumber
+    participant Browser
+    participant DNS as Recursive resolver
+    participant Server as IP address from DNS
+    Browser->>DNS: Query hostname (only on cache miss)
+    DNS-->>Browser: A / AAAA answer and TTL
+    Browser->>Server: TCP connect to port 443 (or QUIC for HTTP/3)
+    Browser->>Server: TLS handshake with hostname/SNI
+    Server-->>Browser: Certificate chain
+    Browser->>Browser: Validate CA chain, dates, hostname/SAN
+    Browser->>Server: Encrypted HTTP GET /path
+    Server-->>Browser: Status + headers + body or Location redirect

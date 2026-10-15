@@ -270,6 +270,34 @@ const tree = [
   },
 ];
 
+tree.push({
+  key: 'networking',
+  label: 'Networking',
+  contentKey: 'networking/overview',
+  children: [
+    { key: 'dns-registrars', label: 'DNS & Registrars', contentKey: 'networking/dns-registrars', children: [
+      { key: 'url-uri', label: 'TLD, Domains & URL/URI', contentKey: 'networking/dns-registrars/url-uri' },
+      { key: 'dns-resolution', label: 'DNS Resolution, Caches & TTL', contentKey: 'networking/dns-registrars/dns-resolution' },
+      { key: 'dns-records', label: 'DNS Record Types & Commands', contentKey: 'networking/dns-registrars/dns-records' },
+    ] },
+    { key: 'tls-ssl', label: 'TLS/SSL', contentKey: 'networking/tls-ssl', children: [
+      { key: 'local-testing', label: 'Local Certificates for Testing', contentKey: 'networking/tls-ssl/local-testing' },
+    ] },
+    { key: 'protocols', label: 'Types of Protocols', contentKey: 'networking/protocols', children: [
+      { key: 'http-https', label: 'HTTP/HTTPS & Redirects', contentKey: 'networking/protocols/http-https' },
+      { key: 'smtp', label: 'SMTP & Mail Delivery', contentKey: 'networking/protocols/smtp' },
+      { key: 'ftp', label: 'FTP, FTPS & SFTP', contentKey: 'networking/protocols/ftp' },
+      { key: 'tcp-udp', label: 'TCP vs UDP', contentKey: 'networking/protocols/tcp-udp' },
+    ] },
+    { key: 'socket-connections', label: 'Socket Connections', contentKey: 'networking/socket-connections' },
+    { key: 'proxy-server', label: 'Proxy Server', contentKey: 'networking/proxy-server', children: [
+      { key: 'forward-proxy', label: 'Forward Proxy', contentKey: 'networking/proxy-server/forward-proxy' },
+      { key: 'reverse-proxy', label: 'Reverse Proxy', contentKey: 'networking/proxy-server/reverse-proxy' },
+    ] },
+    { key: 'browser-request-flow', label: 'Browser Request Walkthroughs', contentKey: 'networking/browser-request-flow' },
+  ],
+});
+
 const legacyPlatform = ['text', 'nodejs', 'json', 'jwt', 'git', 'email'].map((categoryKey) => {
   const category = CATEGORIES.find((item) => item.key === categoryKey);
   return {

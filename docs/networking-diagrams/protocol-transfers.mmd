@@ -1,0 +1,11 @@
+flowchart LR
+    subgraph M[SMTP mail delivery]
+      Sender[Sender / submission client] -->|SMTP over protected submission channel| MTA1[Sending mail server]
+      MTA1 -->|DNS MX selects next hop| MTA2[Recipient mail server]
+      MTA2 --> Mailbox[Recipient mailbox]
+    end
+    subgraph F[Classic FTP — not encrypted by default]
+      Client[FTP client] -->|TCP control: commands and replies| Server[FTP server]
+      Client <-->|separate TCP data: file/listing| Server
+    end
+    U[UDP applications] -. datagrams: no delivery/order guarantee .-> V[Application service]
