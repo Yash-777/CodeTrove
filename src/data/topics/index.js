@@ -171,7 +171,18 @@ export const CATEGORIES = [
     topics: [],
     tools: [
       { name: 'HTML / XML / JSON Formatter & Validator', description: 'Beautify, minify, validate, and explore JSON/XML in a tree view.', internalTool: 'html-xml-json', externalUrl: null },
+    ],
+  },
+  {
+    key: 'diagrams-editors',
+    label: 'Diagrams / Editors tools',
+    color: '#8B5CF6',
+    codeLang: 'markdown',
+    topics: [],
+    tools: [
+      { name: 'Markdown Editor', description: 'Write Markdown with live preview, Mermaid diagrams, and browser-based export.', internalTool: 'markdown-editor', externalUrl: 'https://markdown.org/tools/editors/markdown/' },
       { name: 'JSON Crack', description: 'Open-source JSON, YAML, XML, and CSV visualization as interactive graphs.', internalTool: 'json-crack', externalUrl: 'https://jsoncrack.com/editor' },
+      { name: 'Draw.io', description: 'Create flowcharts, UML, ER, network, and other diagrams in the official online editor.', internalTool: null, externalUrl: 'https://app.diagrams.net/' },
     ],
   },
   {
