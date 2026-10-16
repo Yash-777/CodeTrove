@@ -13,8 +13,11 @@ if (sourceMapArg) {
 }
 console.info(`[CodeTrove] Starting Vite with local test authentication; source maps ${generateSourceMap ? 'enabled' : 'disabled'} for configured transforms/builds.`);
 
-const viteBin = process.platform === 'win32' ? 'vite.cmd' : 'vite';
-const child = spawn(viteBin, viteArgs, { cwd: root, env: process.env, stdio: 'inherit', shell: process.platform === 'win32' });
+// Invoke Vite's JavaScript CLI through the current Node executable instead of
+// spawning `vite.cmd` through a shell. This works from PowerShell, cmd.exe,
+// Git Bash, and npm because it does not depend on shell PATH/batch-file rules.
+const viteCli = path.join(root, 'node_modules', 'vite', 'bin', 'vite.js');
+const child = spawn(process.execPath, [viteCli, ...viteArgs], { cwd: root, env: process.env, stdio: 'inherit', shell: false });
 child.on('exit', (code, signal) => {
   if (signal) process.kill(process.pid, signal);
   else process.exit(code ?? 1);

@@ -1,0 +1,5 @@
+flowchart LR
+  A[main: commit A] --> B[main: commit B]
+  B --> C[feature: commit C with fix]
+  B --> D[release: current tip]
+  C -. cherry-pick patch .-> E[release: new commit C-prime]

@@ -35,17 +35,19 @@ import { oneDark } from '@codemirror/theme-one-dark';
 import { keymap } from '@codemirror/view';
 import { Prec } from '@codemirror/state';
 import { StreamLanguage } from '@codemirror/language';
-import { java, kotlin } from '@codemirror/legacy-modes/mode/clike';
+import { c, cpp, java, kotlin } from '@codemirror/legacy-modes/mode/clike';
+import { python } from '@codemirror/legacy-modes/mode/python';
 import { linter, lintGutter, setDiagnostics } from '@codemirror/lint';
 import { compileTypeScript, formatDiagnostic, preloadTypeScript } from '../../utils/tsCompiler.js';
 import { DEFAULT_KOTLIN_TARGET, getKotlinVersion, highlightKotlin, runKotlin } from '../../utils/kotlinApi.js';
-import { getJavaRuntimes, pickDefaultRuntime, runJava } from '../../utils/javaApi.js';
+import { DEFAULT_JAVA_API, JAVA_APIS, getJavaRuntimes, pickDefaultRuntime, runJava } from '../../utils/javaApi.js';
+import { getNativeRuntimes, isNativeLanguage, pickNativeRuntime, runNative } from '../../utils/judge0Api.js';
 import './RunnableCode.css';
 
 /** File name shown in the header, used by Save and in error messages. */
-export const FILE_NAMES = { javascript: 'index.js', typescript: 'index.ts', kotlin: 'Main.kt', java: 'Main.java' };
-const LANGUAGE_LABELS = { javascript: 'JavaScript', typescript: 'TypeScript', kotlin: 'Kotlin', java: 'Java' };
-const LANGUAGE_BADGES = { javascript: 'JS', typescript: 'TS', kotlin: 'KT', java: 'JV' };
+export const FILE_NAMES = { javascript: 'index.js', typescript: 'index.ts', kotlin: 'Main.kt', java: 'Main.java', c: 'main.c', cpp: 'main.cpp', python: 'main.py' };
+const LANGUAGE_LABELS = { javascript: 'JavaScript', typescript: 'TypeScript', kotlin: 'Kotlin', java: 'Java', c: 'C', cpp: 'C++', python: 'Python' };
+const LANGUAGE_BADGES = { javascript: 'JS', typescript: 'TS', kotlin: 'KT', java: 'JV', c: 'C', cpp: 'C++', python: 'PY' };
 
 const TIMEOUT_MS = 10000;
 const JAVA_TIMEOUT_MS = 30000;
@@ -270,12 +272,14 @@ export default function RunnableCode({
   const isTs = language === 'typescript';
   const isKotlin = language === 'kotlin';
   const isJava = language === 'java';
+  const isNative = isNativeLanguage(language);
   const label = LANGUAGE_LABELS[language] || 'JavaScript';
   const displayName = fileName || FILE_NAMES[language] || 'index.js';
   const isPlayground = variant === 'playground';
 
   const [code, setCode] = useState(initial);
   const [confType, setConfType] = useState(DEFAULT_KOTLIN_TARGET);
+  const [javaApi, setJavaApi] = useState(DEFAULT_JAVA_API);
   const [runtimes, setRuntimes] = useState([]);
   const [runtimeId, setRuntimeId] = useState('');
   const confTypeRef = useRef(confType);
@@ -345,14 +349,51 @@ export default function RunnableCode({
       setStatus('done');
     };
 
-    if (isJava) {
-      // Compile + run remotely (Wandbox, open-source) with the selected JDK.
+    if (isNative) {
+      // Compile + run C, C++, or Python remotely through Judge0.
       const controller = new AbortController();
       abortRef.current = controller;
       timeoutRef.current = setTimeout(() => controller.abort('timeout'), JAVA_TIMEOUT_MS);
       try {
-        const compiler = runtimeId || pickDefaultRuntime(await getJavaRuntimes());
-        const { lines, diagnostics } = await runJava(code, controller.signal, { stdin: inputRef.current, compiler });
+        const compiler = runtimeId || pickNativeRuntime(await getNativeRuntimes(language));
+        const { lines, diagnostics } = await runNative(code, controller.signal, { language, compiler, stdin: inputRef.current });
+        if (activeRunRef.current !== myRun) return;
+        clearTimeout(timeoutRef.current);
+        const view = editorViewRef.current;
+        if (view) {
+          const docLength = view.state.doc.length;
+          view.dispatch(setDiagnostics(view.state, diagnostics.map((d) => ({
+            from: Math.min(d.from, docLength),
+            to: Math.min(Math.max(d.to, d.from + 1), docLength),
+            severity: d.severity,
+            message: d.message,
+            source: language,
+          }))));
+        }
+        finishWithoutRun(lines);
+      } catch (error) {
+        if (activeRunRef.current !== myRun) return;
+        clearTimeout(timeoutRef.current);
+        const timedOut = controller.signal.aborted;
+        finishWithoutRun([{
+          type: 'error',
+          text: timedOut
+            ? `Timed out after ${JAVA_TIMEOUT_MS / 1000}s waiting for the ${label} service.`
+            : `Could not reach the ${label} Judge0 service. Check your internet connection and try again. (${error.message})`,
+        }]);
+        if (timedOut) setStatus('timeout');
+      }
+      return;
+    }
+
+    if (isJava) {
+      // Compile + run remotely with the selected provider and JDK.
+      const controller = new AbortController();
+      abortRef.current = controller;
+      timeoutRef.current = setTimeout(() => controller.abort('timeout'), JAVA_TIMEOUT_MS);
+      try {
+        const compiler = runtimeId || pickDefaultRuntime(await getJavaRuntimes(javaApi));
+        const { lines, diagnostics } = await runJava(code, controller.signal, { stdin: inputRef.current, compiler, api: javaApi });
         if (activeRunRef.current !== myRun) return;
         clearTimeout(timeoutRef.current);
         const view = editorViewRef.current;
@@ -375,7 +416,7 @@ export default function RunnableCode({
           type: 'error',
           text: timedOut
             ? `Timed out after ${JAVA_TIMEOUT_MS / 1000}s waiting for the Java service.`
-            : `Could not reach the Java service (wandbox.org). Check your internet connection and try again. (${error.message})`,
+            : `Could not reach the Java service (${JAVA_APIS[javaApi].server}). Check your internet connection and try again. (${error.message})`,
         }]);
         if (timedOut) setStatus('timeout');
       }
@@ -444,7 +485,7 @@ export default function RunnableCode({
       setStats({ time: performance.now() - startedAtRef.current, memory: null });
       stopCode('timeout');
     }, TIMEOUT_MS);
-  }, [code, isTs, isKotlin, isJava, displayName, stopCode, confType, runtimeId]);
+  }, [code, isTs, isKotlin, isJava, isNative, language, label, displayName, stopCode, confType, runtimeId, javaApi]);
 
   const resetCode = () => {
     stopCode('idle');
@@ -471,7 +512,11 @@ export default function RunnableCode({
 
   const extensions = useMemo(() => {
     const list = [
-      isJava ? StreamLanguage.define(java) : isKotlin ? StreamLanguage.define(kotlin) : javascript({ typescript: isTs }),
+      isJava ? StreamLanguage.define(java)
+        : language === 'c' ? StreamLanguage.define(c)
+        : language === 'cpp' ? StreamLanguage.define(cpp)
+        : language === 'python' ? StreamLanguage.define(python)
+        : isKotlin ? StreamLanguage.define(kotlin) : javascript({ typescript: isTs }),
       // Ctrl/Cmd + Enter runs the snippet from inside the editor.
       Prec.highest(keymap.of([{ key: 'Mod-Enter', run: () => { document.dispatchEvent(new CustomEvent('codetrove:run-focused')); return true; } }])),
     ];
@@ -499,7 +544,7 @@ export default function RunnableCode({
         lintGutter()
       );
     }
-    if (isJava) {
+    if (isJava || isNative) {
       // javac errors are underlined after Run (setDiagnostics). Wandbox has no
       // analysis-only endpoint and Run executes the program, so nothing is sent
       // while typing; this linter just clears stale squiggles once you edit.
@@ -535,19 +580,22 @@ export default function RunnableCode({
       );
     }
     return list;
-  }, [isTs, isKotlin, isJava, initial]);
+  }, [isTs, isKotlin, isJava, isNative, initial, language]);
 
-  // Java: load the runtime (JDK) versions offered by the service for the dropdown.
+  // Java/C/C++/Python: load runtime versions offered by the selected provider.
   useEffect(() => {
-    if (!isJava) return undefined;
+    if (!isJava && !isNative) return undefined;
     let cancelled = false;
-    getJavaRuntimes().then((list) => {
+    setRuntimes([]);
+    setRuntimeId('');
+    const runtimePromise = isNative ? getNativeRuntimes(language) : getJavaRuntimes(javaApi);
+    runtimePromise.then((list) => {
       if (cancelled) return;
       setRuntimes(list);
-      setRuntimeId((current) => current || pickDefaultRuntime(list));
+      setRuntimeId((current) => current || (isNative ? pickNativeRuntime(list) : pickDefaultRuntime(list)));
     });
     return () => { cancelled = true; };
-  }, [isJava]);
+  }, [isJava, isNative, javaApi, language]);
 
   useEffect(() => {
     if (isTs) preloadTypeScript().catch(() => {});
@@ -579,8 +627,8 @@ export default function RunnableCode({
   const inputTitle = isKotlin ? 'Arguments' : 'STDIN';
   const inputHelp = isKotlin
     ? 'Optional program arguments passed to main(args) - separated by spaces.'
-    : isJava
-    ? 'Optional input fed to the program - read it with new Scanner(System.in).'
+    : isJava || isNative
+    ? 'Optional input fed to the program through standard input.'
     : 'Optional input fed to the program - one value per line, read with readLine() or prompt().';
 
   return (
@@ -596,11 +644,28 @@ export default function RunnableCode({
         </span>
         <div className="runnable-code__actions">
           {isJava && (
-            <label className="runnable-code__target" title="JDK used to compile and run the code (sent as `compiler` in the request)">
+            <label className="runnable-code__target" title="Java execution API. Wandbox is the default; Judge0 can be public or self-hosted.">
+              <span>API</span>
+              <select value={javaApi} onChange={(event) => setJavaApi(event.target.value)} disabled={status === 'running'} aria-label="Java execution API">
+                {Object.values(JAVA_APIS).map((api) => <option key={api.id} value={api.id}>{api.label}</option>)}
+              </select>
+            </label>
+          )}
+          {isJava && (
+            <label className="runnable-code__target" title={`JDK used by ${JAVA_APIS[javaApi].label} (sent as the provider's runtime identifier)`}>
               <span>Java</span>
               <select value={runtimeId} onChange={(event) => setRuntimeId(event.target.value)} disabled={status === 'running' || runtimes.length === 0} aria-label="Java runtime version">
                 {runtimes.length === 0 && <option value="">Loading…</option>}
                 {runtimes.map((r) => <option key={r.id} value={r.id}>{r.label}</option>)}
+              </select>
+            </label>
+          )}
+          {isNative && (
+            <label className="runnable-code__target" title={`${label} runtime provided by Judge0 CE. The selected language ID is sent with the submission.`}>
+              <span>Runtime</span>
+              <select value={runtimeId} onChange={(event) => setRuntimeId(event.target.value)} disabled={status === 'running' || runtimes.length === 0} aria-label={`${label} runtime version`}>
+                {runtimes.length === 0 && <option value="">Loading…</option>}
+                {runtimes.map((runtime) => <option key={runtime.id} value={runtime.id}>{runtime.label}</option>)}
               </select>
             </label>
           )}
@@ -694,7 +759,7 @@ export default function RunnableCode({
             ))}
           </div>
           {isKotlin && <div className="runnable-code__footer">Compiled by JetBrains · api.kotlinlang.org</div>}
-          {isJava && <div className="runnable-code__footer">Compiled and run by Wandbox (open source) · wandbox.org</div>}
+          {isJava && <div className="runnable-code__footer">Compiled and run by {JAVA_APIS[javaApi].label} · {JAVA_APIS[javaApi].description}</div>}
         </div>
       </div>
 

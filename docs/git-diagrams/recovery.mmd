@@ -1,0 +1,10 @@
+flowchart TD
+  S[What do you need to undo?] --> W[Unstaged file edit]
+  S --> I[Staged change]
+  S --> L[Local commit not shared]
+  S --> P[Published shared commit]
+  W --> WR[git restore --worktree]
+  I --> IR[git restore --staged to unstage]
+  L --> LR[reset only after review; choose mode]
+  P --> PR[git revert adds inverse commit]
+  LR -. hard reset can discard work .-> C[Caution: preserve important edits]

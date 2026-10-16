@@ -20,10 +20,15 @@ import CompilerPage from './pages/build/CompilerPage.jsx';
 import ToolsPage from './pages/build/ToolsPage.jsx';
 import JwtToolPage from './pages/build/JwtToolPage.jsx';
 import CharacterCounterPage from './pages/build/CharacterCounterPage.jsx';
+import StringUtilitiesPage from './pages/build/StringUtilitiesPage.jsx';
+import CryptographyToolsPage from './pages/build/CryptographyToolsPage.jsx';
 import PomFormatterPage from './pages/build/PomFormatterPage.jsx';
 import PropertiesYamlConverterPage from './pages/build/PropertiesYamlConverterPage.jsx';
 import UnixTimestampConverterPage from './pages/build/UnixTimestampConverterPage.jsx';
 import HtmlXmlJsonToolPage from './pages/build/HtmlXmlJsonToolPage.jsx';
+import JsonCrackPage from './pages/build/JsonCrackPage.jsx';
+import MarkdownEditorPage from './pages/build/MarkdownEditorPage.jsx';
+import NetworkToolsPage from './pages/build/NetworkToolsPage.jsx';
 import ProjectsPage from './pages/build/ProjectsPage.jsx';
 import ProfilePage from './pages/store/ProfilePage.jsx';
 import ResumePage from './pages/store/ResumePage.jsx';
@@ -57,10 +62,15 @@ export default function App() {
           <Route path="/build/tools" element={<ToolsPage />} />
           <Route path="/build/tools/jwt-tool" element={<JwtToolPage />} />
           <Route path="/build/tools/character-counter" element={<CharacterCounterPage />} />
+          <Route path="/build/tools/string-utilities" element={<StringUtilitiesPage />} />
+          <Route path="/build/tools/cryptography" element={<CryptographyToolsPage />} />
           <Route path="/build/tools/pom-formatter" element={<PomFormatterPage />} />
           <Route path="/build/tools/properties-yaml-converter" element={<PropertiesYamlConverterPage />} />
           <Route path="/build/tools/unix-timestamp-converter" element={<UnixTimestampConverterPage />} />
           <Route path="/build/tools/html-xml-json" element={<HtmlXmlJsonToolPage />} />
+          <Route path="/build/tools/json-crack" element={<JsonCrackPage />} />
+          <Route path="/build/tools/markdown-editor" element={<MarkdownEditorPage />} />
+          <Route path="/build/tools/network" element={<NetworkToolsPage />} />
           <Route path="/build/projects" element={<RequireRole allow={ANY_LOGGED_IN}><ProjectsPage /></RequireRole>} />
 
           <Route path="/store/profile" element={<RequireRole allow={ANY_LOGGED_IN}><ProfilePage /></RequireRole>} />

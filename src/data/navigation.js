@@ -248,7 +248,35 @@ const tree = [
   },
   {
     key: 'git-collaboration', label: 'Git & Collaboration', children: [
-      { key: 'git', label: 'Git', pages: {'branching': 'Branching', 'merge-rebase': 'Merge Rebase', 'cherry-pick': 'Cherry Pick', 'reset-revert': 'Reset Revert', 'bisect': 'Bisect'} },
+      { key: 'git', label: 'Git', children: [
+        { key: 'foundations', label: 'Foundations', pages: {
+          'init-clone': 'Create or Clone a Repository',
+          'staging-commits': 'Working Tree, Staging, and Commits',
+          'head-refs': 'HEAD, Refs, and Commit Hashes',
+        } },
+        { key: 'branching', label: 'Branching and History', pages: {
+          'branch-switch': 'Create and Switch Branches',
+          'merge-conflicts': 'Merge and Resolve Conflicts',
+          'rebase': 'Rebase',
+          'cherry-pick': 'Cherry-pick',
+        } },
+        { key: 'remotes', label: 'Remote Collaboration', pages: {
+          'fetch-pull-push': 'Fetch, Pull, and Push',
+          'publish-branch': 'Publish a Branch and Set Upstream',
+          'force-push': 'Force-push Safely',
+        } },
+        { key: 'recovery', label: 'Stash, Patches, and Recovery', pages: {
+          'stash': 'Stash Local Work',
+          'patches': 'Create and Apply Patches',
+          'undo-reset-revert': 'Undo: Restore, Reset, Revert',
+          'debugging': 'Conflict Recovery and Bisect',
+        } },
+      ], pages: {
+        'merge-rebase': { label: 'Branching and History', contentKey: 'git-collaboration/git/branching' },
+        'cherry-pick': { label: 'Cherry-pick', contentKey: 'git-collaboration/git/branching/cherry-pick' },
+        'reset-revert': { label: 'Reset and Revert', contentKey: 'git-collaboration/git/recovery/undo-reset-revert' },
+        'bisect': { label: 'Bisect and Conflict Recovery', contentKey: 'git-collaboration/git/recovery/debugging' },
+      } },
       { key: 'pull-requests', label: 'Pull Requests', pages: {'pr-review': 'Pr Review', 'review-checklist': 'Review Checklist', 'commit-strategy': 'Commit Strategy'} },
       { key: 'source-control', label: 'Source Control', pages: {'release-branching': 'Release Branching', 'semantic-versioning': 'Semantic Versioning'} },
     ],
@@ -269,6 +297,34 @@ const tree = [
     ],
   },
 ];
+
+tree.push({
+  key: 'networking',
+  label: 'Networking',
+  contentKey: 'networking/overview',
+  children: [
+    { key: 'dns-registrars', label: 'DNS & Registrars', contentKey: 'networking/dns-registrars', children: [
+      { key: 'url-uri', label: 'TLD, Domains & URL/URI', contentKey: 'networking/dns-registrars/url-uri' },
+      { key: 'dns-resolution', label: 'DNS Resolution, Caches & TTL', contentKey: 'networking/dns-registrars/dns-resolution' },
+      { key: 'dns-records', label: 'DNS Record Types & Commands', contentKey: 'networking/dns-registrars/dns-records' },
+    ] },
+    { key: 'tls-ssl', label: 'TLS/SSL', contentKey: 'networking/tls-ssl', children: [
+      { key: 'local-testing', label: 'Local Certificates for Testing', contentKey: 'networking/tls-ssl/local-testing' },
+    ] },
+    { key: 'protocols', label: 'Types of Protocols', contentKey: 'networking/protocols', children: [
+      { key: 'http-https', label: 'HTTP/HTTPS & Redirects', contentKey: 'networking/protocols/http-https' },
+      { key: 'smtp', label: 'SMTP & Mail Delivery', contentKey: 'networking/protocols/smtp' },
+      { key: 'ftp', label: 'FTP, FTPS & SFTP', contentKey: 'networking/protocols/ftp' },
+      { key: 'tcp-udp', label: 'TCP vs UDP', contentKey: 'networking/protocols/tcp-udp' },
+    ] },
+    { key: 'socket-connections', label: 'Socket Connections', contentKey: 'networking/socket-connections' },
+    { key: 'proxy-server', label: 'Proxy Server', contentKey: 'networking/proxy-server', children: [
+      { key: 'forward-proxy', label: 'Forward Proxy', contentKey: 'networking/proxy-server/forward-proxy' },
+      { key: 'reverse-proxy', label: 'Reverse Proxy', contentKey: 'networking/proxy-server/reverse-proxy' },
+    ] },
+    { key: 'browser-request-flow', label: 'Browser Request Walkthroughs', contentKey: 'networking/browser-request-flow' },
+  ],
+});
 
 const legacyPlatform = ['text', 'nodejs', 'json', 'jwt', 'git', 'email'].map((categoryKey) => {
   const category = CATEGORIES.find((item) => item.key === categoryKey);

@@ -1,0 +1,15 @@
+flowchart LR
+    subgraph Forward [Forward proxy represents clients]
+      C[Client browser] -->|configured outbound request| FP[Forward proxy]
+      FP -->|new request or CONNECT tunnel| Internet[Internet destination]
+      Internet -->|response| FP
+      FP --> C
+    end
+    subgraph Reverse [Reverse proxy represents services]
+      Visitor[Visitor browser] -->|public HTTPS request| RP[Reverse proxy or edge]
+      RP -->|route and balance| App1[Backend service A]
+      RP -->|route and balance| App2[Backend service B]
+      App1 --> RP
+      App2 --> RP
+      RP --> Visitor
+    end

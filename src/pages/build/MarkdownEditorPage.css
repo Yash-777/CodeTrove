@@ -1,0 +1,19 @@
+.embedded-tool-page { max-width: 1400px; }
+.embedded-tool-page__head { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; }
+.embedded-tool-page__eyebrow { margin: 0 0 0.35rem; color: var(--color-muted); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.08em; }
+.embedded-tool-page h1 { margin: 0 0 0.35rem; }
+.embedded-tool-page__subtitle { margin: 0; max-width: 68ch; color: var(--color-muted); }
+.embedded-tool-page__links { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.embedded-tool-page__link { padding: 0.5rem 0.8rem; border: 1px solid var(--color-border); border-radius: 8px; color: var(--color-text); background: var(--color-paper); font-size: 0.85rem; font-weight: 600; text-decoration: none; }
+.embedded-tool-page__link:hover { border-color: var(--color-accent); }
+.embedded-tool-page__link--primary { color: #fff; background: var(--color-accent); border-color: var(--color-accent); }
+.embedded-tool-page__frame-card { overflow: hidden; border: 1px solid var(--color-border); border-radius: 12px; background: #fff; }
+.embedded-tool-page__frame { display: block; width: 100%; height: min(78vh, 900px); min-height: 620px; border: 0; background: #fff; }
+.embedded-tool-page__fallback { margin: 0; padding: 0.7rem 1rem; border-top: 1px solid var(--color-border); color: var(--color-muted); font-size: 0.82rem; }
+.embedded-tool-page__fallback a, .embedded-tool-page__about a { color: var(--color-accent); font-weight: 600; }
+.embedded-tool-page__about { margin-top: 1.2rem; padding: 1rem 1.2rem; border: 1px solid var(--color-border); border-radius: 10px; background: var(--color-paper); }
+.embedded-tool-page__about h2 { margin: 0 0 0.45rem; font-size: 1.1rem; }
+.embedded-tool-page__about p { margin-bottom: 0; line-height: 1.6; }
+@media (max-width: 700px) {
+  .embedded-tool-page__frame { min-height: 500px; height: 70vh; }
+}

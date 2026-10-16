@@ -1,0 +1,8 @@
+flowchart LR
+  B[Merge base line] --> O[Current branch changed line]
+  B --> T[Incoming branch changed same line]
+  O --> X[Git cannot infer intent<br/>conflict markers]
+  T --> X
+  X --> U[User removes markers<br/>and writes intended result]
+  U --> A[git add resolved file]
+  A --> M[Continue merge]

@@ -1,0 +1,13 @@
+sequenceDiagram
+    autonumber
+    participant C as TCP client socket
+    participant OS
+    participant L as Server listening socket
+    participant S as Accepted server socket
+    C->>OS: connect(server IP, port)
+    OS-->>L: Incoming connection after TCP setup
+    L->>S: accept() returns connected socket
+    C->>S: Ordered byte stream (application frames messages)
+    S-->>C: Response bytes
+    C->>S: close()
+    Note over L,S: Listener remains available for other clients

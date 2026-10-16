@@ -3,10 +3,7 @@
 > Content placeholder: expand this page with project-specific examples, trade-offs, diagrams, and production incidents.
 
 <details>
-<summary>Interview Asking question conceptual wise</summary>
-
-### Question
-What is **Service Discovery**, why is it used in a production system, and what trade-offs should a senior engineer discuss?
+<summary>What is <strong>Service Discovery</strong>, why is it used in a production system, and what trade-offs should a senior engineer discuss?</summary>
 
 ### Answer
 Add the concise definition first, then explain the request/data flow, failure modes, scalability implications, security considerations, observability, testing strategy, and a concrete production example.

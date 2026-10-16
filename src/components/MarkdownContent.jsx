@@ -9,6 +9,7 @@
  */
 
 import ReactMarkdown from 'react-markdown';
+import { Link } from 'react-router-dom';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import remarkGfm from 'remark-gfm';
@@ -35,6 +36,51 @@ function normalizeRunnableLanguage(language = '') {
   if (value === 'kt' || value === 'kotlin') return 'kotlin';
   if (value === 'java') return 'java';
   return 'javascript';
+}
+
+const NETWORKING_DIAGRAMS = {
+  'request-lifecycle': 'request-lifecycle.png',
+  'dns-resolution': 'dns-resolution.png',
+  'url-anatomy': 'url-anatomy.png',
+  'tls-trust': 'tls-trust.png',
+  'proxy-comparison': 'proxy-comparison.png',
+  'forward-proxy': 'proxy-comparison.png',
+  'reverse-proxy': 'proxy-comparison.png',
+  'protocol-transfers': 'protocol-transfers.png',
+  'socket-lifecycle': 'socket-lifecycle.png',
+  'ftp-connections': 'ftp-connections.png',
+  'dns-tls-http': 'dns-tls-http.png',
+  'smtp-flow': 'smtp-flow.png',
+};
+const GIT_DIAGRAMS = {
+  overview: 'overview.png',
+  'local-remote': 'local-remote.png',
+  'head-branches': 'head-branches.png',
+  lifecycle: 'lifecycle.png',
+  merge: 'merge.png',
+  rebase: 'rebase.png',
+  'cherry-pick': 'cherry-pick.png',
+  'remote-flow': 'remote-flow.png',
+  'publish-branch': 'publish-branch.png',
+  'force-push': 'force-push.png',
+  stash: 'stash.png',
+  patch: 'patch.png',
+  integration: 'integration.png',
+  recovery: 'recovery.png',
+  conflict: 'conflict.png',
+};
+
+function resolveMarkdownImage(src) {
+  if (typeof src !== 'string') return src;
+  if (src.startsWith('networking-diagram:')) {
+    const name = NETWORKING_DIAGRAMS[src.slice('networking-diagram:'.length)];
+    return name ? `${import.meta.env.BASE_URL}networking/${name}` : src;
+  }
+  if (src.startsWith('git-diagram:')) {
+    const name = GIT_DIAGRAMS[src.slice('git-diagram:'.length)];
+    return name ? `${import.meta.env.BASE_URL}git/${name}` : src;
+  }
+  return src;
 }
 
 function MarkdownCode({ inline, className, children, node, ...props }) {
@@ -124,21 +170,26 @@ export default function MarkdownContent({ children }) {
         h3: ({ node, ...props }) => <h3 className="markdown-h3" {...props} />,
         h4: ({ node, ...props }) => <h4 className="markdown-h4" {...props} />,
         p: ({ node, ...props }) => <p className="markdown-p" {...props} />,
-        ul: ({ node, className, ...props }) => (
+        ul: ({ node, className, ordered: _ordered, ...props }) => (
           <ul className={`markdown-ul${className ? ` ${className}` : ''}`} {...props} />
         ),
         ol: ({ node, ...props }) => <ol className="markdown-ol" {...props} />,
-        li: ({ node, ...props }) => <li className="markdown-li" {...props} />,
+        li: ({ node, ordered: _ordered, ...props }) => <li className="markdown-li" {...props} />,
         img: ({ node, ...props }) => (
-          <img className="markdown-image" loading="lazy" {...props} />
+          <img className="markdown-image" loading="lazy" {...props} src={resolveMarkdownImage(props.src)} />
         ),
         table: ({ node, ...props }) => <table className="markdown-table" {...props} />,
         thead: ({ node, ...props }) => <thead className="markdown-thead" {...props} />,
         tbody: ({ node, ...props }) => <tbody className="markdown-tbody" {...props} />,
         tr: ({ node, ...props }) => <tr className="markdown-tr" {...props} />,
-        th: ({ node, ...props }) => <th className="markdown-th" {...props} />,
+        th: ({ node, isHeader: _isHeader, ...props }) => <th className="markdown-th" {...props} />,
         td: ({ node, ...props }) => <td className="markdown-td" {...props} />,
-        a: ({ node, ...props }) => <a className="markdown-a" {...props} />,
+        a: ({ node, href, children, ...props }) => {
+          const isInternalRoute = href?.startsWith('/') && !href.startsWith('//');
+          return isInternalRoute
+            ? <Link className="markdown-a" to={href} {...props}>{children}</Link>
+            : <a className="markdown-a" href={href} {...props}>{children}</a>;
+        },
         blockquote: ({ node, children, ...props }) => {
           const type = alertType(children);
           return (

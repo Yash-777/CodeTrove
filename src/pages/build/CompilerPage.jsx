@@ -2,15 +2,18 @@
  * src/pages/build/CompilerPage.jsx
  * ------------------------------------------------------------------
  * Route: /build/compiler   (deep link: /build/compiler?lang=kotlin)
- * Online compiler / playground for JavaScript, TypeScript, Kotlin and Java,
+ * Online compiler / playground for JavaScript, TypeScript, Kotlin, Java, C,
+ * C++ and Python,
  * built on the same RunnableCode component used by `runnable` blocks in
  * the Markdown pages (side-by-side editor and output).
  *
  * - JavaScript / TypeScript run in the browser (sandboxed iframe + Web
  *   Worker, TypeScript is type-checked first).
  * - Kotlin is compiled by JetBrains' public service (api.kotlinlang.org).
- * - Java is compiled and run by Wandbox (open source, wandbox.org) with a
- *   selectable OpenJDK version (utils/javaApi.js).
+ * - Java is compiled and run by Wandbox by default, or Judge0, with a
+ *   provider-specific selectable Java runtime (utils/javaApi.js).
+ * - C, C++ and Python are compiled and run by Judge0 with a selectable
+ *   language runtime (utils/judge0Api.js).
  * All editors stay mounted so switching tabs keeps your code.
  */
 
@@ -90,6 +93,58 @@ console.log(\`In 5 years you will be \${person.age + 5}.\`);
     targets: KOTLIN_TARGET_OPTIONS,
   },
   {
+    key: 'c',
+    param: 'c',
+    label: 'C',
+    learnTo: '/build/compiler?lang=c',
+    docsUrl: 'https://en.cppreference.com/w/c',
+    input: 'Alice\n30',
+    code: `#include <stdio.h>
+
+int main(void) {
+    char name[50];
+    int age;
+    scanf("%49s %d", name, &age);
+    printf("Hello, %s!\\n", name);
+    printf("In 5 years you will be %d.\\n", age + 5);
+    return 0;
+}
+`,
+  },
+  {
+    key: 'cpp',
+    param: 'cpp',
+    label: 'C++',
+    learnTo: '/build/compiler?lang=cpp',
+    docsUrl: 'https://en.cppreference.com/w/cpp',
+    input: 'Alice\n30',
+    code: `#include <iostream>
+#include <string>
+
+int main() {
+    std::string name;
+    int age;
+    std::cin >> name >> age;
+    std::cout << "Hello, " << name << "!\\n";
+    std::cout << "In 5 years you will be " << age + 5 << ".\\n";
+}
+`,
+  },
+  {
+    key: 'python',
+    param: 'python',
+    label: 'Python',
+    learnTo: '/build/compiler?lang=python',
+    docsUrl: 'https://docs.python.org/3/tutorial/',
+    input: 'Alice\n30',
+    code: `name = input().strip() or "World"
+age = int(input() or 0)
+
+print(f"Hello, {name}!")
+print(f"In 5 years you will be {age + 5}.")
+`,
+  },
+  {
     key: 'java',
     param: 'java',
     label: 'Java',
@@ -100,12 +155,29 @@ console.log(\`In 5 years you will be \${person.age + 5}.\`);
 
 public class Main {
     public static void main(String[] args) {
+        // Display the Java version used by the selected runtime.
+        printJavaVersion();
+
         Scanner in = new Scanner(System.in);
         String name = in.hasNextLine() ? in.nextLine() : "World";
         int age = in.hasNextInt() ? in.nextInt() : 0;
 
         System.out.println("Hello, " + name + "!");
         System.out.println("In 5 years you will be " + (age + 5) + ".");
+    }
+
+    /**
+     * Detects Java 9+ with reflection, while remaining compilable on Java 8.
+     */
+    public static void printJavaVersion() {
+        String version;
+        try {
+            version = java.lang.Runtime.class.getMethod("version").invoke(null).toString();
+        } catch (Exception e) {
+            // Runtime.version() does not exist on Java 8 and earlier.
+            version = System.getProperty("java.version");
+        }
+        System.out.println("Running Java Version: " + version);
     }
 }
 `,
@@ -174,27 +246,49 @@ function JavaAbout() {
 
       <h3>How Run works</h3>
       <p>
-        A browser cannot run <code>javac</code> or a JVM, so this page sends your code to{' '}
-        <a href="https://wandbox.org/" target="_blank" rel="noreferrer">Wandbox</a>, an open-source
-        (<a href="https://github.com/melpon/wandbox" target="_blank" rel="noreferrer">melpon/wandbox</a>) online
-        compiler that runs real OpenJDK builds in sandboxed containers. The calls are plain CORS requests, so it works
-        on GitHub Pages with no backend of our own. Press <strong>Run</strong> (or <kbd>Ctrl/Cmd</kbd> + <kbd>Enter</kbd>):
+        A browser cannot run <code>javac</code> or a JVM, so this page sends your code to the selected execution API.
+        Wandbox is the default; Judge0 is available when you need its REST submission model or a self-hosted Judge0
+        service. The calls are plain CORS requests, so it works on GitHub Pages with no backend of our own. Press{' '}
+        <strong>Run</strong> (or <kbd>Ctrl/Cmd</kbd> + <kbd>Enter</kbd>):
       </p>
       <ol>
-        <li>The page asks <code>GET /api/list.json</code> for the available Java compilers (the runtime dropdown).</li>
-        <li>Run sends <code>POST /api/compile.json</code> with your source, the selected runtime and STDIN.</li>
-        <li>Wandbox compiles and runs it, then returns the compiler messages and the program&apos;s output, which are shown on the right.</li>
+        <li>Select <strong>API</strong> first. The page then loads the Java runtimes offered by that provider.</li>
+        <li>Select the Java runtime. Run sends your source and STDIN using the provider&apos;s request format.</li>
+        <li>The response is normalized into compiler output, program output, errors, status, and editor diagnostics.</li>
       </ol>
       <pre className="cp-about__code">{`POST https://wandbox.org/api/compile.json
 {"code":"public class Main { ... }","compiler":"openjdk-jdk-21+35","stdin":"Alice\n30","options":"","compiler-option-raw":"","runtime-option-raw":"","save":false}
 
 {"status":"0","compiler_error":"","program_output":"Hello, Alice!\n","program_error":""}`}</pre>
 
+      <h3>Judge0 API flow</h3>
+      <p>
+        <a href="https://github.com/judge0/judge0" target="_blank" rel="noreferrer">Judge0</a> is an open-source,
+        sandboxed REST execution system. CodeTrove first reads its available language IDs, filters the Java entries,
+        and uses the selected ID for the submission. The public Judge0 CE endpoint is shown below; a self-hosted
+        deployment can use the same contract with its own URL and installed JDK versions.
+      </p>
+      <pre className="cp-about__code">{`GET https://ce.judge0.com/languages
+
+POST https://ce.judge0.com/submissions?base64_encoded=false&wait=true
+{"source_code":"public class Main { ... }","language_id":91,"stdin":"Alice\\n30","cpu_time_limit":5,"wall_time_limit":10,"memory_limit":256000}
+
+{"stdout":"Hello, Alice!\\n","stderr":"","compile_output":null,"status":{"id":3,"description":"Accepted"},"time":"0.08","memory":12340}`}</pre>
+      <p>
+        Judge0 returns <code>compile_output</code> for compiler diagnostics, <code>stdout</code> for normal program
+        output, <code>stderr</code> for runtime errors, and a <code>status</code> object describing the execution.
+        CodeTrove displays those fields in the same output panel and applies Java compiler diagnostics to the editor.
+        <code>wait=true</code> requests the completed result in one response; Judge0 also supports token-based polling,
+        which is preferable for production-scale or self-hosted deployments where synchronous waiting is disabled.
+      </p>
+
       <h3>Runtime version</h3>
       <p>
-        The <strong>Java</strong> dropdown above the editor lists the JDK versions the service offers (newest first;
-        the default is the newest LTS available). The selected id is sent as <code>compiler</code>, so you can check
-        how code behaves on, for example, Java 17 versus 21. The editor file is <code>Main.java</code> with{' '}
+        The <strong>API</strong> dropdown comes before the <strong>Java</strong> dropdown. The Java list is refreshed
+        from the selected provider: Wandbox exposes compiler names such as <code>openjdk-jdk-21+35</code>, while
+        Judge0 exposes numeric language IDs such as <code>91</code>. Versions are shown newest first where possible;
+        unavailable versions are not simulated or added manually. The selected provider and runtime are sent with each
+        request. The editor file is <code>Main.java</code> with{' '}
         <code>public class Main</code>; because the service saves the source under its own file name, the{' '}
         <code>public</code> modifier of top-level classes is removed from the copy that is sent (line and column
         numbers are unchanged), so the same code also compiles on your machine.
@@ -206,9 +300,45 @@ function JavaAbout() {
           editor after Run; runtime exceptions show the Java stack trace.</li>
         <li>The <strong>STDIN</strong> box feeds <code>System.in</code> (for example <code>new Scanner(System.in)</code>).</li>
         <li>Code is not compiled while you type: Run executes the program, so it only goes to the service when you press it.</li>
-        <li>Your code and STDIN are sent to wandbox.org, nothing is saved (<code>save:false</code>), an internet
-          connection is needed, and the public service may rate-limit heavy use or stop long-running programs.</li>
+        <li>Your code and STDIN are sent to the selected provider. Wandbox sets <code>save:false</code>; an internet
+          connection is needed, and public services may rate-limit heavy use or stop long-running programs.</li>
       </ul>
+    </section>
+  );
+}
+
+const NATIVE_ABOUT = {
+  c: { label: 'C', file: 'main.c', pattern: 'C (GCC or Clang)' },
+  cpp: { label: 'C++', file: 'main.cpp', pattern: 'C++ (GCC or Clang)' },
+  python: { label: 'Python', file: 'main.py', pattern: 'Python (3.x)' },
+};
+
+function NativeAbout({ language }) {
+  const info = NATIVE_ABOUT[language];
+  return (
+    <section className="cp-about" aria-labelledby={`cp-about-${language}`}>
+      <h2 id={`cp-about-${language}`}>About the {info.label} playground</h2>
+      <p>
+        This editor sends <code>{info.file}</code> to the open-source{' '}
+        <a href="https://github.com/judge0/judge0" target="_blank" rel="noreferrer">Judge0</a> execution API.
+        Choose a discovered <strong>Runtime</strong> above, enter optional standard input, and press <strong>Run</strong>.
+      </p>
+      <h3>Runtime discovery and execution flow</h3>
+      <ol>
+        <li>CodeTrove calls <code>GET https://ce.judge0.com/languages</code> and keeps {info.pattern} entries.</li>
+        <li>The Runtime dropdown displays the available versions, newest first where the service provides version information.</li>
+        <li>Run submits the source and selected language ID to Judge0:</li>
+      </ol>
+      <pre className="cp-about__code">{`POST https://ce.judge0.com/submissions?base64_encoded=false&wait=true
+{"source_code":"...","language_id":109,"stdin":"Alice\\n30","cpu_time_limit":5,"wall_time_limit":10,"memory_limit":256000}
+
+{"stdout":"Hello, Alice!\\n","stderr":"","compile_output":null,"status":{"id":3,"description":"Accepted"}}`}</pre>
+      <p>
+        CodeTrove displays <code>compile_output</code> for compiler messages, <code>stdout</code> for normal output,
+        <code>stderr</code> for runtime errors, and <code>status.description</code> for execution status. The selected
+        runtime ID and source are sent to the public service, so an internet connection is required and public rate
+        limits may apply. A self-hosted Judge0-compatible endpoint can provide different runtime versions.
+      </p>
     </section>
   );
 }
@@ -259,10 +389,12 @@ export default function CompilerPage() {
 
       {active.key === 'kotlin' && <KotlinAbout />}
       {active.key === 'java' && <JavaAbout />}
+      {NATIVE_ABOUT[active.key] && <NativeAbout language={active.key} />}
 
       <p className="cp-note">
         JavaScript and TypeScript run in your browser (isolated, 10&nbsp;s limit, no DOM). Kotlin is compiled by
-        JetBrains&apos; public service (api.kotlinlang.org) and Java by the open-source Wandbox service (wandbox.org), so the Kotlin or Java code you run is sent to those services.
+        JetBrains&apos; public service (api.kotlinlang.org), Java by the selected Wandbox or Judge0 service, and C,
+        C++ and Python by Judge0, so those snippets are sent to external services.
       </p>
     </div>
   );

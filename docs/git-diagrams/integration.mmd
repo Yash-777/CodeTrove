@@ -1,0 +1,7 @@
+flowchart TD
+  S[Need to combine changes] --> M[Merge]
+  S --> R[Rebase]
+  S --> C[Cherry-pick]
+  M --> M1[Keep commits; join histories]
+  R --> R1[Replay local commits; new IDs]
+  C --> C1[Apply selected change; new commit]

@@ -85,6 +85,16 @@ export const CATEGORIES = [
     ],
   },
   {
+    key: 'cryptography',
+    label: 'Cryptography',
+    color: '#7C3AED',
+    codeLang: 'text',
+    topics: [],
+    tools: [
+      { name: 'Cryptography Tools', description: 'Encrypt and decrypt text, generate hashes, and create or verify HMAC signatures.', internalTool: 'cryptography', externalUrl: null },
+    ],
+  },
+  {
     key: 'text',
     label: 'Text',
     color: '#10B981',
@@ -92,6 +102,7 @@ export const CATEGORIES = [
     topics: [],
     tools: [
       { name: 'Character Counter', description: 'Count characters, words, lines and common platform limits.', internalTool: 'character-counter', externalUrl: null },
+      { name: 'String Utilities', description: 'Remove extra spaces, duplicate lines, and accents from text.', internalTool: 'string-utilities', externalUrl: null },
       { name: 'Compare — Diffchecker', description: 'Compare text or files in a new tab.', internalTool: null, externalUrl: 'https://www.diffchecker.com/' },
       { name: 'Compare — Text-Compare', description: 'Quick online text comparison.', internalTool: null, externalUrl: 'https://text-compare.com/' },
       { name: 'Beyond Compare', description: 'Powerful local file comparison tool (heavy files).', internalTool: null, externalUrl: 'https://www.scootersoftware.com/' },
@@ -150,6 +161,7 @@ export const CATEGORIES = [
     })),
     tools: [
       { name: 'Live Coding Interview Tool', description: 'Real-time collaborative coding sandbox.', internalTool: null, externalUrl: 'https://codeinterview.io/' },
+      { name: 'Learn Git Branching', description: 'Open-source visual Git simulator with interactive lessons for commits, branches, merges, and remotes. Runs in its own browser sandbox and does not access your local repository.', internalTool: null, externalUrl: 'https://learngitbranching.js.org/' },
     ],
   },
   {
@@ -160,6 +172,18 @@ export const CATEGORIES = [
     topics: [],
     tools: [
       { name: 'HTML / XML / JSON Formatter & Validator', description: 'Beautify, minify, validate, and explore JSON/XML in a tree view.', internalTool: 'html-xml-json', externalUrl: null },
+    ],
+  },
+  {
+    key: 'diagrams-editors',
+    label: 'Diagrams / Editors tools',
+    color: '#8B5CF6',
+    codeLang: 'markdown',
+    topics: [],
+    tools: [
+      { name: 'Markdown Editor', description: 'Write Markdown with live preview, Mermaid diagrams, and browser-based export.', internalTool: 'markdown-editor', externalUrl: 'https://markdown.org/tools/editors/markdown/' },
+      { name: 'JSON Crack', description: 'Open-source JSON, YAML, XML, and CSV visualization as interactive graphs.', internalTool: 'json-crack', externalUrl: 'https://jsoncrack.com/editor' },
+      { name: 'Draw.io', description: 'Create flowcharts, UML, ER, network, and other diagrams in the official online editor.', internalTool: null, externalUrl: 'https://app.diagrams.net/' },
     ],
   },
   {
@@ -184,6 +208,16 @@ export const CATEGORIES = [
     tools: [
       { name: 'Temp Mail', description: 'Disposable inbox for testing email delivery.', internalTool: null, externalUrl: 'https://temp-mail.org/en/' },
       { name: 'Temp Mail IO', description: 'Alternative disposable inbox for email verification.', internalTool: null, externalUrl: 'https://temp-mail.io/en' },
+    ],
+  },
+  {
+    key: 'networking',
+    label: 'Networking',
+    color: '#0EA5E9',
+    codeLang: 'text',
+    topics: [],
+    tools: [
+      { name: 'Network', description: 'Explore public connection details, DNS records, TCP setup, and TLS certificates with local command guides.', internalTool: 'network', externalUrl: null },
     ],
   },
 ];

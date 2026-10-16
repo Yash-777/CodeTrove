@@ -11,7 +11,7 @@ export default function ToolsPage() {
         Built-in tools open inside CodeTrove; external tools open in a new tab.
       </p>
 
-      {CATEGORIES.filter((category) => category.tools.length > 0).map((category) => (
+      {CATEGORIES.filter((category) => category.key !== 'json' && category.tools.length > 0).map((category) => (
         <div key={category.key} style={{ marginTop: '1.8rem' }}>
           <h2 className="content-page__subheading" style={{ color: category.color, marginTop: 0 }}>
             {category.label}
@@ -23,7 +23,16 @@ export default function ToolsPage() {
                   <strong>{tool.name}</strong>
                   <p>{tool.description}</p>
                 </div>
-                {tool.externalUrl ? (
+                {tool.internalTool && tool.externalUrl ? (
+                  <span className="tool-list__actions">
+                    <Link to={`/build/tools/${tool.internalTool}`} className="tool-list__link">
+                      Open in app <span className="tool-list__badge tool-list__badge--soon">internal</span>
+                    </Link>
+                    <a href={tool.externalUrl} target="_blank" rel="noopener noreferrer" className="tool-list__link">
+                      Open ↗ <span className="tool-list__badge">new tab</span>
+                    </a>
+                  </span>
+                ) : tool.externalUrl ? (
                   <a href={tool.externalUrl} target="_blank" rel="noopener noreferrer" className="tool-list__link">
                     Open ↗ <span className="tool-list__badge">new tab</span>
                   </a>

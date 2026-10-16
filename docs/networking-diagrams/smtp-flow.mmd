@@ -1,0 +1,13 @@
+sequenceDiagram
+    autonumber
+    participant User
+    participant Submit as SMTP submission server
+    participant DNS as DNS MX lookup
+    participant Relay as Recipient mail exchanger
+    participant Mailbox
+    User->>Submit: Authenticated message submission over TLS
+    Submit->>DNS: Find MX for recipient domain
+    DNS-->>Submit: Ordered mail exchanger candidates
+    Submit->>Relay: SMTP session and message transfer
+    Relay->>Mailbox: Local delivery after policy checks
+    Note over Submit,Relay: Temporary failures may be queued and retried

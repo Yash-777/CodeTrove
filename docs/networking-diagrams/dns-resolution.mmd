@@ -1,0 +1,20 @@
+flowchart LR
+    START[Application needs a hostname] --> BROWSER{Browser cache or open connection?}
+    BROWSER -->|yes| USE[Reuse cached address or connection]
+    BROWSER -->|no| HOSTS{Local hosts entry?}
+    HOSTS -->|yes| LOCAL[Use local mapping]
+    HOSTS -->|no| STUB[Ask operating system resolver]
+    STUB --> REC{Recursive resolver cache hit?}
+    REC -->|yes| ANSWER[Return cached record and remaining TTL]
+    REC -->|no| ROOT[Recursive resolver asks DNS root]
+    ROOT --> TLD[Root refers to TLD nameservers]
+    TLD --> AUTH[TLD refers to authoritative zone servers]
+    AUTH --> TYPE{Authoritative result}
+    TYPE -->|A AAAA or CNAME| FOUND[Return positive answer and TTL]
+    TYPE -->|NXDOMAIN or NODATA| NEG[Return valid negative answer; negative-cache TTL may apply]
+    AUTH -. timeout or unreachable .-> RETRY[Resolver may retry another authoritative server]
+    RETRY --> AUTH
+    ANSWER --> USE
+    FOUND --> USE
+    NEG --> FAIL[Name or requested record is absent]
+    LOCAL --> USE

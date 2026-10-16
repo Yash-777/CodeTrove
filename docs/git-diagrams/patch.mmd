@@ -1,0 +1,8 @@
+flowchart LR
+  W[Working tree diff] -->|git diff| P[plain patch file]
+  P --> C[git apply --check]
+  C -->|pass| A[git apply<br/>files change; no commit]
+  A --> R[review, stage, commit]
+  H[Existing commit] -->|git format-patch| M[mailbox patch with metadata]
+  M --> AM[git am]
+  AM --> MC[commit recreated]

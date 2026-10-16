@@ -1,0 +1,11 @@
+flowchart LR
+  subgraph Before[Before rebase]
+    A[A] --> B[B] --> C[C main]
+    B --> D[D feature] --> E[E feature]
+  end
+  subgraph After[After rebase]
+    A2[A] --> B2[B] --> C2[C main]
+    C2 --> D2[D-prime new ID] --> E2[E-prime new ID]
+  end
+  E -->|replay changes| D2
+  E -->|then replay| E2
