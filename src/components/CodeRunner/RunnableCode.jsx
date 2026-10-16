@@ -28,9 +28,10 @@
  * (`document`/`window`).
  */
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 import CodeMirror from '@uiw/react-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
+import { parse as parseJavaScript } from 'acorn';
 import { oneDark } from '@codemirror/theme-one-dark';
 import { keymap } from '@codemirror/view';
 import { Prec } from '@codemirror/state';
@@ -39,9 +40,11 @@ import { c, cpp, java, kotlin } from '@codemirror/legacy-modes/mode/clike';
 import { python } from '@codemirror/legacy-modes/mode/python';
 import { linter, lintGutter, setDiagnostics } from '@codemirror/lint';
 import { compileTypeScript, formatDiagnostic, preloadTypeScript } from '../../utils/tsCompiler.js';
-import { DEFAULT_KOTLIN_TARGET, getKotlinVersion, highlightKotlin, runKotlin } from '../../utils/kotlinApi.js';
+import { DEFAULT_KOTLIN_TARGET, getKotlinVersions, highlightKotlin, runKotlin } from '../../utils/kotlinApi.js';
 import { DEFAULT_JAVA_API, JAVA_APIS, getJavaRuntimes, pickDefaultRuntime, runJava } from '../../utils/javaApi.js';
 import { getNativeRuntimes, isNativeLanguage, pickNativeRuntime, runNative } from '../../utils/judge0Api.js';
+import { formatSource, getSampleFormatRules } from '../../utils/codeFormatter.js';
+import { getLocalSyntaxDiagnostics } from '../../utils/localSyntaxDiagnostics.js';
 import './RunnableCode.css';
 
 /** File name shown in the header, used by Save and in error messages. */
@@ -206,6 +209,10 @@ const CopyIcon = () => (<svg {...iconProps}><rect x="9" y="9" width="11" height=
 const CheckIcon = () => (<svg {...iconProps}><path d="M20 6 9 17l-5-5" /></svg>);
 const SaveIcon = () => (<svg {...iconProps}><path d="M12 3v12" /><path d="m7 11 5 5 5-5" /><path d="M5 21h14" /></svg>);
 const ChevronIcon = () => (<svg {...iconProps} width="14" height="14"><path d="m6 9 6 6 6-6" /></svg>);
+const FormatIcon = () => (<svg {...iconProps}><path d="m15 4 5 5" /><path d="M4 20 14.5 9.5" /><path d="m13 6 5 5" /><path d="M7 3v4M5 5h4M19 15v4M17 17h4" /></svg>);
+const ResetIcon = () => (<svg {...iconProps}><path d="M3 11a9 9 0 1 1 2.6 6.4" /><path d="M3 4v7h7" /></svg>);
+const ClearIcon = () => (<svg {...iconProps}><path d="M4 7h16" /><path d="M10 11v6M14 11v6" /><path d="m5 7 1 14h12l1-14" /><path d="M9 7V4h6v3" /></svg>);
+const SampleIcon = () => (<svg {...iconProps}><path d="M4 4h16v16H4z" /><path d="M8 9h8M8 13h8M8 17h5" /></svg>);
 
 function formatMemory(bytes) {
   if (!bytes) return null;
@@ -268,6 +275,8 @@ export default function RunnableCode({
   variant = 'inline',
   fileName,
   targets = null,
+  versionSamples = null,
+  isActive = true,
 }) {
   const isTs = language === 'typescript';
   const isKotlin = language === 'kotlin';
@@ -279,9 +288,17 @@ export default function RunnableCode({
 
   const [code, setCode] = useState(initial);
   const [confType, setConfType] = useState(DEFAULT_KOTLIN_TARGET);
+  const [jsVersion, setJsVersion] = useState('es6');
+  const [tsTarget, setTsTarget] = useState('ES2020');
+  const [kotlinVersions, setKotlinVersions] = useState([]);
+  const [kotlinVersion, setKotlinVersion] = useState('');
+  const [indentWidth, setIndentWidth] = useState(2);
+  const [formatRules, setFormatRules] = useState(getSampleFormatRules);
+  const [formatMessage, setFormatMessage] = useState('');
   const [javaApi, setJavaApi] = useState(DEFAULT_JAVA_API);
   const [runtimes, setRuntimes] = useState([]);
   const [runtimeId, setRuntimeId] = useState('');
+  const [loadedRuntimeKey, setLoadedRuntimeKey] = useState('');
   const confTypeRef = useRef(confType);
   confTypeRef.current = confType;
   const [input, setInput] = useState(initialInput);
@@ -291,6 +308,7 @@ export default function RunnableCode({
   const [execution, setExecution] = useState({ key: 0, document: null });
   const [copied, setCopied] = useState({ code: false, output: false });
   const frameRef = useRef(null);
+  const formatRulesId = useId();
   const rootRef = useRef(null);
   const activeRunRef = useRef(0);
   const timeoutRef = useRef(null);
@@ -429,7 +447,7 @@ export default function RunnableCode({
       abortRef.current = controller;
       timeoutRef.current = setTimeout(() => controller.abort('timeout'), KOTLIN_TIMEOUT_MS);
       try {
-        const { lines, diagnostics } = await runKotlin(code, controller.signal, { args: inputRef.current.trim(), displayName, confType });
+        const { lines, diagnostics } = await runKotlin(code, controller.signal, { args: inputRef.current.trim(), displayName, confType, version: kotlinVersion });
         if (activeRunRef.current !== myRun) return;
         clearTimeout(timeoutRef.current);
         // Underline the same problems the compiler reported for this Run.
@@ -465,7 +483,7 @@ export default function RunnableCode({
       // Type-check first. Like tsc / the TS playgrounds, code that does not
       // compile is NOT executed - the compiler errors are the output.
       try {
-        const { diagnostics, js } = await compileTypeScript(code);
+        const { diagnostics, js } = await compileTypeScript(code, { target: tsTarget });
         if (activeRunRef.current !== myRun) return; // stopped or re-run meanwhile
         if (diagnostics.length > 0) {
           finishWithoutRun(diagnostics.map((d) => ({ type: 'error', text: formatDiagnostic(d, displayName) })));
@@ -485,11 +503,11 @@ export default function RunnableCode({
       setStats({ time: performance.now() - startedAtRef.current, memory: null });
       stopCode('timeout');
     }, TIMEOUT_MS);
-  }, [code, isTs, isKotlin, isJava, isNative, language, label, displayName, stopCode, confType, runtimeId, javaApi]);
+  }, [code, isTs, isKotlin, isJava, isNative, language, label, displayName, stopCode, confType, runtimeId, javaApi, tsTarget, kotlinVersion]);
 
   const resetCode = () => {
     stopCode('idle');
-    setCode(initial);
+    setCode(language === 'javascript' ? (versionSamples?.[jsVersion] || initial) : initial);
     setInput(initialInput);
     setLogs([]);
     setStats({ time: null, memory: null });
@@ -502,6 +520,13 @@ export default function RunnableCode({
     setStats({ time: null, memory: null });
   };
 
+  const clearOrSampleCode = () => {
+    stopCode('idle');
+    setCode(code ? '' : (language === 'javascript' ? (versionSamples?.[jsVersion] || initial) : initial));
+    setLogs([]);
+    setStats({ time: null, memory: null });
+  };
+
   const flashCopied = (key) => {
     setCopied((current) => ({ ...current, [key]: true }));
     setTimeout(() => setCopied((current) => ({ ...current, [key]: false })), 1500);
@@ -509,6 +534,22 @@ export default function RunnableCode({
 
   const copyCode = async () => { if (await copyToClipboard(code)) flashCopied('code'); };
   const copyOutput = async () => { if (await copyToClipboard(logs.map((entry) => entry.text).join('\n'))) flashCopied('output'); };
+
+  const formatCurrentCode = async () => {
+    try {
+      const formatted = await formatSource(language, code, { indentWidth, rulesText: formatRules });
+      setCode(formatted);
+      setFormatMessage(`${label} formatted with ${indentWidth}-space indentation.`);
+    } catch (error) {
+      setFormatMessage(`Format failed: ${error.message}`);
+    }
+  };
+
+  const changeJavaScriptVersion = (next) => {
+    const oldSample = versionSamples?.[jsVersion];
+    if (oldSample && (code === oldSample || code === initial)) setCode(versionSamples[next] || code);
+    setJsVersion(next);
+  };
 
   const extensions = useMemo(() => {
     const list = [
@@ -520,13 +561,37 @@ export default function RunnableCode({
       // Ctrl/Cmd + Enter runs the snippet from inside the editor.
       Prec.highest(keymap.of([{ key: 'Mod-Enter', run: () => { document.dispatchEvent(new CustomEvent('codetrove:run-focused')); return true; } }])),
     ];
-    if (isTs) {
+    if (isActive && language === 'javascript') {
+      list.push(
+        linter((view) => {
+          try {
+            parseJavaScript(view.state.doc.toString(), {
+              ecmaVersion: jsVersion === 'es5' ? 5 : 6,
+              sourceType: 'script',
+              allowReturnOutsideFunction: true,
+            });
+            return [];
+          } catch (error) {
+            const from = Math.min(error.pos ?? 0, view.state.doc.length);
+            return [{
+              from,
+              to: Math.min(from + 1, view.state.doc.length),
+              severity: 'error',
+              message: `${jsVersion === 'es5' ? 'ES5' : 'ES6'}: ${error.message}`,
+              source: 'Acorn',
+            }];
+          }
+        }, { delay: 350 }),
+        lintGutter()
+      );
+    }
+    if (isActive && isTs) {
       // Red squiggles + gutter markers from the real TypeScript compiler.
       list.push(
         linter(
           async (view) => {
             try {
-              const { diagnostics } = await compileTypeScript(view.state.doc.toString());
+              const { diagnostics } = await compileTypeScript(view.state.doc.toString(), { target: tsTarget });
               const docLength = view.state.doc.length;
               return diagnostics.map((d) => ({
                 from: Math.min(d.from, docLength),
@@ -544,13 +609,20 @@ export default function RunnableCode({
         lintGutter()
       );
     }
-    if (isJava || isNative) {
-      // javac errors are underlined after Run (setDiagnostics). Wandbox has no
-      // analysis-only endpoint and Run executes the program, so nothing is sent
-      // while typing; this linter just clears stale squiggles once you edit.
-      list.push(linter(() => [], { delay: 400 }), lintGutter());
+    if (isActive && (isJava || ['c', 'cpp', 'python'].includes(language))) {
+      // Tree-sitter parses locally in the browser: no source is sent to Judge0
+      // or Wandbox while typing. Run still performs full compiler/type checks.
+      list.push(
+        linter(async (view) => {
+          const source = view.state.doc.toString();
+          if (!source.trim() || source.length > 50000) return [];
+          try { return await getLocalSyntaxDiagnostics(language, source); }
+          catch { return []; }
+        }, { delay: 500 }),
+        lintGutter()
+      );
     }
-    if (isKotlin) {
+    if (isActive && isKotlin) {
       // Underline compiler errors/warnings as you type (service-side analysis).
       list.push(
         linter(
@@ -561,7 +633,7 @@ export default function RunnableCode({
             // Diagnostics for an unedited box appear when you press Run.
             if (source === initial || !source.trim() || source.length > 20000) return [];
             try {
-              const diagnostics = await highlightKotlin(source, undefined, confTypeRef.current);
+              const diagnostics = await highlightKotlin(source, undefined, confTypeRef.current, kotlinVersion);
               const docLength = view.state.doc.length;
               return diagnostics.map((d) => ({
                 from: Math.min(d.from, docLength),
@@ -580,11 +652,13 @@ export default function RunnableCode({
       );
     }
     return list;
-  }, [isTs, isKotlin, isJava, isNative, initial, language]);
+  }, [isActive, isTs, isKotlin, isJava, isNative, initial, language, jsVersion, tsTarget, kotlinVersion]);
 
   // Java/C/C++/Python: load runtime versions offered by the selected provider.
   useEffect(() => {
-    if (!isJava && !isNative) return undefined;
+    if (!isActive || (!isJava && !isNative)) return undefined;
+    const requestedRuntimeKey = `${language}:${javaApi}`;
+    if (loadedRuntimeKey === requestedRuntimeKey) return undefined;
     let cancelled = false;
     setRuntimes([]);
     setRuntimeId('');
@@ -593,14 +667,21 @@ export default function RunnableCode({
       if (cancelled) return;
       setRuntimes(list);
       setRuntimeId((current) => current || (isNative ? pickNativeRuntime(list) : pickDefaultRuntime(list)));
+      setLoadedRuntimeKey(requestedRuntimeKey);
     });
     return () => { cancelled = true; };
-  }, [isJava, isNative, javaApi, language]);
+  }, [isActive, isJava, isNative, javaApi, language, loadedRuntimeKey]);
 
   useEffect(() => {
+    if (!isActive) return;
     if (isTs) preloadTypeScript().catch(() => {});
-    if (isKotlin) getKotlinVersion();
-  }, [isTs, isKotlin]);
+    if (isKotlin && kotlinVersions.length === 0) {
+      getKotlinVersions().then((versions) => {
+        setKotlinVersions(versions);
+        setKotlinVersion((current) => current || versions[0] || '');
+      });
+    }
+  }, [isActive, isTs, isKotlin, kotlinVersions.length]);
 
   // Only the box that owns keyboard focus reacts to Ctrl/Cmd + Enter.
   useEffect(() => {
@@ -643,6 +724,25 @@ export default function RunnableCode({
           <span className="runnable-code__file-name">{displayName}</span>
         </span>
         <div className="runnable-code__actions">
+          {isPlayground && language === 'javascript' && (
+            <label className="runnable-code__target" title="Choose the ECMAScript syntax version and matching prototype/class sample.">
+              <span>Version</span>
+              <select value={jsVersion} onChange={(event) => changeJavaScriptVersion(event.target.value)} disabled={isRunning} aria-label="JavaScript language version">
+                <option value="es5">ES5 · Prototype</option>
+                <option value="es6">ES6 · Class</option>
+              </select>
+            </label>
+          )}
+          {isPlayground && isTs && (
+            <label className="runnable-code__target" title="JavaScript target used by TypeScript checking and transpilation.">
+              <span>Version</span>
+              <select value={tsTarget} onChange={(event) => setTsTarget(event.target.value)} disabled={isRunning} aria-label="TypeScript JavaScript target version">
+                <option value="ES5">ES5</option>
+                <option value="ES2015">ES2015</option>
+                <option value="ES2020">ES2020</option>
+              </select>
+            </label>
+          )}
           {isJava && (
             <label className="runnable-code__target" title="Java execution API. Wandbox is the default; Judge0 can be public or self-hosted.">
               <span>API</span>
@@ -653,7 +753,7 @@ export default function RunnableCode({
           )}
           {isJava && (
             <label className="runnable-code__target" title={`JDK used by ${JAVA_APIS[javaApi].label} (sent as the provider's runtime identifier)`}>
-              <span>Java</span>
+              <span>Version</span>
               <select value={runtimeId} onChange={(event) => setRuntimeId(event.target.value)} disabled={status === 'running' || runtimes.length === 0} aria-label="Java runtime version">
                 {runtimes.length === 0 && <option value="">Loading…</option>}
                 {runtimes.map((r) => <option key={r.id} value={r.id}>{r.label}</option>)}
@@ -662,7 +762,7 @@ export default function RunnableCode({
           )}
           {isNative && (
             <label className="runnable-code__target" title={`${label} runtime provided by Judge0 CE. The selected language ID is sent with the submission.`}>
-              <span>Runtime</span>
+              <span>Version</span>
               <select value={runtimeId} onChange={(event) => setRuntimeId(event.target.value)} disabled={status === 'running' || runtimes.length === 0} aria-label={`${label} runtime version`}>
                 {runtimes.length === 0 && <option value="">Loading…</option>}
                 {runtimes.map((runtime) => <option key={runtime.id} value={runtime.id}>{runtime.label}</option>)}
@@ -677,12 +777,22 @@ export default function RunnableCode({
               </select>
             </label>
           )}
+          {isPlayground && isKotlin && (
+            <label className="runnable-code__target" title="Compiler versions are discovered from the Kotlin Playground compiler service.">
+              <span>Version</span>
+              <select value={kotlinVersion} onChange={(event) => setKotlinVersion(event.target.value)} disabled={isRunning || kotlinVersions.length === 0} aria-label="Kotlin compiler version">
+                {kotlinVersions.length === 0 && <option value="">Loading…</option>}
+                {kotlinVersions.map((version) => <option key={version} value={version}>{version}</option>)}
+              </select>
+            </label>
+          )}
           <button type="button" className={`runnable-code__icon-button${copied.code ? ' is-copied' : ''}`} onClick={copyCode} title="Copy to clipboard" aria-label={copied.code ? "Copied to clipboard" : "Copy code"}>
             {copied.code ? <CheckIcon /> : <CopyIcon />}
           </button>
           <button type="button" className="runnable-code__icon-button" onClick={() => downloadTextFile(displayName, code)} title={`Save as ${displayName}`} aria-label={`Save as ${displayName}`}>
             <SaveIcon />
           </button>
+          {isPlayground && <button type="button" className="runnable-code__button" onClick={formatCurrentCode} title="Format code using the selected language and rules">Format</button>}
           <button type="button" className="runnable-code__button" onClick={resetCode} title="Restore the original example">Reset</button>
           {isPlayground && <button type="button" className="runnable-code__button" onClick={eraseCode} title="Clear the editor">Erase</button>}
           {isRunning && <button type="button" className="runnable-code__button runnable-code__button--stop" onClick={() => stopCode('idle')}>■ Stop</button>}
@@ -697,6 +807,38 @@ export default function RunnableCode({
           </button>
         </div>
       </div>
+
+      {isPlayground && (
+        <details className="runnable-code__format">
+          <summary><ChevronIcon /><span>Format rules</span><span className="runnable-code__format-summary">Language-aware, local formatting</span></summary>
+          <div className="runnable-code__format-body">
+            <div className="runnable-code__format-toolbar">
+              <label className="runnable-code__target" title="Indentation width used by the formatter.">
+                <span>Indent</span>
+                <select value={indentWidth} onChange={(event) => { setIndentWidth(Number(event.target.value)); setFormatMessage(''); }} aria-label="Indent width">
+                  {[2, 3, 4].map((width) => <option key={width} value={width}>{width} spaces</option>)}
+                </select>
+              </label>
+              <button type="button" className="runnable-code__button" onClick={formatCurrentCode} title="Format the editor using these rules">Format code</button>
+              <button type="button" className="runnable-code__button" onClick={() => { setFormatRules((current) => current.trim() ? '' : getSampleFormatRules()); setFormatMessage(''); }} title={formatRules.trim() ? 'Clear custom rules' : 'Restore the sample rules'}>
+                {formatRules.trim() ? 'Clear rules' : 'Sample rules'}
+              </button>
+            </div>
+            <label className="runnable-code__rules-label" htmlFor={`format-rules-${formatRulesId}`}>Format rules (JSON)</label>
+            <textarea
+              id={`format-rules-${formatRulesId}`}
+              className="runnable-code__rules-area"
+              value={formatRules}
+              onChange={(event) => { setFormatRules(event.target.value); setFormatMessage(''); }}
+              spellCheck={false}
+              rows={5}
+              placeholder="Enter formatter options as a JSON object."
+            />
+            <p className="runnable-code__format-hint">{language === 'kotlin' ? 'Kotlin formatting currently normalizes existing block indentation; it does not rewrite expressions or line breaks.' : <>Rules are applied locally. Common options: <code>singleQuote</code>, <code>semi</code>, <code>printWidth</code>, <code>clangStyle</code>, and <code>pythonQuoteStyle</code>.</>}</p>
+            {formatMessage && <p className={`runnable-code__format-message${formatMessage.startsWith('Format failed:') ? ' is-error' : ''}`} role="status">{formatMessage}</p>}
+          </div>
+        </details>
+      )}
 
       <details className="runnable-code__input" open={isPlayground && initialInput !== ''}>
         <summary>
@@ -718,6 +860,20 @@ export default function RunnableCode({
 
       <div className="runnable-code__body">
         <div className="runnable-code__editor">
+          {isPlayground && (
+            <div className="runnable-code__editor-head">
+              <span className="runnable-code__editor-title">Input</span>
+              <div className="runnable-code__editor-tools">
+                <button type="button" className="runnable-code__icon-button" onClick={clearOrSampleCode} title={code ? 'Clear code' : 'Load sample code'} aria-label={code ? 'Clear code' : 'Load sample code'}>
+                  {code ? <ClearIcon /> : <SampleIcon />}
+                </button>
+                <button type="button" className="runnable-code__icon-button" onClick={() => downloadTextFile(displayName, code)} title={`Download ${displayName}`} aria-label={`Download ${displayName}`}><SaveIcon /></button>
+                <button type="button" className={`runnable-code__icon-button${copied.code ? ' is-copied' : ''}`} onClick={copyCode} title="Copy input code" aria-label={copied.code ? 'Copied input code' : 'Copy input code'}>{copied.code ? <CheckIcon /> : <CopyIcon />}</button>
+                <button type="button" className="runnable-code__icon-button" onClick={formatCurrentCode} title="Format input code" aria-label="Format input code"><FormatIcon /></button>
+                <button type="button" className="runnable-code__icon-button" onClick={resetCode} title="Reset code to sample" aria-label="Reset code to sample"><ResetIcon /></button>
+              </div>
+            </div>
+          )}
           <CodeMirror
             value={code}
             extensions={extensions}

@@ -1,6 +1,7 @@
 node_modules
 dist
+public/web-tree-sitter.wasm
+public/code-parsers/
 .env
 .DS_Store
 server/serviceAccountKey.json
-

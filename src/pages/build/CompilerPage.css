@@ -24,3 +24,7 @@
 .cp-about p, .cp-about li { font-size: 0.9rem; line-height: 1.6; }
 .cp-about__code { white-space: pre-wrap; word-break: break-all; font-size: 0.78rem; }
 .cp-about kbd { padding: 0.05rem 0.35rem; border: 1px solid var(--color-border); border-radius: 4px; font-size: 0.78rem; }
+
+.cp-editor-references { margin: 1.25rem 0 0; }
+.cp-editor-references .cp-links { margin-top: 0.75rem; }
+.cp-editor-references .cp-link { display: inline-flex; align-items: center; }

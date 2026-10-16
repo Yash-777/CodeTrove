@@ -45,6 +45,39 @@ class SampleTest {
 const KOTLIN_SAMPLES = { java: KOTLIN_MAIN_SAMPLE, junit: KOTLIN_JUNIT_SAMPLE };
 const KOTLIN_TARGET_OPTIONS = KOTLIN_TARGETS.map((target) => ({ ...target, code: KOTLIN_SAMPLES[target.confType] || KOTLIN_MAIN_SAMPLE }));
 
+const JAVASCRIPT_SAMPLES = {
+  es5: `// ES5 style: constructor function and prototype
+function Person(name, age) {
+    this.name = name;
+    this.age = age;
+}
+
+Person.prototype.greet = function () {
+    console.log('Hello, ' + this.name + '!');
+    console.log('In 5 years you will be ' + (this.age + 5) + '.');
+};
+
+var person = new Person(readLine() || 'World', Number(readLine() || 0));
+person.greet();
+`,
+  es6: `// ES6 style: class syntax
+class Person {
+    constructor(name, age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    greet() {
+        console.log('Hello, ' + this.name + '!');
+        console.log('In 5 years you will be ' + (this.age + 5) + '.');
+    }
+}
+
+const person = new Person(readLine() || 'World', Number(readLine() || 0));
+person.greet();
+`,
+};
+
 const LANGUAGES = [
   {
     key: 'javascript',
@@ -53,13 +86,7 @@ const LANGUAGES = [
     learnTo: '/content/tree/languages/javascript',
     docsUrl: 'https://developer.mozilla.org/en-US/docs/Web/JavaScript',
     input: 'Alice\n30',
-    code: `// Read input with readLine() - one value per line (see STDIN above)
-const name = readLine() ?? 'World';
-const age = Number(readLine() ?? 0);
-
-console.log(\`Hello, \${name}!\`);
-console.log(\`In 5 years you will be \${age + 5}.\`);
-`,
+    code: JAVASCRIPT_SAMPLES.es6,
   },
   {
     key: 'typescript',
@@ -383,6 +410,8 @@ export default function CompilerPage() {
             initial={item.code}
             initialInput={item.input}
             targets={item.targets}
+            versionSamples={item.key === 'javascript' ? JAVASCRIPT_SAMPLES : null}
+            isActive={item.key === active.key}
           />
         </div>
       ))}
@@ -392,10 +421,22 @@ export default function CompilerPage() {
       {NATIVE_ABOUT[active.key] && <NativeAbout language={active.key} />}
 
       <p className="cp-note">
-        JavaScript and TypeScript run in your browser (isolated, 10&nbsp;s limit, no DOM). Kotlin is compiled by
-        JetBrains&apos; public service (api.kotlinlang.org), Java by the selected Wandbox or Judge0 service, and C,
-        C++ and Python by Judge0, so those snippets are sent to external services.
+        JavaScript and TypeScript run in an isolated browser worker (10&nbsp;s limit, no DOM). JavaScript, TypeScript,
+        Java, C, C++ and Python syntax checks run locally in the browser; formatting also runs locally with Prettier,
+        clang-format WASM or Ruff WASM. Kotlin diagnostics and execution use JetBrains&apos; public service, and Run
+        sends Java to Wandbox/Judge0 and C, C++ or Python to Judge0. Kotlin&apos;s built-in Format action currently
+        normalizes indentation only; use a full Kotlin editor/formatter for project-wide ktfmt formatting.
       </p>
+
+      <section className="cp-about cp-editor-references" aria-labelledby="cp-editor-references-title">
+        <h2 id="cp-editor-references-title">More editors and references</h2>
+        <p>Use these free web tools when you need a full editor, language extensions, or a development environment beyond this browser playground.</p>
+        <div className="cp-links">
+          <a className="cp-link" href="https://vscode.dev/" target="_blank" rel="noreferrer">Open VS Code for the Web</a>
+          <a className="cp-link" href="https://code.visualstudio.com/docs/remote/vscode-web" target="_blank" rel="noreferrer">VS Code Web documentation</a>
+          <a className="cp-link" href="https://prettier.io/docs/browser" target="_blank" rel="noreferrer">Prettier browser API</a>
+        </div>
+      </section>
     </div>
   );
 }

@@ -36,28 +36,34 @@ export const KOTLIN_TARGETS = [
 ];
 export const DEFAULT_KOTLIN_TARGET = 'java';
 
-let versionPromise = null;
+let versionsPromise = null;
 
-/** Latest stable Kotlin compiler version offered by the service. */
-export function getKotlinVersion() {
-  if (!versionPromise) {
-    versionPromise = fetch(`${KOTLIN_SERVER}/versions`)
+/** Stable and supported compiler versions offered by the service. */
+export function getKotlinVersions() {
+  if (!versionsPromise) {
+    versionsPromise = fetch(`${KOTLIN_SERVER}/versions`)
       .then((response) => response.json())
       .then((list) => {
-        const stable = list.find((item) => item.latestStable)
-          || [...list].reverse().find((item) => !item.obsolete);
-        return stable?.version || FALLBACK_VERSION;
+        const active = list.filter((item) => !item.obsolete && item.version);
+        active.sort((a, b) => String(b.version).localeCompare(String(a.version), undefined, { numeric: true }));
+        const stable = active.find((item) => item.latestStable);
+        return [...new Set([stable?.version, ...active.map((item) => item.version)].filter(Boolean))];
       })
       .catch(() => {
-        versionPromise = null; // retry next time (offline, blocked, ...)
-        return FALLBACK_VERSION;
+        versionsPromise = null; // retry next time (offline, blocked, ...)
+        return [FALLBACK_VERSION];
       });
   }
-  return versionPromise;
+  return versionsPromise;
 }
 
-async function post(path, code, signal, args = '', confType = DEFAULT_KOTLIN_TARGET) {
-  const version = await getKotlinVersion();
+/** Latest stable Kotlin compiler version offered by the service. */
+export async function getKotlinVersion() {
+  return (await getKotlinVersions())[0] || FALLBACK_VERSION;
+}
+
+async function post(path, code, signal, args = '', confType = DEFAULT_KOTLIN_TARGET, selectedVersion = '') {
+  const version = selectedVersion || await getKotlinVersion();
   const response = await fetch(`${KOTLIN_SERVER}/api/${version}/compiler/${path}`, {
     method: 'POST',
     signal,
@@ -112,8 +118,8 @@ function normalizeDiagnostics(raw, code) {
 }
 
 /** Diagnostics for the editor squiggles (no execution). */
-export async function highlightKotlin(code, signal, confType = DEFAULT_KOTLIN_TARGET) {
-  const data = await post('highlight', code, signal, '', confType);
+export async function highlightKotlin(code, signal, confType = DEFAULT_KOTLIN_TARGET, version = '') {
+  const data = await post('highlight', code, signal, '', confType, version);
   return normalizeDiagnostics(data?.[FILE_NAME], code);
 }
 
@@ -185,8 +191,8 @@ function formatTestResults(testResults) {
  * followed by the program output. `diagnostics` (with editor offsets) lets the
  * editor underline the same problems.
  */
-export async function runKotlin(code, signal, { args = '', displayName = FILE_NAME, confType = DEFAULT_KOTLIN_TARGET } = {}) {
-  const data = await post('run', code, signal, args, confType);
+export async function runKotlin(code, signal, { args = '', displayName = FILE_NAME, confType = DEFAULT_KOTLIN_TARGET, version = '' } = {}) {
+  const data = await post('run', code, signal, args, confType, version);
   // The service always sees "File.kt"; show the name of the file in the editor.
   const rename = (text) => String(text).replace(/FileKt/g, displayName.replace(/\.kt$/, 'Kt')).replace(/File\.kt/g, displayName);
   const all = Object.values(data?.errors || {}).flatMap((list) => normalizeDiagnostics(list, code));

@@ -52,6 +52,7 @@ const NETWORKING_DIAGRAMS = {
   'dns-tls-http': 'dns-tls-http.png',
   'smtp-flow': 'smtp-flow.png',
 };
+
 const GIT_DIAGRAMS = {
   overview: 'overview.png',
   'local-remote': 'local-remote.png',
