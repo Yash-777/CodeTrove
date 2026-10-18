@@ -11,10 +11,13 @@ const humanize = (value) => value.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.t
 
 const tree = [
   {
-    key: 'languages', label: 'Programming Languages', children: [
+    key: 'languages', label: 'Programming Languages', contentKey: 'languages', children: [
       { key: 'java', label: 'Java', data: 'content.md', children: [
         { key: 'core', label: 'Core', children: [
-          { key: 'oop', label: 'Object-Oriented Programming', data: 'content.md', pages: { 'interface': 'Interfaces', 'class': 'Classes', 'object': 'Objects', 'encapsulation': 'Encapsulation (Data Hiding)', 'inheritance': 'Inheritance (Code Reuse)', 'abstraction': 'Abstraction (Hiding Complexity)', 'polymorphism': 'Polymorphism (Many Forms)' } },
+          { key: 'oop', label: 'Object-Oriented Programming', data: 'content.md', children: [
+            { key: 'class-object', label: 'Class & Object', contentKey: 'languages/java/core/oop/class-object' },
+            { key: 'interface-abstract-class', label: 'Interface & Abstract Class', contentKey: 'languages/java/core/oop/interface-abstract-class' },
+          ], pages: { 'encapsulation': 'Encapsulation (Data Hiding)', 'inheritance': 'Inheritance (Code Reuse)', 'abstraction': 'Abstraction (Hiding Complexity)', 'polymorphism': 'Polymorphism (Many Forms)' } },
           { key: 'language-basics', label: 'Language Basics', pages: {'generics': 'Generics', 'collections': 'Collections', 'exceptions': 'Exceptions', 'optional': {label: 'Optional', contentKey: 'java/optional'}, 'records': {label: 'Records', contentKey: 'java/records'}, 'streams': {label: 'Streams', contentKey: 'java/streams'}} },
           { key: 'concurrency', label: 'Concurrency', pages: {'threads': 'Threads', 'executors': 'Executors', 'completable-future': 'Completable Future', 'synchronization': 'Synchronization', 'locks': 'Locks'} },
           { key: 'jvm', label: 'JVM', pages: {'jvm-memory': 'Jvm Memory', 'garbage-collection': 'Garbage Collection', 'class-loading': 'Class Loading', 'jvm-tuning': 'Jvm Tuning'} },

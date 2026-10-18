@@ -1,114 +1,58 @@
-#### Object-Oriented Programming <sup>[oracle.com](https://www.oracle.com/java/technologies/oop.html)</sup>
+# Object-Oriented Programming in Java
 
-Object-oriented programming is a method of programming based on a hierarchy of classes, and well-defined and cooperating objects.
+Object-oriented programming organizes software around objects that combine state and behavior. In Java, a class defines a type, an object is an instance, and methods express behavior. The dedicated [Class & Object lesson](/content/tree/languages/java/core/oop/class-object) and [Interface & Abstract Class lesson](/content/tree/languages/java/core/oop/interface-abstract-class) cover those building blocks in detail. This page focuses on the design principles that use them.
 
+## The remaining core principles
 
-🧱 The Foundation: Classes and Objects
-
-Before diving into the pillars of OOP, you must understand the two core components:
-• Class: A blueprint or template used to create objects. It defines the structure (fields/attributes) and behavior (methods).
-• Object: An instance of a class. It represents a real-world entity with a specific state and behavior.
+- **Encapsulation:** protect state behind a small, valid public API. Keep fields private and let methods enforce rules such as “balance cannot become negative.”
+- **Inheritance:** use `extends` when a subtype truly satisfies the parent type's contract. Java allows one direct superclass.
+- **Polymorphism:** write code against a parent type or interface and let the runtime select the appropriate override.
 
 ```java
-// The Blueprint (Class)
-class Car {
-    String model; // Attribute
-    
-    void drive() { // Method
-        System.out.println("The " + model + " is moving.");
-    }
+interface Notifier {
+    void send(String message);
 }
 
-// The Real-World Instance (Object)
-public class Main {
-    public static void main(String[] args) {
-        Car myCar = new Car(); // Creating an object
-        myCar.model = "Tesla";
-        myCar.drive(); // Outputs: The Tesla is moving.
-    }
-}
-```
-
-
-🏛️ The 4 Main Pillars of OOP
-
-Java's entire OOP ecosystem relies on four fundamental concepts:
-
-1. Encapsulation (Data Hiding)
-
-Encapsulation bundles variables (data) and methods (behavior) into a single unit (a class) and restricts direct access from outside. You achieve this by declaring attributes as private and exposing access through public getters and setters.
-• Goal: Keeps data safe from unauthorized modification.
-• Example: You cannot change your bank balance directly; you must use a deposit() or withdraw() method.
-```java
-class BankAccount {
-    private double balance; // Private variable hidden from external access
-
-    public double getBalance() { // Getter
-        return balance;
-    }
-
-    public void deposit(double amount) { // Setter with validation logic
-        if (amount > 0) {
-            balance += amount;
-        }
-    }
-}
-```
-
-2. Inheritance (Code Reuse)
-
-Inheritance allows a new class (subclass/child) to acquire the properties and methods of an existing class (superclass/parent) using the extends keyword.
-• Goal: Prevents code duplication ("Don't Repeat Yourself" or DRY).
-• Relationship: Establishes an "is-a" relationship (e.g., a Dog is a type of Animal).
-```java
-class Animal {
-    void eat() {
-        System.out.println("Eating...");
-    }
-}
-
-class Dog extends Animal { // Dog inherits eat() from Animal
-    void bark() {
-        System.out.println("Barking...");
-    }
-}
-```
-
-3. Polymorphism (Many Forms)
-
-Polymorphism allows objects to take on multiple forms. It occurs when classes are related to each other via inheritance. Java supports two types:
-• Compile-time (Method Overloading): Multiple methods in the same class share the same name but have different parameters.
-• Runtime (Method Overriding): A subclass provides a specific implementation of a method that is already defined in its parent class.
-```java
-class Sound {
-    // Overloading: Same name, different parameters
-    void makeNoise() { System.out.println("Generic sound"); }
-    void makeNoise(String tone) { System.out.println("Sound in " + tone); }
-}
-
-class Cat extends Animal {
-    // Overriding: Changing parent behavior
+final class EmailNotifier implements Notifier {
     @Override
-    void eat() {
-        System.out.println("Cat eats fish.");
+    public void send(String message) {
+        System.out.println("Email: " + message);
+    }
+}
+
+final class AlertService {
+    private final Notifier notifier;
+
+    AlertService(Notifier notifier) {
+        this.notifier = notifier;
+    }
+
+    void alert(String message) {
+        notifier.send(message); // polymorphic call
     }
 }
 ```
 
-4. Abstraction (Hiding Complexity)
+`AlertService` is coupled to the `Notifier` contract, not to `EmailNotifier`. A different implementation can be supplied without changing the service. This also makes testing easier because a test double can implement the same interface.
 
-Abstraction hides complex internal implementation details and only shows essential features to the user. In Java, abstraction is achieved using abstract classes and interfaces.
-• Goal: Reduces complexity by focusing on what the object does rather than how it does it.
-• Example: When you drive a car, you push the gas pedal to accelerate. You do not need to know how the engine manages fuel injection under the hood.
-```java
-// Interface defining a contract without full implementations
-interface Vehicle {
-    void startEngine(); 
-}
+## Prefer composition when it communicates ownership better
 
-class CarImpl implements Vehicle {
-    public void startEngine() {
-        System.out.println("Engine started via combustion.");
-    }
-}
-```
+Inheritance reuses a type relationship, but it also couples the child to assumptions in the parent. Composition stores collaborators as fields and delegates work to them. Prefer composition when the relationship is “uses a” rather than “is a,” or when the lifecycle and behavior should remain independent.
+
+## Questions to ask during design
+
+1. Which state must remain valid at all times?
+2. Which operations are part of the public contract?
+3. Is the relationship genuinely an `is-a` relationship, or would a field be clearer?
+4. Can the caller depend on an interface rather than a concrete class?
+5. Would a value object or record express the data more clearly than a mutable entity?
+
+## Related lessons
+
+- [Class & Object](/content/tree/languages/java/core/oop/class-object)
+- [Interface & Abstract Class](/content/tree/languages/java/core/oop/interface-abstract-class)
+- [Encapsulation](/content/tree/languages/java/core/oop/encapsulation)
+- [Inheritance](/content/tree/languages/java/core/oop/inheritance)
+- [Polymorphism](/content/tree/languages/java/core/oop/polymorphism)
+
+References: [dev.java Object-Oriented Programming](https://dev.java/learn/oop/) and [Oracle Object-Oriented Programming Concepts](https://docs.oracle.com/javase/tutorial/java/concepts/index.html).
