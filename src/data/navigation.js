@@ -60,7 +60,16 @@ const tree = [
         { key: 'html', label: 'HTML', pages: {'semantic-html': 'Semantic Html', 'forms': 'Forms', 'accessibility': 'Accessibility'} },
         { key: 'css', label: 'CSS', pages: {'layout': 'Layout', 'flexbox': 'Flexbox', 'grid': 'Grid', 'responsive-design': 'Responsive Design'} },
       ]},
-      { key: 'nodejs', label: 'Node.js', pages: {'modules': 'Modules', 'event-loop': 'Event Loop', 'express': 'Express', 'streams': 'Streams', 'security': 'Security'} },
+      { key: 'nodejs', label: 'Node.js', contentKey: 'languages/nodejs', pages: {
+        'installation-and-versions': 'Installation and Version Management',
+        'npm-and-package-json': 'npm and package.json',
+        'modules': 'Modules: CommonJS and ES Modules',
+        'event-loop': 'Event Loop and Asynchronous Work',
+        'streams': 'Streams and Backpressure',
+        'express': 'Express HTTP Services',
+        'security': 'Security Basics',
+        'windows-cli-troubleshooting': 'Windows PATH and CLI Troubleshooting',
+      } },
     ],
   },
   {
