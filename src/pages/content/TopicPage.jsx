@@ -14,11 +14,30 @@ import { useParams, Link } from 'react-router-dom';
 import { getTopic, getCategory } from '../../data/topics/index.js';
 import { getDocumentationRoute } from '../../data/topics/navigation.js';
 import { getTopicContent } from '../../data/topics/contentLoader.js';
+import { getNavigationNode } from '../../data/navigation.js';
 import { addRecentTopic } from '../../utils/recentTopics.js';
 import { paths } from '../../routes/routes.config.js';
 import { useAuth } from '../../context/AuthContext.jsx';
 import MarkdownContent from '../../components/MarkdownContent.jsx';
+import ContentBreadcrumbs from '../../components/ContentBreadcrumbs.jsx';
 import './ContentPages.css';
+
+function findNavigationDescendant(parent, label) {
+  if (!parent || !label) return undefined;
+  const normalize = (value) => value.replace(/\s*\([^)]*\)/g, '').toLowerCase().replace(/[^a-z0-9]/g, '');
+  const target = normalize(label);
+
+  function search(nodes) {
+    for (const node of nodes) {
+      if (normalize(node.label) === target) return node;
+      const match = search(node.children || []);
+      if (match) return match;
+    }
+    return undefined;
+  }
+
+  return search(parent.children || []);
+}
 
 export default function TopicPage() {
   const { categoryKey, topicSlug, sectionKey, subtopicSlug, pageSlug } = useParams();
@@ -74,21 +93,42 @@ export default function TopicPage() {
   const title = page?.title || subtopic?.title || documentationTopic?.title || legacyTopic.title;
   const tags = page?.keywords || documentationTopic?.keywords || legacyTopic.tags || [];
   const isLocked = legacyTopic?.restricted && !user;
+  const documentationSection = nestedRoute ? getNavigationNode(nestedRoute.sectionKey) : undefined;
+  const documentationTopicNode = nestedRoute
+    ? getNavigationNode(`${nestedRoute.sectionKey}/${documentationTopic.key}`)
+    : undefined;
+  const documentationSubtopicNode = subtopic
+    ? findNavigationDescendant(documentationTopicNode, subtopic.title)
+    : undefined;
+  const breadcrumbItems = nestedRoute
+    ? [
+        ...(documentationSection ? [{
+          label: documentationSection.label,
+          to: paths.navigationTree(documentationSection.path),
+          path: documentationSection.path,
+        }] : [{ label: nestedRoute.sectionKey }]),
+        ...(documentationTopicNode ? [{
+          label: documentationTopic.title,
+          to: paths.navigationTree(documentationTopicNode.path),
+          path: documentationTopicNode.path,
+        }] : [{ label: documentationTopic.title }]),
+        ...(subtopic ? [{
+          label: subtopic.title,
+          to: documentationSubtopicNode
+            ? paths.navigationTree(documentationSubtopicNode.path)
+            : paths.documentationSubtopic(nestedRoute.sectionKey, documentationTopic.key, subtopic.key),
+          path: documentationSubtopicNode?.path
+            || `${nestedRoute.sectionKey}/${documentationTopic.key}/${subtopic.key}`,
+        }] : []),
+      ]
+    : [
+        { label: 'Learn', to: paths.home(), path: 'learn' },
+        { label: legacyCategory?.label || categoryKey, to: paths.category(categoryKey), path: categoryKey },
+      ];
 
   return (
     <article className="content-page">
-      <p className="content-page__breadcrumb">
-        {nestedRoute ? (
-          <>
-            <Link to={paths.documentationTopic(nestedRoute.sectionKey, documentationTopic.key)}>
-              {documentationTopic.title}
-            </Link>
-            {subtopic && <> / {subtopic.title}</>}
-          </>
-        ) : (
-          <Link to={paths.category(categoryKey)}>{legacyCategory?.label || categoryKey}</Link>
-        )}
-      </p>
+      <ContentBreadcrumbs items={breadcrumbItems} />
 
       <h1>{title}</h1>
 

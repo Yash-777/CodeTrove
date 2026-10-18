@@ -9,9 +9,39 @@
 .content-page__breadcrumb {
   margin: 0 0 0.5rem;
   font-size: 0.85rem;
+  color: var(--color-muted);
+}
+
+.content-page__breadcrumb-list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.content-page__breadcrumb-list li + li::before {
+  content: "/";
+  display: inline-block;
+  padding: 0 0.45rem;
+  color: var(--color-muted);
 }
 
 .content-page__breadcrumb a {
+  color: var(--color-accent);
+  text-decoration: none;
+}
+
+.content-page__breadcrumb a:hover,
+.content-page__breadcrumb a:focus-visible {
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.content-page__breadcrumb [aria-current="page"] {
+  color: var(--color-text);
+  font-weight: 600;
 }
 
 .content-page__grid {
