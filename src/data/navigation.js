@@ -86,7 +86,7 @@ const tree = [
         { key: 'exceptions-resources', label: 'Exceptions & Resource Safety', contentKey: 'interview-prep/java/exceptions-resources' },
         { key: 'j2ee-web', label: 'J2EE Web Container', contentKey: 'interview-prep/java/j2ee-web' },
       ]},
-      { key: 'sql', label: 'SQL', pages: {'sql-interview-questions': 'Sql Interview Questions', 'joins-and-indexes': 'Joins And Indexes', 'transactions-and-locking': 'Transactions And Locking', 'query-tuning': 'Query Tuning'} },
+      { key: 'sql', label: 'SQL – NoSQL', contentKey: 'interview-prep/sql', pages: {'sql-interview-questions': 'Sql Interview Questions', 'joins-and-indexes': 'Joins And Indexes', 'transactions-and-locking': 'Transactions And Locking', 'query-tuning': 'Query Tuning'} },
       { key: 'microservices', label: 'Microservices', children: [
         { key: 'project-flow', label: 'Project Flow & Architecture', pages: {'microservice-project-flow-architecture': 'Microservice Project Flow Architecture', 'microservice-architecture-deep-dive': {label: 'Microservice Architecture Deep Dive', contentKey: 'interview-prep/microservices/project-flow/microservice-architecture-deep-dive'}}, children: [
           { key: 'api-gateway-idempotency', label: 'API Gateway & Idempotency', pages: {'api-gateway-idempotency': 'Api Gateway Idempotency'} },
