@@ -209,7 +209,27 @@ const tree = [
   },
   {
     key: 'databases', label: 'Databases & Storage', children: [
-      { key: 'sql', label: 'SQL', pages: {'relational-model': 'Relational Model', 'normalization': 'Normalization', 'indexes': 'Indexes', 'sql-data-pages': 'Sql Data Pages', 'joins': 'Joins', 'transactions': 'Transactions', 'deadlocks': 'Deadlocks'} },
+      {
+        key: 'sql',
+        label: 'SQL',
+        contentKey: 'databases/sql',
+        pages: {
+          'indexes': 'Index Fundamentals and Query Plans',
+          'index-structures': 'B-tree Pages and Clustered / Nonclustered Indexes',
+          'composite-indexes': 'Composite Indexes and Leftmost Prefix',
+          'sql-data-pages': 'Database Data Pages and B-tree Storage',
+          'schema-and-collation': 'Inspect Schema, Character Sets and Collations',
+          'row-size-estimation': 'Estimate Field and Row Sizes',
+          'index-analysis': 'Inspect Duplicate and Redundant Indexes',
+          'index-design-maintenance': 'Design, Monitor and Maintain Indexes',
+          'bulk-inserts': 'Batch-load Data and Diagnose Long Inserts',
+          'relational-model': 'Relational Model',
+          'normalization': 'Normalization',
+          'joins': 'Joins',
+          'transactions': 'Transactions',
+          'deadlocks': 'Deadlocks',
+        },
+      },
       { key: 'nosql', label: 'NoSQL', pages: {'sql-vs-nosql': 'Sql Vs Nosql', 'document-databases': 'Document Databases', 'key-value': 'Key Value', 'eventual-consistency': 'Eventual Consistency'} },
       { key: 'caching', label: 'Caching', pages: {'cache-aside': 'Cache Aside', 'redis': 'Redis', 'hazelcast': 'Hazelcast', 'cache-invalidation': 'Cache Invalidation'} },
       { key: 'file-storage', label: 'File Storage', pages: {'s3': 'S3', 'firestore-storage': 'Firestore Storage', 'object-storage-patterns': 'Object Storage Patterns'} },

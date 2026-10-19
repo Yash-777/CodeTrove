@@ -8,12 +8,12 @@ import './ContentPages.css';
 
 export default function NavigationPage() {
   const params = useParams();
-  const pagePath = params['*'] || [
+  const pagePath = (params['*'] || [
     params.treeSection,
     params.treeTopic,
     params.treeSubtopic,
     params.treePage,
-  ].filter(Boolean).join('/');
+  ].filter(Boolean).join('/')).replace(/^\/+|\/+$/g, '');
   const page = getNavigationPage(pagePath);
   const node = !page ? getNavigationNode(pagePath) : undefined;
 

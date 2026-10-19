@@ -19,6 +19,7 @@
 
 import { Link, useSearchParams } from 'react-router-dom';
 import RunnableCode from '../../components/CodeRunner/RunnableCode.jsx';
+import SqlPlayground from '../../components/CodeRunner/SqlPlayground.jsx';
 import { KOTLIN_TARGETS } from '../../utils/kotlinApi.js';
 import './CompilerPage.css';
 
@@ -209,6 +210,14 @@ public class Main {
 }
 `,
   },
+  {
+    key: 'sql',
+    param: 'sql',
+    label: 'SQL',
+    learnTo: '/content/tree/databases/sql',
+    docsUrl: 'https://www.sqlite.org/lang.html',
+    code: '',
+  },
 ];
 
 function pickLanguage(value) {
@@ -370,6 +379,35 @@ function NativeAbout({ language }) {
   );
 }
 
+function SqlAbout() {
+  return (
+    <section className="cp-about" aria-labelledby="cp-about-sql">
+      <h2 id="cp-about-sql">About the SQL playground</h2>
+      <p>
+        This tab runs SQLite through the open-source SQL.js WebAssembly engine in a dedicated browser worker.
+        Your statements execute locally; CodeTrove does not send them to a remote database service. The database
+        is temporary and held in memory, so reloading this page or resetting the runtime clears its tables and rows.
+      </p>
+      <p>
+        The editor uses the SQLite dialect. It is useful for practicing common SQL statements, creating tables and
+        indexes, inspecting query plans, and trying joins or aggregates. It is not a MySQL, MariaDB or SQL Server
+        instance: commands such as <code>SHOW INDEX</code>, MySQL <code>INFORMATION_SCHEMA</code> queries, server-side
+        stored procedures, InnoDB table options and MySQL&apos;s <code>EXPLAIN ANALYZE</code> are not supported here.
+      </p>
+      <p>
+        Results are limited to the first 200 rows per result set. A query is stopped after 10 seconds; if that limit
+        is reached, the isolated worker restarts and its in-memory database is cleared.
+      </p>
+      <h3>Open-source components and documentation</h3>
+      <ul>
+        <li><a href="https://github.com/sql-js/sql.js" target="_blank" rel="noreferrer">SQL.js</a> is MIT-licensed SQLite compiled to WebAssembly for browser use.</li>
+        <li><a href="https://github.com/codemirror/lang-sql" target="_blank" rel="noreferrer">CodeMirror SQL language support</a> is MIT-licensed and provides SQL dialect highlighting and completion.</li>
+        <li><a href="https://www.sqlite.org/lang.html" target="_blank" rel="noreferrer">SQLite SQL language reference</a> documents the dialect executed by this playground.</li>
+      </ul>
+    </section>
+  );
+}
+
 export default function CompilerPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const active = pickLanguage(searchParams.get('lang'));
@@ -404,31 +442,36 @@ export default function CompilerPage() {
 
       {LANGUAGES.map((item) => (
         <div key={item.key} hidden={item.key !== active.key} role="tabpanel" aria-label={`${item.label} editor`}>
-          <RunnableCode
-            variant="playground"
-            language={item.key}
-            initial={item.code}
-            initialInput={item.input}
-            targets={item.targets}
-            versionSamples={item.key === 'javascript' ? JAVASCRIPT_SAMPLES : null}
-            isActive={item.key === active.key}
-          />
+          {item.key === 'sql' ? (
+            <SqlPlayground isActive={item.key === active.key} />
+          ) : (
+            <RunnableCode
+              variant="playground"
+              language={item.key}
+              initial={item.code}
+              initialInput={item.input}
+              targets={item.targets}
+              versionSamples={item.key === 'javascript' ? JAVASCRIPT_SAMPLES : null}
+              isActive={item.key === active.key}
+            />
+          )}
         </div>
       ))}
 
       {active.key === 'kotlin' && <KotlinAbout />}
       {active.key === 'java' && <JavaAbout />}
       {NATIVE_ABOUT[active.key] && <NativeAbout language={active.key} />}
+      {active.key === 'sql' && <SqlAbout />}
 
-      <p className="cp-note">
+      {active.key !== 'sql' && <p className="cp-note">
         JavaScript and TypeScript run in an isolated browser worker (10&nbsp;s limit, no DOM). JavaScript, TypeScript,
         Java, C, C++ and Python syntax checks run locally in the browser; formatting also runs locally with Prettier,
         clang-format WASM or Ruff WASM. Kotlin diagnostics and execution use JetBrains&apos; public service, and Run
         sends Java to Wandbox/Judge0 and C, C++ or Python to Judge0. Kotlin&apos;s built-in Format action currently
         normalizes indentation only; use a full Kotlin editor/formatter for project-wide ktfmt formatting.
-      </p>
+      </p>}
 
-      <section className="cp-about cp-editor-references" aria-labelledby="cp-editor-references-title">
+      {active.key !== 'sql' && <section className="cp-about cp-editor-references" aria-labelledby="cp-editor-references-title">
         <h2 id="cp-editor-references-title">More editors and references</h2>
         <p>Use these free web tools when you need a full editor, language extensions, or a development environment beyond this browser playground.</p>
         <div className="cp-links">
@@ -436,7 +479,7 @@ export default function CompilerPage() {
           <a className="cp-link" href="https://code.visualstudio.com/docs/remote/vscode-web" target="_blank" rel="noreferrer">VS Code Web documentation</a>
           <a className="cp-link" href="https://prettier.io/docs/browser" target="_blank" rel="noreferrer">Prettier browser API</a>
         </div>
-      </section>
+      </section>}
     </div>
   );
 }
