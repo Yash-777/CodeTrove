@@ -6,6 +6,17 @@ Git lets developers record project history, work on isolated branches, and excha
 
 Open **Git & Collaboration → Git** in the Learn navigation for the full expandable lesson tree. It begins with repository setup, staging, commits, `HEAD`, branch names, and commit IDs. Later groups explain branch integration, remote collaboration, stash, patches, undo, conflicts, and debugging.
 
+The most commonly used legacy Git lessons are now direct pages under this section:
+
+- [Common Git Commands](/content/tree/git-collaboration/common-commands)
+- [Undo Git Changes](/content/tree/git-collaboration/undo-things)
+- [Branching Strategy](/content/tree/git-collaboration/branching-strategy)
+
+SourceTree and the GitHub Secrets service-account guide remain separate sessions under **Git & Collaboration → Git**, so they can be opened independently:
+
+- [SourceTree](/content/tree/git-collaboration/git/sourcetree)
+- [Service Account from GitHub Secrets](/content/tree/git-collaboration/git/service-account-from-github-secrets)
+
 ![Git records local snapshots and communicates with hosted repositories only during remote operations.](git-diagram:overview)
 
 | Work on your computer | Communicate with the host |

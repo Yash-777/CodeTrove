@@ -259,7 +259,11 @@ const tree = [
     ],
   },
   {
-    key: 'git-collaboration', label: 'Git & Collaboration', children: [
+    key: 'git-collaboration', label: 'Git & Collaboration', pages: {
+      'common-commands': { label: 'Common Git Commands', contentKey: 'git-collaboration/common-commands' },
+      'undo-things': { label: 'Undo Git Changes', contentKey: 'git-collaboration/undo-things' },
+      'branching-strategy': { label: 'Branching Strategy', contentKey: 'git-collaboration/branching-strategy' },
+    }, children: [
       { key: 'git', label: 'Git', children: [
         { key: 'foundations', label: 'Foundations', pages: {
           'init-clone': 'Create or Clone a Repository',
@@ -288,6 +292,8 @@ const tree = [
         'cherry-pick': { label: 'Cherry-pick', contentKey: 'git-collaboration/git/branching/cherry-pick' },
         'reset-revert': { label: 'Reset and Revert', contentKey: 'git-collaboration/git/recovery/undo-reset-revert' },
         'bisect': { label: 'Bisect and Conflict Recovery', contentKey: 'git-collaboration/git/recovery/debugging' },
+        'sourcetree': { label: 'SourceTree', contentKey: 'git-collaboration/git/sourcetree' },
+        'service-account-from-github-secrets': { label: 'Service Account from GitHub Secrets', contentKey: 'git-collaboration/git/service-account-from-github-secrets' },
       } },
       { key: 'pull-requests', label: 'Pull Requests', pages: {'pr-review': 'Pr Review', 'review-checklist': 'Review Checklist', 'commit-strategy': 'Commit Strategy'} },
       { key: 'source-control', label: 'Source Control', pages: {'release-branching': 'Release Branching', 'semantic-versioning': 'Semantic Versioning'} },
@@ -338,7 +344,7 @@ tree.push({
   ],
 });
 
-const legacyPlatform = ['text', 'nodejs', 'json', 'jwt', 'git', 'email'].map((categoryKey) => {
+const legacyPlatform = ['text', 'nodejs', 'json', 'jwt', 'email'].map((categoryKey) => {
   const category = CATEGORIES.find((item) => item.key === categoryKey);
   return {
     key: categoryKey,
