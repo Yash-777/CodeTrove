@@ -73,14 +73,22 @@ const tree = [
     ],
   },
   {
-    key: 'interview-prep', label: 'Interview Prep', children: [
+    key: 'interview-prep', label: 'Interview Prep', contentKey: 'interview-prep', pages: {
+      'overview': { label: 'Interview Guide Overview', contentKey: 'interview-prep' },
+    }, children: [
       { key: 'java', label: 'Java', children: [
-        { key: 'core', label: 'Core', pages: {'core-interview-questions': 'Core Interview Questions', 'oop-interview-questions': 'Oop Interview Questions', 'collections-interview-questions': 'Collections Interview Questions', 'concurrency-interview-questions': 'Concurrency Interview Questions', 'jvm-interview-questions': 'Jvm Interview Questions'} },
-        { key: 'advanced', label: 'Advanced', pages: {'java-advanced-interview-questions': 'Java Advanced Interview Questions', 'performance-interview-questions': 'Performance Interview Questions', 'design-patterns-interview-questions': 'Design Patterns Interview Questions'} },
+        { key: 'fundamentals', label: 'Java SE Fundamentals', contentKey: 'interview-prep/java/fundamentals' },
+        { key: 'oop-contracts', label: 'OOP & Object Contracts', contentKey: 'interview-prep/java/oop-contracts' },
+        { key: 'collections', label: 'Collections & Comparators', contentKey: 'interview-prep/java/collections' },
+        { key: 'streams-functional', label: 'Streams & Functional Java', contentKey: 'interview-prep/java/streams-functional' },
+        { key: 'jvm-gc', label: 'JVM, Class Loading & GC', contentKey: 'interview-prep/java/jvm-gc' },
+        { key: 'concurrency', label: 'Threads, Executors & CompletableFuture', contentKey: 'interview-prep/java/concurrency' },
+        { key: 'exceptions-resources', label: 'Exceptions & Resource Safety', contentKey: 'interview-prep/java/exceptions-resources' },
+        { key: 'j2ee-web', label: 'J2EE Web Container', contentKey: 'interview-prep/java/j2ee-web' },
       ]},
       { key: 'sql', label: 'SQL', pages: {'sql-interview-questions': 'Sql Interview Questions', 'joins-and-indexes': 'Joins And Indexes', 'transactions-and-locking': 'Transactions And Locking', 'query-tuning': 'Query Tuning'} },
       { key: 'microservices', label: 'Microservices', children: [
-        { key: 'project-flow', label: 'Project Flow & Architecture', pages: {'microservice-project-flow-architecture': 'Microservice Project Flow Architecture', 'microservice-architecture-deep-dive': 'Microservice Architecture Deep Dive'}, children: [
+        { key: 'project-flow', label: 'Project Flow & Architecture', pages: {'microservice-project-flow-architecture': 'Microservice Project Flow Architecture', 'microservice-architecture-deep-dive': {label: 'Microservice Architecture Deep Dive', contentKey: 'interview-prep/microservices/project-flow/microservice-architecture-deep-dive'}}, children: [
           { key: 'api-gateway-idempotency', label: 'API Gateway & Idempotency', pages: {'api-gateway-idempotency': 'Api Gateway Idempotency'} },
           { key: 'eureka-service-discovery', label: 'Eureka Service Discovery (Registry)', children: [
             { key: 'mechanics-client-lifecycle', label: 'Eureka Server Mechanics & Client Lifecycle', pages: {'eureka-mechanics-client-lifecycle': 'Eureka Mechanics Client Lifecycle'} },
@@ -98,7 +106,7 @@ const tree = [
             { key: 'choreography', label: 'Choreography (Decentralized)', pages: {'saga-choreography': 'Saga Choreography'} },
             { key: 'orchestration', label: 'Orchestration (Centralized)', pages: {'saga-orchestration': 'Saga Orchestration'} },
           ] },
-          { key: 'config-server-vault', label: 'Config Server vs Vault', pages: {'config-server-vs-vault': {label: 'Config Server vs Vault', contentKey: 'interview-prep/microservices/project-flow/config-server-vs-vault/config-server-vs-vault'}} },
+          { key: 'config-server-vault', label: 'Config Server vs Vault', pages: {'config-server-vault': {label: 'Config Server vs Vault', contentKey: 'interview-prep/microservices/project-flow/config-server-vs-vault/config-server-vs-vault'}} },
           { key: 'circuit-breaker-fallback', label: 'Circuit Breaker & Fallback', pages: {'circuit-breaker-fallback': 'Circuit Breaker Fallback'} },
         ] },
         { key: 'distributed-systems', label: 'Distributed Systems', pages: {'service-discovery': 'Service Discovery', 'config-server-vault': 'Config Server Vault', 'circuit-breaker': 'Circuit Breaker', 'distributed-tracing': 'Distributed Tracing', 'metrics-observability': 'Metrics Observability'} },
