@@ -516,11 +516,11 @@ Never optimize only the average latency. A query that is fast for one tenant can
 
 ## Related Interview Prep sections
 
-- [SQL and index fundamentals](/#/content/tree/databases/sql)
-- [NoSQL data models](/#/content/tree/databases/nosql)
-- [Transactions and locking](/#/content/tree/interview-prep/sql/transactions-and-locking)
-- [Joins and indexes](/#/content/tree/interview-prep/sql/joins-and-indexes)
-- [Query tuning](/#/content/tree/interview-prep/sql/query-tuning)
+- [SQL and index fundamentals](/content/tree/databases/sql)
+- [NoSQL data models](/content/tree/databases/nosql)
+- [Transactions and locking](/content/tree/interview-prep/sql/transactions-and-locking)
+- [Joins and indexes](/content/tree/interview-prep/sql/joins-and-indexes)
+- [Query tuning](/content/tree/interview-prep/sql/query-tuning)
 
 ## Further reading
 
