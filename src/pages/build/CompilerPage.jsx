@@ -384,24 +384,38 @@ function SqlAbout() {
     <section className="cp-about" aria-labelledby="cp-about-sql">
       <h2 id="cp-about-sql">About the SQL playground</h2>
       <p>
-        This tab runs SQLite through the open-source SQL.js WebAssembly engine in a dedicated browser worker.
-        Your statements execute locally; CodeTrove does not send them to a remote database service. The database
-        is temporary and held in memory, so reloading this page or resetting the runtime clears its tables and rows.
+        Choose SQLite, MySQL, PostgreSQL, Microsoft SQL Server (T-SQL), or MariaDB from the <strong>Database</strong>
+        dropdown. The selection changes SQL highlighting, local syntax diagnostics, and the dialect-specific formatter
+        rules. The parser checks grammar while you edit and underlines a reported token; click a diagnostic below the
+        editor to jump to its line.
       </p>
       <p>
-        The editor uses the SQLite dialect. It is useful for practicing common SQL statements, creating tables and
-        indexes, inspecting query plans, and trying joins or aggregates. It is not a MySQL, MariaDB or SQL Server
-        instance: commands such as <code>SHOW INDEX</code>, MySQL <code>INFORMATION_SCHEMA</code> queries, server-side
-        stored procedures, InnoDB table options and MySQL&apos;s <code>EXPLAIN ANALYZE</code> are not supported here.
+        Only SQLite is an execution engine in this browser playground: it runs locally through SQL.js WebAssembly in
+        a dedicated worker, with a temporary in-memory database. The other dialects are syntax/format modes only; they
+        do not connect to MySQL, PostgreSQL, MariaDB, or SQL Server, and pressing Run is disabled for those choices.
+        The local parser checks grammar, not database objects, types, permissions, server versions, query plans, or
+        runtime behavior. SQLite-only commands such as <code>EXPLAIN QUERY PLAN</code> will not work in other engines.
+      </p>
+      <h3>Salary-ranking interview examples</h3>
+      <p>
+        Use the <strong>Example</strong> menu and sample button to load a full employee dataset, then practice finding
+        the third-highest distinct salary and the second-highest distinct salary in each department. Both use a
+        correlated <code>COUNT(DISTINCT ...)</code> subquery, so ties share a rank and the examples work across the
+        listed dialect grammars. The department query compares the inner and outer department, restarting its rank
+        within each department. With the bundled data, the global third salary is <code>112000</code>; the department
+        results are Engineering <code>118000</code>, Design <code>98000</code>, and Sales <code>93000</code>.
       </p>
       <p>
         Results are limited to the first 200 rows per result set. A query is stopped after 10 seconds; if that limit
-        is reached, the isolated worker restarts and its in-memory database is cleared.
+        is reached, the isolated worker restarts and its in-memory database is cleared. SQLite data is never sent to a
+        remote database service.
       </p>
       <h3>Open-source components and documentation</h3>
       <ul>
         <li><a href="https://github.com/sql-js/sql.js" target="_blank" rel="noreferrer">SQL.js</a> is MIT-licensed SQLite compiled to WebAssembly for browser use.</li>
         <li><a href="https://github.com/codemirror/lang-sql" target="_blank" rel="noreferrer">CodeMirror SQL language support</a> is MIT-licensed and provides SQL dialect highlighting and completion.</li>
+        <li><a href="https://github.com/sql-formatter-org/sql-formatter" target="_blank" rel="noreferrer">SQL Formatter</a> is an open-source formatter with dialect-specific SQL formatting options.</li>
+        <li><a href="https://github.com/taozhi8833998/node-sql-parser" target="_blank" rel="noreferrer">node-sql-parser</a> is an open-source local parser used for dialect-specific grammar diagnostics.</li>
         <li><a href="https://www.sqlite.org/lang.html" target="_blank" rel="noreferrer">SQLite SQL language reference</a> documents the dialect executed by this playground.</li>
       </ul>
     </section>

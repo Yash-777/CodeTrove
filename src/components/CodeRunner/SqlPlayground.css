@@ -5,17 +5,60 @@
 .sql-workbench__engine { display: flex; align-items: center; gap: 0.55rem; min-width: 12rem; color: var(--color-muted); font-size: 0.85rem; }
 .sql-workbench__status-dot { flex: 0 0 auto; width: 0.55rem; height: 0.55rem; border-radius: 50%; background: #d99b20; }
 .sql-workbench__status-dot.is-ready { background: #198754; }
-.sql-workbench__actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 0.4rem; }
-.sql-workbench__actions button { min-height: 2.05rem; padding: 0.35rem 0.65rem; border: 1px solid var(--color-border); border-radius: 6px; background: var(--color-paper); color: var(--color-text); font: inherit; font-size: 0.82rem; cursor: pointer; }
-.sql-workbench__actions button:hover:not(:disabled) { border-color: var(--color-accent); }
-.sql-workbench__actions button:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+.sql-workbench__status-dot.is-syntax-only { background: #5586be; }
+.sql-workbench__actions,
+.sql-workbench__format-toolbar,
+.sql-workbench__editor-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem; }
+.sql-workbench__actions { justify-content: flex-end; }
+.sql-workbench__select,
+.sql-workbench__example-select { display: inline-flex; align-items: center; gap: 0.4rem; color: var(--color-muted); font-size: 0.78rem; }
+.sql-workbench__select select,
+.sql-workbench__example-select select { min-height: 2.05rem; max-width: min(19rem, 54vw); padding: 0.3rem 1.8rem 0.3rem 0.55rem; border: 1px solid var(--color-border); border-radius: 6px; background: var(--color-paper); color: var(--color-text); font: inherit; font-size: 0.82rem; }
+.sql-workbench__actions button,
+.sql-workbench__format-toolbar button { min-height: 2.05rem; padding: 0.35rem 0.65rem; border: 1px solid var(--color-border); border-radius: 6px; background: var(--color-paper); color: var(--color-text); font: inherit; font-size: 0.82rem; cursor: pointer; }
+.sql-workbench__actions button:hover:not(:disabled),
+.sql-workbench__format-toolbar button:hover:not(:disabled) { border-color: var(--color-accent); }
+.sql-workbench__actions button:focus-visible,
+.sql-workbench__format-toolbar button:focus-visible,
+.sql-workbench__icon-button:focus-visible,
+.sql-workbench__select select:focus-visible,
+.sql-workbench__example-select select:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
 .sql-workbench__actions button:disabled { opacity: 0.55; cursor: not-allowed; }
 .sql-workbench__actions .sql-workbench__run { border-color: var(--color-accent); background: var(--color-accent); color: #fff; font-weight: 700; }
+.sql-workbench__format { border-bottom: 1px solid var(--color-border); }
+.sql-workbench__format > summary { display: flex; align-items: center; gap: 0.5rem; padding: 0.7rem 0.85rem; color: var(--color-text); font-size: 0.85rem; font-weight: 700; cursor: pointer; list-style: none; }
+.sql-workbench__format > summary::-webkit-details-marker { display: none; }
+.sql-workbench__format > summary svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; transition: transform 140ms ease; }
+.sql-workbench__format[open] > summary svg { transform: rotate(180deg); }
+.sql-workbench__format-summary { color: var(--color-muted); font-size: 0.78rem; font-weight: 400; }
+.sql-workbench__format-body { padding: 0.25rem 0.85rem 0.85rem; }
+.sql-workbench__format-toolbar { margin-bottom: 0.7rem; }
+.sql-workbench__rules-label { display: block; margin: 0.5rem 0 0.35rem; color: var(--color-muted); font-size: 0.78rem; }
+.sql-workbench__rules-area { box-sizing: border-box; display: block; width: 100%; min-height: 7rem; padding: 0.65rem; border: 1px solid var(--color-border); border-radius: 6px; background: var(--color-paper); color: var(--color-text); font: 0.82rem/1.5 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; resize: vertical; }
+.sql-workbench__rules-area:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 1px; }
+.sql-workbench__format-hint,
+.sql-workbench__format-message { margin: 0.5rem 0 0; color: var(--color-muted); font-size: 0.76rem; line-height: 1.5; }
+.sql-workbench__format-message { color: #198754; }
+.sql-workbench__format-message.is-error { color: #a12828; }
+.sql-workbench__format-hint code { padding: 0.03rem 0.2rem; border-radius: 3px; background: color-mix(in srgb, var(--color-border) 42%, transparent); }
+.sql-workbench__editor-head { display: flex; flex-wrap: wrap; align-items: center; gap: 0.65rem; padding: 0.55rem 0.75rem; border-bottom: 1px solid var(--color-border); }
+.sql-workbench__editor-title { color: var(--color-text); font-size: 0.86rem; font-weight: 700; }
+.sql-workbench__example-select { margin-left: auto; }
+.sql-workbench__editor-tools { justify-content: flex-end; }
+.sql-workbench__icon-button { display: inline-grid; place-items: center; width: 2rem; height: 2rem; padding: 0; border: 1px solid var(--color-border); border-radius: 6px; background: var(--color-paper); color: var(--color-text); cursor: pointer; }
+.sql-workbench__icon-button:hover { border-color: var(--color-accent); color: var(--color-accent); }
+.sql-workbench__icon-button.is-copied { color: #198754; }
+.sql-workbench__icon-button svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 .sql-workbench__editor .cm-editor { font-size: 0.9rem; }
 .sql-workbench__editor .cm-scroller { min-height: 390px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
 .sql-workbench__editor .cm-gutters { min-height: 390px; }
 .sql-workbench__hint { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.35rem 1rem; padding: 0.5rem 0.85rem; border-top: 1px solid var(--color-border); color: var(--color-muted); font-size: 0.76rem; }
 .sql-workbench__hint kbd { padding: 0.05rem 0.25rem; border: 1px solid var(--color-border); border-radius: 4px; font-size: 0.72rem; }
+.sql-workbench__syntax-status { color: var(--color-text); }
+.sql-workbench__diagnostics { display: grid; gap: 0.35rem; padding: 0.6rem 0.85rem 0.75rem; border-top: 1px solid var(--color-border); background: color-mix(in srgb, #c73535 5%, var(--color-paper)); }
+.sql-workbench__diagnostics button { width: fit-content; padding: 0; border: 0; background: none; color: #a12828; font: inherit; font-size: 0.78rem; text-align: left; cursor: pointer; }
+.sql-workbench__diagnostics button:hover { text-decoration: underline; }
+.sql-workbench__diagnostics p { margin: 0.1rem 0 0; color: var(--color-muted); font-size: 0.74rem; line-height: 1.45; }
 .sql-workbench__output { margin-top: 0.9rem; }
 .sql-workbench__output-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 0.45rem 1rem; padding: 0.75rem 0.9rem; border-bottom: 1px solid var(--color-border); }
 .sql-workbench__output-head h2 { margin: 0; font-size: 1rem; }
@@ -39,7 +82,12 @@
 
 @media (max-width: 640px) {
   .sql-workbench__toolbar { align-items: flex-start; }
-  .sql-workbench__actions { justify-content: flex-start; }
+  .sql-workbench__actions { justify-content: flex-start; width: 100%; }
+  .sql-workbench__select,
+  .sql-workbench__example-select { align-items: flex-start; flex-direction: column; gap: 0.2rem; }
+  .sql-workbench__example-select { margin-left: 0; flex: 1 1 100%; }
+  .sql-workbench__select select,
+  .sql-workbench__example-select select { max-width: 100%; }
   .sql-workbench__editor .cm-scroller,
   .sql-workbench__editor .cm-gutters { min-height: 320px; }
   .sql-workbench__result th,
