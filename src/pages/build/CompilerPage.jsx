@@ -406,6 +406,13 @@ function SqlAbout() {
         results are Engineering <code>118000</code>, Design <code>98000</code>, and Sales <code>93000</code>.
       </p>
       <p>
+        The menu also includes second-highest salary with <code>LIMIT 1 OFFSET 1</code>, two distinct values starting
+        from the third-highest with <code>LIMIT 2 OFFSET 2</code>, highest salary by department, and a list of employees
+        with duplicate salaries. These new SELECT statements are intentionally one line; use <strong>Format SQL</strong>
+        when you want them expanded for readability. LIMIT/OFFSET is used by SQLite, MySQL, PostgreSQL and MariaDB;
+        SQL Server uses its own <code>OFFSET ... FETCH</code> syntax.
+      </p>
+      <p>
         Results are limited to the first 200 rows per result set. A query is stopped after 10 seconds; if that limit
         is reached, the isolated worker restarts and its in-memory database is cleared. SQLite data is never sent to a
         remote database service.

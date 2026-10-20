@@ -62,10 +62,22 @@ WHERE (
 ORDER BY employee.department, employee.name;
 `;
 
+const SECOND_HIGHEST_OFFSET_QUERY = `-- Find the second-highest DISTINCT salary using LIMIT and OFFSET.
+SELECT DISTINCT salary FROM employees ORDER BY salary DESC LIMIT 1 OFFSET 1;`;
+
+const TOP_TWO_FROM_THIRD_QUERY = `-- Return two DISTINCT salary values beginning at the third-highest using LIMIT and OFFSET.
+SELECT DISTINCT salary FROM employees ORDER BY salary DESC LIMIT 2 OFFSET 2;`;
+
+const DEPARTMENT_HIGHEST_QUERY = `-- Find the highest salary in each department.
+SELECT department, MAX(salary) AS highest_salary FROM employees GROUP BY department ORDER BY department;`;
+
+const DUPLICATE_SALARIES_QUERY = `-- List employees whose salary is shared by another employee.
+SELECT id, name, department, salary FROM employees WHERE salary IN (SELECT salary FROM employees GROUP BY salary HAVING COUNT(*) > 1) ORDER BY salary DESC, department, name;`;
+
 const SQL_EXAMPLES = {
   both: {
-    label: 'Both salary interview queries',
-    code: `${SAMPLE_SETUP}\n${THIRD_HIGHEST_QUERY}\n${DEPARTMENT_SECOND_QUERY}`,
+    label: 'All salary interview examples',
+    code: `${SAMPLE_SETUP}\n${THIRD_HIGHEST_QUERY}\n${DEPARTMENT_SECOND_QUERY}\n${SECOND_HIGHEST_OFFSET_QUERY}\n${TOP_TWO_FROM_THIRD_QUERY}\n${DEPARTMENT_HIGHEST_QUERY}\n${DUPLICATE_SALARIES_QUERY}`,
   },
   third: {
     label: 'Third-highest salary',
@@ -74,6 +86,22 @@ const SQL_EXAMPLES = {
   department: {
     label: 'Department-wise second-highest salary',
     code: `${SAMPLE_SETUP}\n${DEPARTMENT_SECOND_QUERY}`,
+  },
+  secondHighest: {
+    label: 'Second-highest salary (LIMIT/OFFSET)',
+    code: `${SAMPLE_SETUP}\n${SECOND_HIGHEST_OFFSET_QUERY}`,
+  },
+  topFromThird: {
+    label: 'Top 2 from third-highest (LIMIT/OFFSET)',
+    code: `${SAMPLE_SETUP}\n${TOP_TWO_FROM_THIRD_QUERY}`,
+  },
+  departmentHighest: {
+    label: 'Highest salary by department',
+    code: `${SAMPLE_SETUP}\n${DEPARTMENT_HIGHEST_QUERY}`,
+  },
+  duplicateSalaries: {
+    label: 'Duplicate-salary employees',
+    code: `${SAMPLE_SETUP}\n${DUPLICATE_SALARIES_QUERY}`,
   },
 };
 
