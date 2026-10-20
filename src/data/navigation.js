@@ -13,7 +13,7 @@ const tree = [
   {
     key: 'languages', label: 'Programming Languages', contentKey: 'languages', children: [
       { key: 'java', label: 'Java', data: 'content.md', children: [
-        { key: 'core', label: 'Core', children: [
+        { key: 'core', label: 'Core', pages: { 'errors-exceptions': 'Errors & Exceptions' }, children: [
           { key: 'oop', label: 'Object-Oriented Programming', data: 'content.md', children: [
             { key: 'class-object', label: 'Class & Object', contentKey: 'languages/java/core/oop/class-object' },
             { key: 'interface-abstract-class', label: 'Interface & Abstract Class', contentKey: 'languages/java/core/oop/interface-abstract-class' },
