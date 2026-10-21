@@ -13,6 +13,7 @@
 import { Link } from 'react-router-dom';
 import { Sun, Moon, Monitor, LogOut } from 'lucide-react';
 import { paths } from '../routes/routes.config.js';
+import codeTroveWordmark from '../assets/brand/codetrove-wordmark.png';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useTheme } from '../context/ThemeContext.jsx';
 import './Header.css';
@@ -39,7 +40,7 @@ export default function Header({ sidebarOpen, onToggleSidebar }) {
       </button>
 
       <Link to={paths.home()} className="app-header__brand">
-        Codetrove
+        <img src={codeTroveWordmark} alt="CodeTrove" />
       </Link>
 
       <div className="app-header__spacer" />

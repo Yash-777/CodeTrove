@@ -23,6 +23,6 @@ export const apiRateLimiter = rateLimit({
   legacyHeaders: false,
   message: {
     error:
-      "We're limiting requests right now to keep Codetrove fast and fair for everyone. Please try again in a few minutes.",
+      "We're limiting requests right now to keep CodeTrove fast and fair for everyone. Please try again in a few minutes.",
   },
 });

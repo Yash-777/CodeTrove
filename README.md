@@ -1,4 +1,4 @@
-# Codetrove
+# CodeTrove
 
 A collaborative developer dashboard organized around three pillars:
 
@@ -142,7 +142,7 @@ Separately from the session cap above, `server/rateLimit.js` uses
 minutes) across all `/api/*` routes. Going over it returns a friendly
 message instead of a raw error:
 
-> "We're limiting requests right now to keep Codetrove fast and fair for
+> "We're limiting requests right now to keep CodeTrove fast and fair for
 > everyone. Please try again in a few minutes."
 
 ## Themes
@@ -228,7 +228,7 @@ src/
 ## Troubleshooting
 
 **Coming from the `LearnTogether` name**: this project was previously scaffolded
-as "LearnTogether" before settling on "Codetrove." Every reference (package
+as "LearnTogether" before settling on "CodeTrove." Every reference (package
 name, brand text, localStorage keys, rate-limit message) has been renamed in
 this version - if you're merging into an existing git history that already has
 a `LearnTogether` commit, expect a rename-heavy diff rather than a small patch.

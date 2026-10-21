@@ -29,10 +29,17 @@
 }
 
 .app-header__brand {
-  font-family: var(--font-mono);
-  font-size: 1.05rem;
-  font-weight: 700;
-  color: var(--color-text);
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+  line-height: 0;
+}
+
+.app-header__brand img {
+  display: block;
+  width: 146px;
+  max-width: 28vw;
+  height: auto;
 }
 
 .app-header__spacer {

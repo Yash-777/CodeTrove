@@ -5,6 +5,12 @@
   font-size: 2rem;
 }
 
+.dashboard__wordmark-title img {
+  display: block;
+  width: min(17rem, 78vw);
+  height: auto;
+}
+
 .dashboard__lede {
   color: var(--color-muted);
   max-width: 62ch;

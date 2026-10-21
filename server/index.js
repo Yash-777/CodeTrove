@@ -89,6 +89,6 @@ app.post('/api/drafts/:id/publish', requireAuth, requireRole(['admin']), (req, r
 
 const PORT = 4000;
 app.listen(PORT, () => {
-  console.log(`Codetrove draft server running at http://localhost:${PORT}`);
+  console.log(`CodeTrove draft server running at http://localhost:${PORT}`);
   console.log('Requires GOOGLE_APPLICATION_CREDENTIALS to be set - see README.md "Setting up Firebase".');
 });
