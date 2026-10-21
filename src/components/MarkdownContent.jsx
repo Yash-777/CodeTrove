@@ -158,10 +158,42 @@ function remarkRunnableCode() {
   };
 }
 
+// Keep reference-style links such as `[SQLite query planner][1]` working
+// across all authored wiki Markdown, including content that passes through
+// raw HTML. Standard CommonMark parsing resolves these already, but this
+// compatibility pass also handles any remaining mdast linkReference nodes.
+function remarkReferenceLinks() {
+  return (tree) => {
+    const definitions = new Map();
+    const collectDefinitions = (node) => {
+      if (node?.type === 'definition' && node.identifier) {
+        definitions.set(node.identifier.toLowerCase(), node);
+      }
+      if (Array.isArray(node?.children)) node.children.forEach(collectDefinitions);
+    };
+    const resolveReferences = (node) => {
+      if (node?.type === 'linkReference' && node.identifier) {
+        const definition = definitions.get(node.identifier.toLowerCase());
+        if (definition) {
+          node.type = 'link';
+          node.url = definition.url;
+          node.title = definition.title;
+          delete node.identifier;
+          delete node.label;
+          delete node.referenceType;
+        }
+      }
+      if (Array.isArray(node?.children)) node.children.forEach(resolveReferences);
+    };
+    collectDefinitions(tree);
+    resolveReferences(tree);
+  };
+}
+
 export default function MarkdownContent({ children }) {
   return (
     <ReactMarkdown
-      remarkPlugins={[remarkGfm, remarkRunnableCode]}
+      remarkPlugins={[remarkGfm, remarkReferenceLinks, remarkRunnableCode]}
       rehypePlugins={[rehypeRaw]}
       components={{
         code: MarkdownCode,

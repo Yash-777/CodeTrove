@@ -1,7 +1,9 @@
 /**
- * Metadata-driven documentation information architecture.
+ * Primary Learn-tree navigation and Markdown content map.
  * Hierarchy: Section -> Topic -> Subtopic -> Page (with deeper nodes supported).
- * New documentation pages live under src/data/topics/<path>/content.md.
+ * By default, a node/page path maps directly to
+ * src/data/topics/<section>/<subsection>/<topic>/content.md. Set contentKey only
+ * when a second UI route intentionally reuses a page stored elsewhere.
  */
 
 import { CATEGORIES } from './topics/index.js';
@@ -18,7 +20,8 @@ const tree = [
             { key: 'class-object', label: 'Class & Object', contentKey: 'languages/java/core/oop/class-object' },
             { key: 'interface-abstract-class', label: 'Interface & Abstract Class', contentKey: 'languages/java/core/oop/interface-abstract-class' },
           ], pages: { 'encapsulation': 'Encapsulation (Data Hiding)', 'inheritance': 'Inheritance (Code Reuse)', 'abstraction': 'Abstraction (Hiding Complexity)', 'polymorphism': 'Polymorphism (Many Forms)' } },
-          { key: 'language-basics', label: 'Language Basics', pages: {'generics': 'Generics', 'collections': 'Collections', 'exceptions': 'Exceptions', 'optional': {label: 'Optional', contentKey: 'java/optional'}, 'records': {label: 'Records', contentKey: 'java/records'}, 'streams': {label: 'Streams', contentKey: 'java/streams'}} },
+          //{ key: 'language-basics', label: 'Language Basics', pages: {'generics': 'Generics', 'collections': 'Collections', 'exceptions': 'Exceptions', 'optional': {label: 'Optional', contentKey: 'java/optional'}, 'records': {label: 'Records', contentKey: 'java/records'}, 'streams': {label: 'Streams', contentKey: 'java/streams'}} },
+          { key: 'language-basics', label: 'Language Basics', pages: {'generics': 'Generics', 'collections': 'Collections', 'exceptions': 'Exceptions', 'optional': 'Optional', 'records': 'Records', 'streams': 'Streams'} },
           { key: 'concurrency', label: 'Concurrency', pages: {'threads': 'Threads', 'executors': 'Executors', 'completable-future': 'Completable Future', 'synchronization': 'Synchronization', 'locks': 'Locks'} },
           { key: 'jvm', label: 'JVM', pages: {'jvm-memory': 'Jvm Memory', 'garbage-collection': 'Garbage Collection', 'class-loading': 'Class Loading', 'jvm-tuning': 'Jvm Tuning'} },
         ]},
@@ -106,7 +109,7 @@ const tree = [
             { key: 'choreography', label: 'Choreography (Decentralized)', pages: {'saga-choreography': 'Saga Choreography'} },
             { key: 'orchestration', label: 'Orchestration (Centralized)', pages: {'saga-orchestration': 'Saga Orchestration'} },
           ] },
-          { key: 'config-server-vault', label: 'Config Server vs Vault', pages: {'config-server-vault': {label: 'Config Server vs Vault', contentKey: 'interview-prep/microservices/project-flow/config-server-vs-vault/config-server-vs-vault'}} },
+          { key: 'config-server-vault', label: 'Config Server vs Vault' },
           { key: 'circuit-breaker-fallback', label: 'Circuit Breaker & Fallback', pages: {'circuit-breaker-fallback': 'Circuit Breaker Fallback'} },
         ] },
         { key: 'distributed-systems', label: 'Distributed Systems', pages: {'service-discovery': 'Service Discovery', 'config-server-vault': 'Config Server Vault', 'circuit-breaker': 'Circuit Breaker', 'distributed-tracing': 'Distributed Tracing', 'metrics-observability': 'Metrics Observability'} },
@@ -203,7 +206,7 @@ const tree = [
       { key: 'api-gateway', label: 'API Gateway', pages: {'gateway-pattern': 'Gateway Pattern', 'routing': 'Routing', 'authentication-at-gateway': 'Authentication At Gateway', 'gateway-rate-limiting': 'Gateway Rate Limiting'} },
       { key: 'load-balancing', label: 'Load Balancing', pages: {'load-balancer-basics': 'Load Balancer Basics', 'client-side-load-balancing': 'Client Side Load Balancing', 'health-checks': 'Health Checks'} },
       { key: 'rest', label: 'REST APIs', pages: {'rest-principles': 'Rest Principles', 'http-methods': 'Http Methods', 'status-codes': 'Status Codes', 'pagination': 'Pagination', 'versioning': 'Versioning'} },
-      { key: 'resilience', label: 'Resilience', pages: {'timeouts-retries': 'Timeouts Retries', 'idempotency': {label: 'Idempotency', contentKey: 'interview-prep/microservices/project-flow/api-gateway-idempotency/api-gateway-idempotency'}, 'rate-limiting': {label: 'Rate Limiting', contentKey: 'interview-prep/system-design/rate-limiting'}, 'dos-protection': 'Dos Protection', 'bulkheads': 'Bulkheads'} },
+      { key: 'resilience', label: 'Resilience', pages: {'timeouts-retries': 'Timeouts Retries', 'idempotency': 'Idempotency', 'rate-limiting': 'Rate Limiting', 'dos-protection': 'Dos Protection', 'bulkheads': 'Bulkheads'} },
       { key: 'documentation', label: 'API Documentation', pages: {'openapi-swagger': 'Openapi Swagger', 'postman': 'Postman'} },
     ],
   },
@@ -347,7 +350,6 @@ const tree = [
 tree.push({
   key: 'networking',
   label: 'Networking',
-  contentKey: 'networking/overview',
   children: [
     { key: 'dns-registrars', label: 'DNS & Registrars', contentKey: 'networking/dns-registrars', children: [
       { key: 'url-uri', label: 'TLD, Domains & URL/URI', contentKey: 'networking/dns-registrars/url-uri' },
@@ -401,6 +403,8 @@ function normalizeNode(node, parentPath = []) {
       type: 'page',
     };
   });
+  // New pages follow their UI path by default. Keep contentKey overrides only
+  // for intentional aliases that reuse a page owned by a different section.
   const contentKey = node.contentKey || path.join('/');
   return {
     ...node,
