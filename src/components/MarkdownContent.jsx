@@ -71,6 +71,11 @@ const GIT_DIAGRAMS = {
   conflict: 'conflict.png',
 };
 
+const JAVA_DIAGRAMS = {
+  'throwable-hierarchy': 'throwable-hierarchy.png',
+  'exception-propagation': 'exception-propagation.png',
+};
+
 function resolveMarkdownImage(src) {
   if (typeof src !== 'string') return src;
   if (src.startsWith('networking-diagram:')) {
@@ -80,6 +85,10 @@ function resolveMarkdownImage(src) {
   if (src.startsWith('git-diagram:')) {
     const name = GIT_DIAGRAMS[src.slice('git-diagram:'.length)];
     return name ? `${import.meta.env.BASE_URL}git/${name}` : src;
+  }
+  if (src.startsWith('java-diagram:')) {
+    const name = JAVA_DIAGRAMS[src.slice('java-diagram:'.length)];
+    return name ? `${import.meta.env.BASE_URL}java/${name}` : src;
   }
   return src;
 }
