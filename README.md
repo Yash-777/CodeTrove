@@ -1,4 +1,4 @@
-# CodeTrove
+#### <img width="80" height="80" alt="CodeTrove Open Book Logo" src="https://github.com/user-attachments/assets/c20ee53b-de93-45e1-94a7-0ba8ef436bd6" />
 
 A collaborative developer dashboard organized around three pillars:
 
