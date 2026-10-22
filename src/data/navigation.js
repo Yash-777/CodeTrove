@@ -374,6 +374,12 @@ tree.push({
   ],
 });
 
+tree.push({
+  key: 'ai',
+  label: 'AI & Machine Learning',
+  contentKey: 'ai',
+});
+
 const legacyPlatform = ['text', 'nodejs', 'json', 'jwt', 'email'].map((categoryKey) => {
   const category = CATEGORIES.find((item) => item.key === categoryKey);
   return {
