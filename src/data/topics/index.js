@@ -101,7 +101,7 @@ export const CATEGORIES = [
     codeLang: 'text',
     topics: [],
     tools: [
-      { name: 'Character Counter', description: 'Count characters, words, lines and common platform limits.', internalTool: 'character-counter', externalUrl: null },
+      { name: 'Character Counter', description: 'Count unique characters, whitespace, symbols, numbers, letters, emojis, words, sentences, and lines locally.', internalTool: 'character-counter', externalUrl: null },
       { name: 'String Utilities', description: 'Remove extra spaces, duplicate lines, and accents from text.', internalTool: 'string-utilities', externalUrl: null },
       { name: 'Compare — Diffchecker', description: 'Compare text or files in a new tab.', internalTool: null, externalUrl: 'https://www.diffchecker.com/' },
       { name: 'Compare — Text-Compare', description: 'Quick online text comparison.', internalTool: null, externalUrl: 'https://text-compare.com/' },
