@@ -1,17 +1,19 @@
 import { Link, useParams } from 'react-router-dom';
 import { getNavigationPage, getNavigationNode } from '../../data/navigation.js';
 import { getNavigationContent } from '../../data/topics/contentLoader.js';
+import { paths } from '../../routes/routes.config.js';
 import MarkdownContent from '../../components/MarkdownContent.jsx';
+import ContentBreadcrumbs from '../../components/ContentBreadcrumbs.jsx';
 import './ContentPages.css';
 
 export default function NavigationPage() {
   const params = useParams();
-  const pagePath = params['*'] || [
+  const pagePath = (params['*'] || [
     params.treeSection,
     params.treeTopic,
     params.treeSubtopic,
     params.treePage,
-  ].filter(Boolean).join('/');
+  ].filter(Boolean).join('/')).replace(/^\/+|\/+$/g, '');
   const page = getNavigationPage(pagePath);
   const node = !page ? getNavigationNode(pagePath) : undefined;
 
@@ -28,15 +30,17 @@ export default function NavigationPage() {
   if (node) {
     return (
       <article className="content-page">
-        <p className="content-page__breadcrumb">
-          {node.path.split('/').map((_, index, parts) => {
+        <ContentBreadcrumbs
+          items={node.path.split('/').map((_, index, parts) => {
             const ancestorPath = parts.slice(0, index + 1).join('/');
             const ancestor = getNavigationNode(ancestorPath);
-            return (
-              <span key={ancestorPath}>{index > 0 ? ' / ' : ''}{ancestor?.label}</span>
-            );
-          })}
-        </p>
+            return ancestor && {
+              label: ancestor.label,
+              path: ancestor.path,
+              to: paths.navigationTree(ancestor.path),
+            };
+          }).filter(Boolean)}
+        />
         <h1>{node.label}</h1>
         {node.hasContent ? (
           <MarkdownContent>{getNavigationContent(node.contentKey)}</MarkdownContent>
@@ -49,11 +53,11 @@ export default function NavigationPage() {
 
   return (
     <article className="content-page">
-      <p className="content-page__breadcrumb">
-        {page.ancestors.map((ancestor, index) => (
-          <span key={ancestor.path}>{index > 0 ? ' / ' : ''}{ancestor.label}</span>
-        ))}
-      </p>
+      <ContentBreadcrumbs items={page.ancestors.map((ancestor) => ({
+        label: ancestor.label,
+        path: ancestor.path,
+        to: paths.navigationTree(ancestor.path),
+      }))} />
       <h1>{page.label}</h1>
       <MarkdownContent>{getNavigationContent(page.contentKey)}</MarkdownContent>
     </article>

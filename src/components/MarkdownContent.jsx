@@ -52,6 +52,7 @@ const NETWORKING_DIAGRAMS = {
   'dns-tls-http': 'dns-tls-http.png',
   'smtp-flow': 'smtp-flow.png',
 };
+
 const GIT_DIAGRAMS = {
   overview: 'overview.png',
   'local-remote': 'local-remote.png',
@@ -70,6 +71,11 @@ const GIT_DIAGRAMS = {
   conflict: 'conflict.png',
 };
 
+const JAVA_DIAGRAMS = {
+  'throwable-hierarchy': 'throwable-hierarchy.png',
+  'exception-propagation': 'exception-propagation.png',
+};
+
 function resolveMarkdownImage(src) {
   if (typeof src !== 'string') return src;
   if (src.startsWith('networking-diagram:')) {
@@ -79,6 +85,10 @@ function resolveMarkdownImage(src) {
   if (src.startsWith('git-diagram:')) {
     const name = GIT_DIAGRAMS[src.slice('git-diagram:'.length)];
     return name ? `${import.meta.env.BASE_URL}git/${name}` : src;
+  }
+  if (src.startsWith('java-diagram:')) {
+    const name = JAVA_DIAGRAMS[src.slice('java-diagram:'.length)];
+    return name ? `${import.meta.env.BASE_URL}java/${name}` : src;
   }
   return src;
 }
@@ -157,10 +167,42 @@ function remarkRunnableCode() {
   };
 }
 
+// Keep reference-style links such as `[SQLite query planner][1]` working
+// across all authored wiki Markdown, including content that passes through
+// raw HTML. Standard CommonMark parsing resolves these already, but this
+// compatibility pass also handles any remaining mdast linkReference nodes.
+function remarkReferenceLinks() {
+  return (tree) => {
+    const definitions = new Map();
+    const collectDefinitions = (node) => {
+      if (node?.type === 'definition' && node.identifier) {
+        definitions.set(node.identifier.toLowerCase(), node);
+      }
+      if (Array.isArray(node?.children)) node.children.forEach(collectDefinitions);
+    };
+    const resolveReferences = (node) => {
+      if (node?.type === 'linkReference' && node.identifier) {
+        const definition = definitions.get(node.identifier.toLowerCase());
+        if (definition) {
+          node.type = 'link';
+          node.url = definition.url;
+          node.title = definition.title;
+          delete node.identifier;
+          delete node.label;
+          delete node.referenceType;
+        }
+      }
+      if (Array.isArray(node?.children)) node.children.forEach(resolveReferences);
+    };
+    collectDefinitions(tree);
+    resolveReferences(tree);
+  };
+}
+
 export default function MarkdownContent({ children }) {
   return (
     <ReactMarkdown
-      remarkPlugins={[remarkGfm, remarkRunnableCode]}
+      remarkPlugins={[remarkGfm, remarkReferenceLinks, remarkRunnableCode]}
       rehypePlugins={[rehypeRaw]}
       components={{
         code: MarkdownCode,

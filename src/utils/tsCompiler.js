@@ -67,8 +67,14 @@ export function preloadTypeScript() {
   return loadTypeScript();
 }
 
-const OPTIONS = (ts) => ({
-  target: ts.ScriptTarget.ES2020,
+const SCRIPT_TARGETS = {
+  ES5: 'ES5',
+  ES2015: 'ES2015',
+  ES2020: 'ES2020',
+};
+
+const OPTIONS = (ts, target) => ({
+  target: ts.ScriptTarget[SCRIPT_TARGETS[target] || 'ES2020'],
   lib: ['lib.es2020.d.ts'],
   strict: true,
   noEmit: true,
@@ -85,14 +91,14 @@ const OPTIONS = (ts) => ({
  * diagnostics: [{ from, to, line, column, code, message }] (0-based
  * offsets for the editor, 1-based line/column like the tsc CLI).
  */
-export async function compileTypeScript(code) {
+export async function compileTypeScript(code, { target = 'ES2020' } = {}) {
   const { ts, libs } = await loadTypeScript();
 
   // Appending `export {};` makes the file a module: top-level names never
   // clash with globals and top-level `await` is allowed. It is added at the
   // END, so every reported position still matches the user's text.
   const checkedText = `${code}\nexport {};\n`;
-  const options = OPTIONS(ts);
+  const options = OPTIONS(ts, target);
 
   const files = new Map([
     [MAIN_FILE, checkedText],
@@ -151,7 +157,7 @@ export async function compileTypeScript(code) {
   let js = '';
   if (diagnostics.length === 0) {
     js = ts.transpileModule(code, {
-      compilerOptions: { target: ts.ScriptTarget.ES2020, module: ts.ModuleKind.ESNext, isolatedModules: true },
+      compilerOptions: { target: ts.ScriptTarget[SCRIPT_TARGETS[target] || 'ES2020'], module: ts.ModuleKind.ESNext, isolatedModules: true },
     }).outputText;
   }
 

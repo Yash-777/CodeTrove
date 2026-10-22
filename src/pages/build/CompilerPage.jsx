@@ -19,6 +19,7 @@
 
 import { Link, useSearchParams } from 'react-router-dom';
 import RunnableCode from '../../components/CodeRunner/RunnableCode.jsx';
+import SqlPlayground from '../../components/CodeRunner/SqlPlayground.jsx';
 import { KOTLIN_TARGETS } from '../../utils/kotlinApi.js';
 import './CompilerPage.css';
 
@@ -45,6 +46,39 @@ class SampleTest {
 const KOTLIN_SAMPLES = { java: KOTLIN_MAIN_SAMPLE, junit: KOTLIN_JUNIT_SAMPLE };
 const KOTLIN_TARGET_OPTIONS = KOTLIN_TARGETS.map((target) => ({ ...target, code: KOTLIN_SAMPLES[target.confType] || KOTLIN_MAIN_SAMPLE }));
 
+const JAVASCRIPT_SAMPLES = {
+  es5: `// ES5 style: constructor function and prototype
+function Person(name, age) {
+    this.name = name;
+    this.age = age;
+}
+
+Person.prototype.greet = function () {
+    console.log('Hello, ' + this.name + '!');
+    console.log('In 5 years you will be ' + (this.age + 5) + '.');
+};
+
+var person = new Person(readLine() || 'World', Number(readLine() || 0));
+person.greet();
+`,
+  es6: `// ES6 style: class syntax
+class Person {
+    constructor(name, age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    greet() {
+        console.log('Hello, ' + this.name + '!');
+        console.log('In 5 years you will be ' + (this.age + 5) + '.');
+    }
+}
+
+const person = new Person(readLine() || 'World', Number(readLine() || 0));
+person.greet();
+`,
+};
+
 const LANGUAGES = [
   {
     key: 'javascript',
@@ -53,13 +87,7 @@ const LANGUAGES = [
     learnTo: '/content/tree/languages/javascript',
     docsUrl: 'https://developer.mozilla.org/en-US/docs/Web/JavaScript',
     input: 'Alice\n30',
-    code: `// Read input with readLine() - one value per line (see STDIN above)
-const name = readLine() ?? 'World';
-const age = Number(readLine() ?? 0);
-
-console.log(\`Hello, \${name}!\`);
-console.log(\`In 5 years you will be \${age + 5}.\`);
-`,
+    code: JAVASCRIPT_SAMPLES.es6,
   },
   {
     key: 'typescript',
@@ -181,6 +209,14 @@ public class Main {
     }
 }
 `,
+  },
+  {
+    key: 'sql',
+    param: 'sql',
+    label: 'SQL',
+    learnTo: '/content/tree/databases/sql',
+    docsUrl: 'https://www.sqlite.org/lang.html',
+    code: '',
   },
 ];
 
@@ -343,6 +379,56 @@ function NativeAbout({ language }) {
   );
 }
 
+function SqlAbout() {
+  return (
+    <section className="cp-about" aria-labelledby="cp-about-sql">
+      <h2 id="cp-about-sql">About the SQL playground</h2>
+      <p>
+        Choose SQLite, MySQL, PostgreSQL, Microsoft SQL Server (T-SQL), or MariaDB from the <strong>Database</strong>
+        dropdown. The selection changes SQL highlighting, local syntax diagnostics, and the dialect-specific formatter
+        rules. The parser checks grammar while you edit and underlines a reported token; click a diagnostic below the
+        editor to jump to its line.
+      </p>
+      <p>
+        Only SQLite is an execution engine in this browser playground: it runs locally through SQL.js WebAssembly in
+        a dedicated worker, with a temporary in-memory database. The other dialects are syntax/format modes only; they
+        do not connect to MySQL, PostgreSQL, MariaDB, or SQL Server, and pressing Run is disabled for those choices.
+        The local parser checks grammar, not database objects, types, permissions, server versions, query plans, or
+        runtime behavior. SQLite-only commands such as <code>EXPLAIN QUERY PLAN</code> will not work in other engines.
+      </p>
+      <h3>Salary-ranking interview examples</h3>
+      <p>
+        Use the <strong>Example</strong> menu and sample button to load a full employee dataset, then practice finding
+        the third-highest distinct salary and the second-highest distinct salary in each department. Both use a
+        correlated <code>COUNT(DISTINCT ...)</code> subquery, so ties share a rank and the examples work across the
+        listed dialect grammars. The department query compares the inner and outer department, restarting its rank
+        within each department. With the bundled data, the global third salary is <code>112000</code>; the department
+        results are Engineering <code>118000</code>, Design <code>98000</code>, and Sales <code>93000</code>.
+      </p>
+      <p>
+        The menu also includes second-highest salary with <code>LIMIT 1 OFFSET 1</code>, two distinct values starting
+        from the third-highest with <code>LIMIT 2 OFFSET 2</code>, highest salary by department, and a list of employees
+        with duplicate salaries. These new SELECT statements are intentionally one line; use <strong>Format SQL</strong>
+        when you want them expanded for readability. LIMIT/OFFSET is used by SQLite, MySQL, PostgreSQL and MariaDB;
+        SQL Server uses its own <code>OFFSET ... FETCH</code> syntax.
+      </p>
+      <p>
+        Results are limited to the first 200 rows per result set. A query is stopped after 10 seconds; if that limit
+        is reached, the isolated worker restarts and its in-memory database is cleared. SQLite data is never sent to a
+        remote database service.
+      </p>
+      <h3>Open-source components and documentation</h3>
+      <ul>
+        <li><a href="https://github.com/sql-js/sql.js" target="_blank" rel="noreferrer">SQL.js</a> is MIT-licensed SQLite compiled to WebAssembly for browser use.</li>
+        <li><a href="https://github.com/codemirror/lang-sql" target="_blank" rel="noreferrer">CodeMirror SQL language support</a> is MIT-licensed and provides SQL dialect highlighting and completion.</li>
+        <li><a href="https://github.com/sql-formatter-org/sql-formatter" target="_blank" rel="noreferrer">SQL Formatter</a> is an open-source formatter with dialect-specific SQL formatting options.</li>
+        <li><a href="https://github.com/taozhi8833998/node-sql-parser" target="_blank" rel="noreferrer">node-sql-parser</a> is an open-source local parser used for dialect-specific grammar diagnostics.</li>
+        <li><a href="https://www.sqlite.org/lang.html" target="_blank" rel="noreferrer">SQLite SQL language reference</a> documents the dialect executed by this playground.</li>
+      </ul>
+    </section>
+  );
+}
+
 export default function CompilerPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const active = pickLanguage(searchParams.get('lang'));
@@ -377,25 +463,44 @@ export default function CompilerPage() {
 
       {LANGUAGES.map((item) => (
         <div key={item.key} hidden={item.key !== active.key} role="tabpanel" aria-label={`${item.label} editor`}>
-          <RunnableCode
-            variant="playground"
-            language={item.key}
-            initial={item.code}
-            initialInput={item.input}
-            targets={item.targets}
-          />
+          {item.key === 'sql' ? (
+            <SqlPlayground isActive={item.key === active.key} />
+          ) : (
+            <RunnableCode
+              variant="playground"
+              language={item.key}
+              initial={item.code}
+              initialInput={item.input}
+              targets={item.targets}
+              versionSamples={item.key === 'javascript' ? JAVASCRIPT_SAMPLES : null}
+              isActive={item.key === active.key}
+            />
+          )}
         </div>
       ))}
 
       {active.key === 'kotlin' && <KotlinAbout />}
       {active.key === 'java' && <JavaAbout />}
       {NATIVE_ABOUT[active.key] && <NativeAbout language={active.key} />}
+      {active.key === 'sql' && <SqlAbout />}
 
-      <p className="cp-note">
-        JavaScript and TypeScript run in your browser (isolated, 10&nbsp;s limit, no DOM). Kotlin is compiled by
-        JetBrains&apos; public service (api.kotlinlang.org), Java by the selected Wandbox or Judge0 service, and C,
-        C++ and Python by Judge0, so those snippets are sent to external services.
-      </p>
+      {active.key !== 'sql' && <p className="cp-note">
+        JavaScript and TypeScript run in an isolated browser worker (10&nbsp;s limit, no DOM). JavaScript, TypeScript,
+        Java, C, C++ and Python syntax checks run locally in the browser; formatting also runs locally with Prettier,
+        clang-format WASM or Ruff WASM. Kotlin diagnostics and execution use JetBrains&apos; public service, and Run
+        sends Java to Wandbox/Judge0 and C, C++ or Python to Judge0. Kotlin&apos;s built-in Format action currently
+        normalizes indentation only; use a full Kotlin editor/formatter for project-wide ktfmt formatting.
+      </p>}
+
+      {active.key !== 'sql' && <section className="cp-about cp-editor-references" aria-labelledby="cp-editor-references-title">
+        <h2 id="cp-editor-references-title">More editors and references</h2>
+        <p>Use these free web tools when you need a full editor, language extensions, or a development environment beyond this browser playground.</p>
+        <div className="cp-links">
+          <a className="cp-link" href="https://vscode.dev/" target="_blank" rel="noreferrer">Open VS Code for the Web</a>
+          <a className="cp-link" href="https://code.visualstudio.com/docs/remote/vscode-web" target="_blank" rel="noreferrer">VS Code Web documentation</a>
+          <a className="cp-link" href="https://prettier.io/docs/browser" target="_blank" rel="noreferrer">Prettier browser API</a>
+        </div>
+      </section>}
     </div>
   );
 }

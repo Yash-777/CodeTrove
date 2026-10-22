@@ -11,6 +11,7 @@
 import { useParams, Link } from 'react-router-dom';
 import { getCategory } from '../../data/topics/index.js';
 import { paths } from '../../routes/routes.config.js';
+import ContentBreadcrumbs from '../../components/ContentBreadcrumbs.jsx';
 import './ContentPages.css';
 
 export default function CategoryPage() {
@@ -28,6 +29,10 @@ export default function CategoryPage() {
 
   return (
     <div className="content-page">
+      <ContentBreadcrumbs items={[
+        { label: 'Learn', to: paths.home(), path: 'learn' },
+        { label: category.label, current: true, path: category.key },
+      ]} />
       <h1 style={{ color: category.color }}>{category.label}</h1>
 
       <div className="content-page__grid">

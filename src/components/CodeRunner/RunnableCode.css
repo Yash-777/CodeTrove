@@ -185,3 +185,64 @@
 }
 .runnable-code__target select:disabled { opacity: 0.6; cursor: not-allowed; }
 .runnable-code__badge--java { background: #e76f00; }
+
+
+/* ---- compiler playground: formatting controls and input pane toolbar ---- */
+.runnable-code__format { border-bottom: 1px solid var(--color-border); background: var(--color-paper); }
+.runnable-code__format > summary {
+  display: flex; align-items: center; gap: 0.5rem; padding: 0.45rem 0.75rem;
+  cursor: pointer; list-style: none; font-size: 0.82rem; font-weight: 650; color: var(--color-text);
+}
+.runnable-code__format > summary::-webkit-details-marker { display: none; }
+.runnable-code__format > summary svg { transition: transform 0.15s ease; }
+.runnable-code__format:not([open]) > summary svg { transform: rotate(-90deg); }
+.runnable-code__format-summary { margin-left: auto; color: var(--color-muted); font-size: 0.75rem; font-weight: 400; }
+.runnable-code__format-body { padding: 0.65rem 0.8rem 0.8rem; border-top: 1px solid var(--color-border); background: var(--color-bg); }
+.runnable-code__format-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 0.45rem; margin-bottom: 0.6rem; }
+.runnable-code__rules-label { display: block; margin: 0 0 0.3rem; font-size: 0.78rem; font-weight: 650; }
+.runnable-code__rules-area {
+  display: block; box-sizing: border-box; width: 100%; min-height: 5.5rem; resize: vertical;
+  padding: 0.55rem 0.65rem; border: 1px solid var(--color-border); border-radius: 6px;
+  color: var(--color-text); background: var(--color-paper);
+  font: 0.78rem/1.45 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+.runnable-code__format-hint, .runnable-code__format-message { margin: 0.4rem 0 0; color: var(--color-muted); font-size: 0.75rem; }
+.runnable-code__format-message { color: #18713a; }
+.runnable-code__format-message.is-error { color: #b42318; }
+.runnable-code__editor-head {
+  display: flex; min-height: 2.8rem; align-items: center; justify-content: space-between; gap: 0.5rem;
+  padding: 0.35rem 0.55rem 0.35rem 0.8rem; border-bottom: 1px solid rgba(255,255,255,0.08);
+  background: #202633; color: #d7dce6;
+}
+.runnable-code__editor-title { font: 700 0.78rem/1.3 system-ui, sans-serif; text-transform: uppercase; letter-spacing: 0.045em; }
+.runnable-code__editor-tools { display: flex; align-items: center; gap: 0.25rem; }
+.runnable-code__editor-tools .runnable-code__icon-button {
+  width: 2rem; height: 2rem; padding: 0; border-color: transparent; color: #a9c8ff;
+  background: transparent; border-radius: 6px;
+}
+.runnable-code__editor-tools .runnable-code__icon-button:hover { color: #fff; border-color: rgba(255,255,255,0.17); background: rgba(255,255,255,0.08); }
+.runnable-code__editor-tools .runnable-code__icon-button svg { width: 17px; height: 17px; }
+.runnable-code__editor-tools .runnable-code__icon-button[title] { position: relative; }
+.runnable-code__editor-tools .runnable-code__icon-button[title]:hover::after,
+.runnable-code__editor-tools .runnable-code__icon-button[title]:focus-visible::after {
+  position: absolute; z-index: 20; right: 0; bottom: calc(100% + 0.45rem); content: attr(title);
+  padding: 0.3rem 0.5rem; border-radius: 5px; color: #fff; background: #111827;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.24); font: 0.72rem/1.2 system-ui, sans-serif; white-space: nowrap;
+  pointer-events: none;
+}
+.runnable-code__target select { max-width: 14rem; }
+.runnable-code--playground .runnable-code__header { align-items: center; }
+.runnable-code--playground .runnable-code__actions { gap: 0.35rem; }
+.runnable-code--playground .runnable-code__editor .cm-editor { min-height: 360px; }
+.runnable-code--playground .runnable-code__output { height: 420px; }
+@media (max-width: 900px) {
+  .runnable-code--playground .runnable-code__header { align-items: flex-start; }
+  .runnable-code--playground .runnable-code__actions { justify-content: flex-end; }
+  .runnable-code--playground .runnable-code__editor .cm-editor { min-height: 280px; }
+}
+@media (max-width: 600px) {
+  .runnable-code__format-summary { display: none; }
+  .runnable-code__format-toolbar { align-items: stretch; }
+  .runnable-code__target select { max-width: 10rem; }
+  .runnable-code--playground .runnable-code__output { height: 260px; }
+}

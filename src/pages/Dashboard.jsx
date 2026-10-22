@@ -14,6 +14,7 @@
 
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import codeTroveWordmark from '../assets/brand/codetrove-wordmark.png';
 import { CATEGORIES, getCategory } from '../data/topics/index.js';
 import { paths } from '../routes/routes.config.js';
 import { useAuth } from '../context/AuthContext.jsx';
@@ -45,7 +46,9 @@ export default function Dashboard() {
   return (
     <div className="dashboard">
       <section className="dashboard__hero">
-        <h1>Codetrove</h1>
+        <h1 className="dashboard__wordmark-title">
+          <img src={codeTroveWordmark} alt="CodeTrove" />
+        </h1>
         <p className="dashboard__lede">
           Explanations, real code samples, and inline tools for Java, JavaScript,
           Node.js, JSON, JWT, and Git - one place, so you stop bookmarking six

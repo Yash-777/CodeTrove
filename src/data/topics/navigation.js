@@ -92,7 +92,6 @@ export const DOCUMENTATION_NAVIGATION = [
       legacyTopic('nodejs', 'nodejs', 'Node.js', ['nodejs', 'node']),
       legacyTopic('json', 'json', 'JSON', ['json']),
       legacyTopic('jwt', 'jwt', 'JWT', ['jwt', 'security']),
-      legacyTopic('git', 'git', 'Git', ['git', 'version-control']),
       legacyTopic('email', 'email', 'Email', ['email', 'smtp', 'imap', 'pop3']),
     ],
   },

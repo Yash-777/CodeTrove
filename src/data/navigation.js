@@ -1,7 +1,9 @@
 /**
- * Metadata-driven documentation information architecture.
+ * Primary Learn-tree navigation and Markdown content map.
  * Hierarchy: Section -> Topic -> Subtopic -> Page (with deeper nodes supported).
- * New documentation pages live under src/data/topics/<path>/content.md.
+ * By default, a node/page path maps directly to
+ * src/data/topics/<section>/<subsection>/<topic>/content.md. Set contentKey only
+ * when a second UI route intentionally reuses a page stored elsewhere.
  */
 
 import { CATEGORIES } from './topics/index.js';
@@ -11,11 +13,15 @@ const humanize = (value) => value.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.t
 
 const tree = [
   {
-    key: 'languages', label: 'Programming Languages', children: [
+    key: 'languages', label: 'Programming Languages', contentKey: 'languages', children: [
       { key: 'java', label: 'Java', data: 'content.md', children: [
-        { key: 'core', label: 'Core', children: [
-          { key: 'oop', label: 'Object-Oriented Programming', data: 'content.md', pages: { 'interface': 'Interfaces', 'class': 'Classes', 'object': 'Objects', 'encapsulation': 'Encapsulation (Data Hiding)', 'inheritance': 'Inheritance (Code Reuse)', 'abstraction': 'Abstraction (Hiding Complexity)', 'polymorphism': 'Polymorphism (Many Forms)' } },
-          { key: 'language-basics', label: 'Language Basics', pages: {'generics': 'Generics', 'collections': 'Collections', 'exceptions': 'Exceptions', 'optional': {label: 'Optional', contentKey: 'java/optional'}, 'records': {label: 'Records', contentKey: 'java/records'}, 'streams': {label: 'Streams', contentKey: 'java/streams'}} },
+        { key: 'core', label: 'Core', pages: { 'errors-exceptions': 'Errors & Exceptions' }, children: [
+          { key: 'oop', label: 'Object-Oriented Programming', data: 'content.md', children: [
+            { key: 'class-object', label: 'Class & Object', contentKey: 'languages/java/core/oop/class-object' },
+            { key: 'interface-abstract-class', label: 'Interface & Abstract Class', contentKey: 'languages/java/core/oop/interface-abstract-class' },
+          ], pages: { 'encapsulation': 'Encapsulation (Data Hiding)', 'inheritance': 'Inheritance (Code Reuse)', 'abstraction': 'Abstraction (Hiding Complexity)', 'polymorphism': 'Polymorphism (Many Forms)' } },
+          //{ key: 'language-basics', label: 'Language Basics', pages: {'generics': 'Generics', 'collections': 'Collections', 'exceptions': 'Exceptions', 'optional': {label: 'Optional', contentKey: 'java/optional'}, 'records': {label: 'Records', contentKey: 'java/records'}, 'streams': {label: 'Streams', contentKey: 'java/streams'}} },
+          { key: 'language-basics', label: 'Language Basics', pages: {'generics': 'Generics', 'collections': 'Collections', 'exceptions': 'Exceptions', 'optional': 'Optional', 'records': 'Records', 'streams': 'Streams'} },
           { key: 'concurrency', label: 'Concurrency', pages: {'threads': 'Threads', 'executors': 'Executors', 'completable-future': 'Completable Future', 'synchronization': 'Synchronization', 'locks': 'Locks'} },
           { key: 'jvm', label: 'JVM', pages: {'jvm-memory': 'Jvm Memory', 'garbage-collection': 'Garbage Collection', 'class-loading': 'Class Loading', 'jvm-tuning': 'Jvm Tuning'} },
         ]},
@@ -57,18 +63,35 @@ const tree = [
         { key: 'html', label: 'HTML', pages: {'semantic-html': 'Semantic Html', 'forms': 'Forms', 'accessibility': 'Accessibility'} },
         { key: 'css', label: 'CSS', pages: {'layout': 'Layout', 'flexbox': 'Flexbox', 'grid': 'Grid', 'responsive-design': 'Responsive Design'} },
       ]},
-      { key: 'nodejs', label: 'Node.js', pages: {'modules': 'Modules', 'event-loop': 'Event Loop', 'express': 'Express', 'streams': 'Streams', 'security': 'Security'} },
+      { key: 'nodejs', label: 'Node.js', contentKey: 'languages/nodejs', pages: {
+        'installation-and-versions': 'Installation and Version Management',
+        'npm-and-package-json': 'npm and package.json',
+        'modules': 'Modules: CommonJS and ES Modules',
+        'event-loop': 'Event Loop and Asynchronous Work',
+        'streams': 'Streams and Backpressure',
+        'express': 'Express HTTP Services',
+        'security': 'Security Basics',
+        'windows-cli-troubleshooting': 'Windows PATH and CLI Troubleshooting',
+      } },
     ],
   },
   {
-    key: 'interview-prep', label: 'Interview Prep', children: [
+    key: 'interview-prep', label: 'Interview Prep', contentKey: 'interview-prep', pages: {
+      'overview': { label: 'Interview Guide Overview', contentKey: 'interview-prep' },
+    }, children: [
       { key: 'java', label: 'Java', children: [
-        { key: 'core', label: 'Core', pages: {'core-interview-questions': 'Core Interview Questions', 'oop-interview-questions': 'Oop Interview Questions', 'collections-interview-questions': 'Collections Interview Questions', 'concurrency-interview-questions': 'Concurrency Interview Questions', 'jvm-interview-questions': 'Jvm Interview Questions'} },
-        { key: 'advanced', label: 'Advanced', pages: {'java-advanced-interview-questions': 'Java Advanced Interview Questions', 'performance-interview-questions': 'Performance Interview Questions', 'design-patterns-interview-questions': 'Design Patterns Interview Questions'} },
+        { key: 'fundamentals', label: 'Java SE Fundamentals', contentKey: 'interview-prep/java/fundamentals' },
+        { key: 'oop-contracts', label: 'OOP & Object Contracts', contentKey: 'interview-prep/java/oop-contracts' },
+        { key: 'collections', label: 'Collections & Comparators', contentKey: 'interview-prep/java/collections' },
+        { key: 'streams-functional', label: 'Streams & Functional Java', contentKey: 'interview-prep/java/streams-functional' },
+        { key: 'jvm-gc', label: 'JVM, Class Loading & GC', contentKey: 'interview-prep/java/jvm-gc' },
+        { key: 'concurrency', label: 'Threads, Executors & CompletableFuture', contentKey: 'interview-prep/java/concurrency' },
+        { key: 'exceptions-resources', label: 'Exceptions & Resource Safety', contentKey: 'interview-prep/java/exceptions-resources' },
+        { key: 'j2ee-web', label: 'J2EE Web Container', contentKey: 'interview-prep/java/j2ee-web' },
       ]},
-      { key: 'sql', label: 'SQL', pages: {'sql-interview-questions': 'Sql Interview Questions', 'joins-and-indexes': 'Joins And Indexes', 'transactions-and-locking': 'Transactions And Locking', 'query-tuning': 'Query Tuning'} },
+      { key: 'sql', label: 'SQL – NoSQL', contentKey: 'interview-prep/sql', pages: {'sql-interview-questions': 'Sql Interview Questions', 'joins-and-indexes': 'Joins And Indexes', 'transactions-and-locking': 'Transactions And Locking', 'query-tuning': 'Query Tuning'} },
       { key: 'microservices', label: 'Microservices', children: [
-        { key: 'project-flow', label: 'Project Flow & Architecture', pages: {'microservice-project-flow-architecture': 'Microservice Project Flow Architecture', 'microservice-architecture-deep-dive': 'Microservice Architecture Deep Dive'}, children: [
+        { key: 'project-flow', label: 'Project Flow & Architecture', pages: {'microservice-project-flow-architecture': 'Microservice Project Flow Architecture', 'microservice-architecture-deep-dive': {label: 'Microservice Architecture Deep Dive', contentKey: 'interview-prep/microservices/project-flow/microservice-architecture-deep-dive'}}, children: [
           { key: 'api-gateway-idempotency', label: 'API Gateway & Idempotency', pages: {'api-gateway-idempotency': 'Api Gateway Idempotency'} },
           { key: 'eureka-service-discovery', label: 'Eureka Service Discovery (Registry)', children: [
             { key: 'mechanics-client-lifecycle', label: 'Eureka Server Mechanics & Client Lifecycle', pages: {'eureka-mechanics-client-lifecycle': 'Eureka Mechanics Client Lifecycle'} },
@@ -86,7 +109,7 @@ const tree = [
             { key: 'choreography', label: 'Choreography (Decentralized)', pages: {'saga-choreography': 'Saga Choreography'} },
             { key: 'orchestration', label: 'Orchestration (Centralized)', pages: {'saga-orchestration': 'Saga Orchestration'} },
           ] },
-          { key: 'config-server-vault', label: 'Config Server vs Vault', pages: {'config-server-vs-vault': {label: 'Config Server vs Vault', contentKey: 'interview-prep/microservices/project-flow/config-server-vs-vault/config-server-vs-vault'}} },
+          { key: 'config-server-vault', label: 'Config Server vs Vault' },
           { key: 'circuit-breaker-fallback', label: 'Circuit Breaker & Fallback', pages: {'circuit-breaker-fallback': 'Circuit Breaker Fallback'} },
         ] },
         { key: 'distributed-systems', label: 'Distributed Systems', pages: {'service-discovery': 'Service Discovery', 'config-server-vault': 'Config Server Vault', 'circuit-breaker': 'Circuit Breaker', 'distributed-tracing': 'Distributed Tracing', 'metrics-observability': 'Metrics Observability'} },
@@ -183,13 +206,33 @@ const tree = [
       { key: 'api-gateway', label: 'API Gateway', pages: {'gateway-pattern': 'Gateway Pattern', 'routing': 'Routing', 'authentication-at-gateway': 'Authentication At Gateway', 'gateway-rate-limiting': 'Gateway Rate Limiting'} },
       { key: 'load-balancing', label: 'Load Balancing', pages: {'load-balancer-basics': 'Load Balancer Basics', 'client-side-load-balancing': 'Client Side Load Balancing', 'health-checks': 'Health Checks'} },
       { key: 'rest', label: 'REST APIs', pages: {'rest-principles': 'Rest Principles', 'http-methods': 'Http Methods', 'status-codes': 'Status Codes', 'pagination': 'Pagination', 'versioning': 'Versioning'} },
-      { key: 'resilience', label: 'Resilience', pages: {'timeouts-retries': 'Timeouts Retries', 'idempotency': {label: 'Idempotency', contentKey: 'interview-prep/microservices/project-flow/api-gateway-idempotency/api-gateway-idempotency'}, 'rate-limiting': {label: 'Rate Limiting', contentKey: 'interview-prep/system-design/rate-limiting'}, 'dos-protection': 'Dos Protection', 'bulkheads': 'Bulkheads'} },
+      { key: 'resilience', label: 'Resilience', pages: {'timeouts-retries': 'Timeouts Retries', 'idempotency': 'Idempotency', 'rate-limiting': 'Rate Limiting', 'dos-protection': 'Dos Protection', 'bulkheads': 'Bulkheads'} },
       { key: 'documentation', label: 'API Documentation', pages: {'openapi-swagger': 'Openapi Swagger', 'postman': 'Postman'} },
     ],
   },
   {
     key: 'databases', label: 'Databases & Storage', children: [
-      { key: 'sql', label: 'SQL', pages: {'relational-model': 'Relational Model', 'normalization': 'Normalization', 'indexes': 'Indexes', 'sql-data-pages': 'Sql Data Pages', 'joins': 'Joins', 'transactions': 'Transactions', 'deadlocks': 'Deadlocks'} },
+      {
+        key: 'sql',
+        label: 'SQL',
+        contentKey: 'databases/sql',
+        pages: {
+          'indexes': 'Index Fundamentals and Query Plans',
+          'index-structures': 'B-tree Pages and Clustered / Nonclustered Indexes',
+          'composite-indexes': 'Composite Indexes and Leftmost Prefix',
+          'sql-data-pages': 'Database Data Pages and B-tree Storage',
+          'schema-and-collation': 'Inspect Schema, Character Sets and Collations',
+          'row-size-estimation': 'Estimate Field and Row Sizes',
+          'index-analysis': 'Inspect Duplicate and Redundant Indexes',
+          'index-design-maintenance': 'Design, Monitor and Maintain Indexes',
+          'bulk-inserts': 'Batch-load Data and Diagnose Long Inserts',
+          'relational-model': 'Relational Model',
+          'normalization': 'Normalization',
+          'joins': 'Joins',
+          'transactions': 'Transactions',
+          'deadlocks': 'Deadlocks',
+        },
+      },
       { key: 'nosql', label: 'NoSQL', pages: {'sql-vs-nosql': 'Sql Vs Nosql', 'document-databases': 'Document Databases', 'key-value': 'Key Value', 'eventual-consistency': 'Eventual Consistency'} },
       { key: 'caching', label: 'Caching', pages: {'cache-aside': 'Cache Aside', 'redis': 'Redis', 'hazelcast': 'Hazelcast', 'cache-invalidation': 'Cache Invalidation'} },
       { key: 'file-storage', label: 'File Storage', pages: {'s3': 'S3', 'firestore-storage': 'Firestore Storage', 'object-storage-patterns': 'Object Storage Patterns'} },
@@ -247,7 +290,11 @@ const tree = [
     ],
   },
   {
-    key: 'git-collaboration', label: 'Git & Collaboration', children: [
+    key: 'git-collaboration', label: 'Git & Collaboration', pages: {
+      'common-commands': { label: 'Common Git Commands', contentKey: 'git-collaboration/common-commands' },
+      'undo-things': { label: 'Undo Git Changes', contentKey: 'git-collaboration/undo-things' },
+      'branching-strategy': { label: 'Branching Strategy', contentKey: 'git-collaboration/branching-strategy' },
+    }, children: [
       { key: 'git', label: 'Git', children: [
         { key: 'foundations', label: 'Foundations', pages: {
           'init-clone': 'Create or Clone a Repository',
@@ -276,6 +323,8 @@ const tree = [
         'cherry-pick': { label: 'Cherry-pick', contentKey: 'git-collaboration/git/branching/cherry-pick' },
         'reset-revert': { label: 'Reset and Revert', contentKey: 'git-collaboration/git/recovery/undo-reset-revert' },
         'bisect': { label: 'Bisect and Conflict Recovery', contentKey: 'git-collaboration/git/recovery/debugging' },
+        'sourcetree': { label: 'SourceTree', contentKey: 'git-collaboration/git/sourcetree' },
+        'service-account-from-github-secrets': { label: 'Service Account from GitHub Secrets', contentKey: 'git-collaboration/git/service-account-from-github-secrets' },
       } },
       { key: 'pull-requests', label: 'Pull Requests', pages: {'pr-review': 'Pr Review', 'review-checklist': 'Review Checklist', 'commit-strategy': 'Commit Strategy'} },
       { key: 'source-control', label: 'Source Control', pages: {'release-branching': 'Release Branching', 'semantic-versioning': 'Semantic Versioning'} },
@@ -301,7 +350,6 @@ const tree = [
 tree.push({
   key: 'networking',
   label: 'Networking',
-  contentKey: 'networking/overview',
   children: [
     { key: 'dns-registrars', label: 'DNS & Registrars', contentKey: 'networking/dns-registrars', children: [
       { key: 'url-uri', label: 'TLD, Domains & URL/URI', contentKey: 'networking/dns-registrars/url-uri' },
@@ -326,7 +374,13 @@ tree.push({
   ],
 });
 
-const legacyPlatform = ['text', 'nodejs', 'json', 'jwt', 'git', 'email'].map((categoryKey) => {
+tree.push({
+  key: 'ai',
+  label: 'AI & Machine Learning',
+  contentKey: 'ai',
+});
+
+const legacyPlatform = ['text', 'nodejs', 'json', 'jwt', 'email'].map((categoryKey) => {
   const category = CATEGORIES.find((item) => item.key === categoryKey);
   return {
     key: categoryKey,
@@ -355,6 +409,8 @@ function normalizeNode(node, parentPath = []) {
       type: 'page',
     };
   });
+  // New pages follow their UI path by default. Keep contentKey overrides only
+  // for intentional aliases that reuse a page owned by a different section.
   const contentKey = node.contentKey || path.join('/');
   return {
     ...node,

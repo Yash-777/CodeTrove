@@ -2,7 +2,7 @@
  * src/routes/routes.config.js
  * ------------------------------------------------------------------
  * Centralized URL path builders, organized around the three pillars
- * from the Codetrove structure: LEARN, BUILD, STORE (see Sidebar.jsx
+ * from the CodeTrove structure: LEARN, BUILD, STORE (see Sidebar.jsx
  * for the tab switcher that navigates between them).
  */
 
@@ -12,6 +12,7 @@ export const paths = {
   // LEARN
   category: (categoryKey) => `/content/${categoryKey}`,
   topic: (categoryKey, slug) => `/content/${categoryKey}/${slug}`,
+  navigationTree: (nodePath = '') => `/content/tree${nodePath ? `/${nodePath}` : ''}`,
   documentationTopic: (sectionKey, topicKey) => `/content/${sectionKey}/${topicKey}`,
   documentationSubtopic: (sectionKey, topicKey, subtopicKey) => `/content/${sectionKey}/${topicKey}/${subtopicKey}`,
   documentationPage: (sectionKey, topicKey, subtopicKey, pageKey) => `/content/${sectionKey}/${topicKey}/${subtopicKey}/${pageKey}`,
