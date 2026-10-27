@@ -15,7 +15,8 @@ const tree = [
   {
     key: 'languages', label: 'Programming Languages', contentKey: 'languages', children: [
       { key: 'java', label: 'Java', data: 'content.md', children: [
-        { key: 'core', label: 'Core', pages: { 'errors-exceptions': 'Errors & Exceptions' }, children: [
+        { key: 'core', label: 'Core', data: 'content.md', pages: { 'errors-exceptions': 'Errors & Exceptions' }, children: [
+          { key: 'arrays-collections', label: 'Arrays, Collection Framework & Generics', data: 'content.md'},
           { key: 'oop', label: 'Object-Oriented Programming', data: 'content.md', children: [
             { key: 'class-object', label: 'Class & Object', contentKey: 'languages/java/core/oop/class-object' },
             { key: 'interface-abstract-class', label: 'Interface & Abstract Class', contentKey: 'languages/java/core/oop/interface-abstract-class' },
@@ -256,6 +257,7 @@ const tree = [
   },
   {
     key: 'security', label: 'Security', children: [
+      { key: 'cryptography', label: 'Cryptography', data: 'content.md', pages: {'symmetric-encryption': 'Symmetric Encryption', 'asymmetric-encryption': 'Asymmetric Encryption', 'hashing': 'Hashing', 'digital-signatures': 'Digital Signatures'} },
       { key: 'application-security', label: 'Application Security', pages: {'owasp-top-10': 'Owasp Top 10', 'input-validation': 'Input Validation', 'csrf': 'Csrf', 'cors': 'Cors', 'secure-headers': 'Secure Headers'} },
       { key: 'identity', label: 'Identity & Access', pages: {'oauth2': 'Oauth2', 'openid-connect': 'Openid Connect', 'jwt': 'Jwt', 'rbac': 'Rbac', 'secrets': 'Secrets'} },
       { key: 'api-security', label: 'API Security', pages: {'api-authentication': 'Api Authentication', 'api-authorization': 'Api Authorization', 'token-validation': 'Token Validation', 'dos-mitigation': 'Dos Mitigation'} },
@@ -284,7 +286,7 @@ const tree = [
   {
     key: 'architecture', label: 'Architecture & Design', children: [
       { key: 'software-architecture', label: 'Software Architecture', pages: {'layered-architecture': 'Layered Architecture', 'hexagonal-architecture': 'Hexagonal Architecture', 'clean-architecture': 'Clean Architecture', 'modular-monolith': 'Modular Monolith'} },
-      { key: 'microservices', label: 'Microservices', pages: {'architecture-deep-dive': {label: 'Microservice Architecture Deep Dive', contentKey: 'interview-prep/microservices/project-flow/microservice-architecture-deep-dive'}, 'microservice-boundaries': 'Microservice Boundaries', 'api-composition': 'Api Composition', 'data-ownership': 'Data Ownership', 'distributed-transactions': 'Distributed Transactions', 'service-versioning': 'Service Versioning'} },
+      { key: 'microservices', label: 'Microservices', contentKey:'architecture/microservices', data: 'content.md', pages: {'architecture-deep-dive': {label: 'Microservice Architecture Deep Dive', contentKey: 'interview-prep/microservices/project-flow/microservice-architecture-deep-dive'}, 'microservice-boundaries': 'Microservice Boundaries', 'api-composition': 'Api Composition', 'data-ownership': 'Data Ownership', 'distributed-transactions': 'Distributed Transactions', 'service-versioning': 'Service Versioning', 'REST and GraphQL': 'REST and GraphQL'} },
       { key: 'design-patterns', label: 'Design Patterns', pages: {'creational-patterns': 'Creational Patterns', 'structural-patterns': 'Structural Patterns', 'behavioral-patterns': 'Behavioral Patterns', 'enterprise-patterns': 'Enterprise Patterns'} },
       { key: 'system-design', label: 'System Design', pages: {'capacity-planning': 'Capacity Planning', 'consistency': 'Consistency', 'partitioning': 'Partitioning', 'sharding': 'Sharding', 'disaster-recovery': 'Disaster Recovery'} },
     ],
@@ -332,6 +334,7 @@ const tree = [
   },
   {
     key: 'tools', label: 'Developer Tools', children: [
+      { key: 'Notepad++', label: 'Notepad++', data: 'content.md', /*pages: {'text-editors': 'Text Editors', 'regex': 'Regex', 'file-compare': 'File Compare'}*/ },
       { key: 'api-tools', label: 'API Tools', pages: {'postman': 'Postman', 'swagger-ui': 'Swagger Ui', 'curl': 'Curl'} },
       { key: 'database-tools', label: 'Database Tools', pages: {'database-clients': 'Database Clients', 'query-analyzers': 'Query Analyzers'} },
       { key: 'developer-tools', label: 'Developer Workflow', pages: {'ide-debugging': 'Ide Debugging', 'terminal-tools': 'Terminal Tools', 'http-debugging': 'Http Debugging'} },

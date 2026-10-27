@@ -1,0 +1,1 @@
+Core Java concepts represent the fundamental building blocks of the Java Standard Edition (Java SE) ecosystem, serving as the absolute foundation for developing standalone, desktop, and enterprise applications.
