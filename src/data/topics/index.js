@@ -53,12 +53,12 @@ export const CATEGORIES = [
       body: getTopicContent('java', topic.slug),
     })),
     tools: [
-      { name: 'Java Formatter', description: 'Beautify Java source using standard style rules.', internalTool: 'java-formatter', externalUrl: null },
+     // { name: 'Java Formatter', description: 'Beautify Java source using standard style rules.', internalTool: 'java-formatter', externalUrl: null },
       { name: 'Maven POM Formatter', description: 'Convert dependency XML to a one-line custom build format and back, and pretty-print pom.xml (2/3/4 spaces).', internalTool: 'pom-formatter', externalUrl: null },
       { name: 'Properties ⇄ YAML ⇄ JSON Converter', description: 'Validate, format, and convert application.properties, application.yml, and application.json in all six directions.', internalTool: 'properties-yaml-converter', externalUrl: null },
     ],
   },
-  {
+  /*{
     key: 'javascript',
     label: 'JavaScript',
     color: '#D9A404',
@@ -70,7 +70,7 @@ export const CATEGORIES = [
     tools: [
       { name: 'JS/JSON Validator', description: 'Catch syntax errors before you run the code.', internalTool: 'json-formatter', externalUrl: null },
     ],
-  },
+  },*/
   {
     key: 'typescript',
     label: 'TypeScript',
@@ -91,7 +91,7 @@ export const CATEGORIES = [
     codeLang: 'text',
     topics: [],
     tools: [
-      { name: 'Cryptography Tools', description: 'Encrypt and decrypt text, generate hashes, and create or verify HMAC signatures.', internalTool: 'cryptography', externalUrl: null },
+      { name: 'Cryptography Tools', description: 'Compare symmetric and asymmetric encryption, reproduce compatible AES formats, and generate hashes or HMAC signatures.', internalTool: 'cryptography', externalUrl: null },
     ],
   },
   {
