@@ -15,6 +15,7 @@ import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
 import RunnableCode from './CodeRunner/RunnableCode.jsx';
+import MermaidDiagram from './MermaidDiagram.jsx';
 import './MarkdownContent.css';
 
 function textContent(value) {
@@ -78,6 +79,9 @@ const JAVA_DIAGRAMS = {
 
 function resolveMarkdownImage(src) {
   if (typeof src !== 'string') return src;
+  /*if (src === 'jwt-infographic:authentication-flow') {
+    return `${import.meta.env.BASE_URL}images/${encodeURIComponent('JWT Authentication Flow Infographic.png')}`;
+  }*/
   if (src.startsWith('networking-diagram:')) {
     const name = NETWORKING_DIAGRAMS[src.slice('networking-diagram:'.length)];
     return name ? `${import.meta.env.BASE_URL}networking/${name}` : src;
@@ -99,6 +103,10 @@ function MarkdownCode({ inline, className, children, node, ...props }) {
   const meta = node?.data?.meta || node?.properties?.meta || '';
   const normalizedLanguage = normalizeRunnableLanguage(language);
   const isRunnable = !inline && ['js', 'javascript', 'ts', 'typescript', 'kt', 'kotlin', 'java'].includes(language.toLowerCase()) && /(?:^|\s)runnable(?:\s|$)/.test(String(meta));
+
+  if (!inline && language.toLowerCase() === 'mermaid') {
+    return <MermaidDiagram chart={String(children).replace(/\n$/, '')} />;
+  }
 
   if (isRunnable) {
     // key = language + source: navigating to another page must remount the box,
@@ -126,6 +134,11 @@ function MarkdownCode({ inline, className, children, node, ...props }) {
 function MarkdownPre({ node, children, ...props }) {
   const codeNode = node?.children?.[0];
   const codeClasses = codeNode?.properties?.className || [];
+  if (Array.isArray(codeClasses) && codeClasses.includes('language-mermaid')) {
+    const chart = (codeNode.children || []).map((child) => child.value || '').join('').replace(/\n$/, '');
+    return <MermaidDiagram chart={chart} />;
+  }
+
   if (Array.isArray(codeClasses) && codeClasses.includes('runnable')) {
     const source = (codeNode.children || []).map((child) => child.value || '').join('').replace(/\n$/, '');
     const languageClass = codeClasses.find((name) => /^language-/.test(name)) || 'language-js';

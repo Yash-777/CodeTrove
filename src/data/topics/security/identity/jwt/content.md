@@ -30,12 +30,6 @@ A signed JWT (JWS compact format) typically contains three parts separated by do
 | :-- | :-- |
 | `Header.Payload.Signature` | `xxxxx.yyyyy.zzzzz` |
 
-The three parts are:
-
-1. **Header**
-2. **Payload**
-3. **Signature**
-
 ## 4. What is the JWT Header?
 
 The header contains metadata about the token, such as the token type and signing algorithm.
@@ -243,43 +237,9 @@ JWT authentication generally involves three main components:
 2. **Authorization Server:** Authenticates users and generates signed JWT access tokens.
 3. **Resource Server:** Hosts protected APIs and verifies JWT access tokens.
 
-### 9.1 JWT Authentication – UML Sequence Diagram
+### 9.1 JWT Authentication
 
-```mermaid
-sequenceDiagram
-    autonumber
-    actor U as User
-    participant C as Client / Browser
-    participant AS as Authorization Server
-    participant RS as Resource Server (Spring Boot API)
-
-    U->>C: Login
-    C->>AS: Send username and password
-    AS->>AS: Validate credentials
-    AS->>AS: Generate and sign JWT
-    AS-->>C: Return JWT Access Token
-
-    Note over AS,RS: Public signing keys are published through JWKS
-    RS->>AS: GET JWKS endpoint
-    AS-->>RS: Return public keys
-    RS->>RS: Cache trusted public keys
-
-    C->>RS: GET /api/employees
-    Note over C,RS: Authorization: Bearer JWT
-
-    RS->>RS: Decode JWT header and claims
-    RS->>RS: Verify signature using public key
-    RS->>RS: Validate exp, iss, aud and nbf
-    RS->>RS: Check user authorities
-
-    alt Valid token and authorized
-        RS-->>C: 200 OK + API response
-    else Invalid or expired token
-        RS-->>C: 401 Unauthorized
-    else Insufficient permission
-        RS-->>C: 403 Forbidden
-    end
-```
+![JWT Authentication Flow Infographic showing login, token issuance, JWKS public-key caching, token verification, claim validation, and authorization.](/images/JWT%20Authentication%20Flow%20Infographic.png)
 
 **Important:** The Resource Server typically does not contact the Authorization Server for every API request. It verifies JWT signatures locally using trusted public keys obtained through JWKS.
 

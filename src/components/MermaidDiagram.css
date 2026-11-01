@@ -1,0 +1,49 @@
+.markdown-mermaid {
+  box-sizing: border-box;
+  width: 100%;
+  margin: 1.25rem 0;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-bg);
+}
+
+.markdown-mermaid__canvas {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 1rem;
+  overflow-x: auto;
+  text-align: center;
+}
+
+.markdown-mermaid__canvas svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 0 auto;
+}
+
+.markdown-mermaid__loading,
+.markdown-mermaid__fallback {
+  padding: 1rem;
+  color: var(--color-text-secondary);
+  font-size: .9rem;
+}
+
+.markdown-mermaid__fallback p { margin: 0 0 .75rem; }
+.markdown-mermaid__fallback pre {
+  max-height: 24rem;
+  margin: 0;
+  padding: .85rem;
+  overflow: auto;
+  border-radius: 7px;
+  background: #1e1e1e;
+  color: #f8f8f2;
+  text-align: left;
+  white-space: pre;
+}
+
+@media (max-width: 640px) {
+  .markdown-mermaid__canvas { padding: .5rem; }
+  .markdown-mermaid__canvas svg { min-width: 640px; max-width: none; }
+}
