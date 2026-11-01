@@ -6,7 +6,7 @@
  */
 
 const jwtTopics = [
-  {
+  /*{
     slug: 'structure',
     title: 'JWT structure',
     summary: 'Header.Payload.Signature - what each part actually contains.',
@@ -23,7 +23,7 @@ const jwtTopics = [
     gifUrl: null,
     relatedTool: 'jwt-tool',
     body: '',
-  },
+  },*/
 ];
 
 export default jwtTopics;

@@ -37,7 +37,7 @@ import javascriptTopics from './javascript.js';
 import typescriptTopics from './typescript.js';
 import nodejsTopics from './nodejs.js';
 import jsonTopics from './json.js';
-import jwtTopics from './jwt.js';
+// import jwtTopics from './jwt.js';
 import gitTopics from './git.js';
 import emailTopics from './email.js';
 import { getTopicContent } from './contentLoader.js';
@@ -136,7 +136,7 @@ export const CATEGORIES = [
       { name: 'JSON Key Editor', description: 'Remove or replace a value by key using regex/path match.', internalTool: 'json-key-editor', externalUrl: null },
     ],
   },
-  {
+  /* {
     key: 'jwt',
     label: 'JWT',
     color: '#8B5CF6',
@@ -149,7 +149,7 @@ export const CATEGORIES = [
       { name: 'JWT Encode/Decode', description: 'Inspect header, payload, and signature.', internalTool: 'jwt-tool', externalUrl: null },
       { name: 'jwt.io', description: 'The reference JWT debugger, for cross-checking results.', internalTool: null, externalUrl: 'https://jwt.io' },
     ],
-  },
+  },*/
   {
     key: 'git',
     label: 'Git',
