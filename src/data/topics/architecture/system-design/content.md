@@ -47,7 +47,7 @@ Use this order in a design interview or an architecture review:
 7. **Add security and observability.** Protect every boundary and make the system diagnosable before production traffic arrives.
 8. **Test the assumptions.** Load test, fail components deliberately, restore backups, and compare measurements with the targets.
 
-The AWS Well-Architected guidance groups architecture review around operational excellence, security, reliability, performance efficiency, cost optimization, and sustainability [1]. These are review lenses, not a requirement to use a particular cloud provider.
+The [AWS Well-Architected Framework pillars](https://docs.aws.amazon.com/wellarchitected/latest/framework/the-pillars-of-the-framework.html) group architecture review around operational excellence, security, reliability, performance efficiency, cost optimization, and sustainability. These are review lenses, not a requirement to use a particular cloud provider.
 
 ## 3. A common request path
 
@@ -80,9 +80,9 @@ sequenceDiagram
 
 - **DNS** maps a hostname to an address. It is not an authorization boundary.
 - **CDN or edge cache** serves cacheable content close to users and absorbs repeated reads.
-- **Reverse proxy** receives a client request, forwards it to an upstream service, receives the response, and sends it back. NGINX documents this request-forwarding model and its header and buffering controls [4].
+- **Reverse proxy** receives a client request, forwards it to an upstream service, receives the response, and sends it back. [NGINX Reverse Proxy](https://docs.nginx.com/nginx/admin-guide/web-server/reverse-proxy/) documents this request-forwarding model and its header and buffering controls.
 - **API gateway** applies common edge policy such as routing, authentication integration, request size limits, rate limiting, version routing, and correlation IDs. It should not become a large business-logic monolith.
-- **Load balancer** spreads traffic across healthy instances. Round robin, least connections, hashing, and latency-aware strategies have different behavior; choose one based on workload and statefulness [5].
+- **Load balancer** spreads traffic across healthy instances. Round robin, least connections, hashing, and latency-aware strategies have different behavior; choose one based on workload and statefulness. [NGINX HTTP Load Balancing](https://docs.nginx.com/nginx/admin-guide/load-balancer/http-load-balancer/) documents these strategies and their trade-offs.
 - **Application service** owns a business capability and its invariants.
 - **Cache** reduces repeated reads but introduces invalidation, staleness, eviction, and stampede concerns.
 - **Database** is the durable source of truth for data that must survive process and machine failures.
@@ -228,7 +228,7 @@ A bulkhead isolates resources such as thread pools, connection pools, queues, or
 
 An idempotent operation can be repeated without creating an unintended second effect. For a payment or order command, accept an idempotency key, store the result associated with that key, and return the original result for a safe repeat. Validate that the same key is not reused with a different request payload.
 
-The AWS reliability guidance explicitly emphasizes loose coupling, idempotent mutating operations, throttling, bounded retries, timeouts, graceful degradation, and stateless designs [2].
+The [AWS Well-Architected Reliability Pillar](https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/welcome.html) explicitly emphasizes loose coupling, idempotent mutating operations, throttling, bounded retries, timeouts, graceful degradation, and stateless designs.
 
 ```mermaid
 sequenceDiagram
@@ -284,7 +284,7 @@ A production system should explain what happened for one request and whether the
 - **Traces** connect spans across service boundaries so a slow request can be decomposed into gateway, application, cache, database, and downstream time.
 - **Profiles** show CPU, memory allocation, lock, and code-level behavior when metrics identify a performance problem.
 
-If only four user-facing signals can be measured, Google SRE recommends latency, traffic, errors, and saturation [3]. Track successful and failed latency separately, and use percentiles such as p95 or p99 when tail behavior matters.
+If only four user-facing signals can be measured, [Google SRE's four golden signals](https://sre.google/sre-book/monitoring-distributed-systems/) are latency, traffic, errors, and saturation. Track successful and failed latency separately, and use percentiles such as p95 or p99 when tail behavior matters.
 
 A useful dashboard answers:
 
@@ -377,11 +377,3 @@ The client sends a unique idempotency key. The service validates and stores the 
 
 Show actors, trust boundaries, request direction, stateful components, data ownership, synchronous calls, asynchronous messages, deployment boundaries, and the important failure or recovery paths. A diagram is useful only when its labels and arrows explain a decision. Add a short narrative for timeouts, retries, consistency, and ownership instead of drawing every implementation detail.
 </details>
-
-## References
-
-[1]: https://docs.aws.amazon.com/wellarchitected/latest/framework/the-pillars-of-the-framework.html "AWS Well-Architected Framework pillars"
-[2]: https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/welcome.html "AWS Well-Architected Reliability Pillar"
-[3]: https://sre.google/sre-book/monitoring-distributed-systems/ "Google SRE: Monitoring Distributed Systems"
-[4]: https://docs.nginx.com/nginx/admin-guide/web-server/reverse-proxy/ "NGINX Reverse Proxy"
-[5]: https://docs.nginx.com/nginx/admin-guide/load-balancer/http-load-balancer/ "NGINX HTTP Load Balancing"

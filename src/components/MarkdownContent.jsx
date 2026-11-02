@@ -39,6 +39,14 @@ function normalizeRunnableLanguage(language = '') {
   return 'javascript';
 }
 
+// Keep canonical Markdown links such as `[label](https://example.com)` as
+// normal anchors, while trimming parser-provided whitespace before routing.
+function normalizeMarkdownHref(href) {
+  if (typeof href !== 'string') return undefined;
+  const normalized = href.trim();
+  return normalized || undefined;
+}
+
 function MarkdownCode({ inline, className, children, node, ...props }) {
   const match = /language-([\w-]+)/.exec(className || '');
   const language = match ? match[1] : 'text';
@@ -188,10 +196,11 @@ export default function MarkdownContent({ children }) {
         th: ({ node, isHeader: _isHeader, ...props }) => <th className="markdown-th" {...props} />,
         td: ({ node, ...props }) => <td className="markdown-td" {...props} />,
         a: ({ node, href, children, ...props }) => {
-          const isInternalRoute = href?.startsWith('/') && !href.startsWith('//');
+          const normalizedHref = normalizeMarkdownHref(href);
+          const isInternalRoute = normalizedHref?.startsWith('/') && !normalizedHref.startsWith('//');
           return isInternalRoute
-            ? <Link className="markdown-a" to={href} {...props}>{children}</Link>
-            : <a className="markdown-a" href={href} {...props}>{children}</a>;
+            ? <Link className="markdown-a" to={normalizedHref} {...props}>{children}</Link>
+            : <a className="markdown-a" href={normalizedHref} {...props}>{children}</a>;
         },
         blockquote: ({ node, children, ...props }) => {
           const type = alertType(children);
