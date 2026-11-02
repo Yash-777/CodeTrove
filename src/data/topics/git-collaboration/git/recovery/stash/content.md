@@ -65,7 +65,16 @@ git stash list
 
 The repository's hosting rules may prohibit pushing custom refs. In that case, use a temporary branch/commit or a patch file instead. Check `git stash -h` because export/import require a sufficiently recent Git version. Do not confuse exporting a stash with publishing a normal branch.
 
-![A stash stores a temporary local snapshot that can be inspected and reapplied, or exported for transfer.](git-diagram:stash)
+```mermaid
+sequenceDiagram
+    participant Dev as Developer
+    participant Work as Working tree
+    participant Stash as Stash entry
+    Dev->>Stash: save temporary changes
+    Stash-->>Work: clean working tree
+    Dev->>Stash: inspect, apply, pop, or export
+    Stash-->>Work: restore selected changes
+```
 
 ## References
 

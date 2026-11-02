@@ -2,7 +2,19 @@
 
 When a browser needs `www.example.com`, it needs an address before it can open a network connection. The path below is common, but modern browsers, VPNs, operating systems, enterprise agents, and encrypted DNS can change the order or add caches.
 
-![DNS resolution path with cache hits and resolver referrals](networking-diagram:dns-resolution)
+```mermaid
+sequenceDiagram
+    participant Client as Client
+    participant Resolver as Recursive resolver
+    participant Root as Root or TLD servers
+    participant Auth as Authoritative server
+    Client->>Resolver: request hostname address
+    Resolver->>Root: follow referral when uncached
+    Root-->>Resolver: identify next nameserver
+    Resolver->>Auth: request authoritative record
+    Auth-->>Resolver: return record and TTL
+    Resolver-->>Client: return and cache answer
+```
 
 ## The common lookup path
 

@@ -4,7 +4,18 @@ These lessons establish the mental model used by every later Git command. Git ke
 
 Start with [creating or cloning a repository](/content/tree/git-collaboration/git/foundations/init-clone), then learn [working tree, staging, and commits](/content/tree/git-collaboration/git/foundations/staging-commits). Finish by understanding [HEAD, refs, and commit hashes](/content/tree/git-collaboration/git/foundations/head-refs).
 
-![Local file changes become staged content and a local commit. Network commands are a separate step.](git-diagram:lifecycle)
+```mermaid
+sequenceDiagram
+    participant Dev as Developer
+    participant Work as Working tree
+    participant Index as Staging index
+    participant Repo as Local repository
+    participant Remote as Hosted remote
+    Dev->>Work: edit files
+    Dev->>Index: git add selected changes
+    Dev->>Repo: git commit
+    Dev->>Remote: git push when ready
+```
 
 ## Questions and answers
 

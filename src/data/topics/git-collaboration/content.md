@@ -17,7 +17,15 @@ SourceTree and the GitHub Secrets service-account guide remain separate sessions
 - [SourceTree](/content/tree/git-collaboration/git/sourcetree)
 - [Service Account from GitHub Secrets](/content/tree/git-collaboration/git/service-account-from-github-secrets)
 
-![Git records local snapshots and communicates with hosted repositories only during remote operations.](git-diagram:overview)
+```mermaid
+sequenceDiagram
+    participant Dev as Developer
+    participant Local as Local repository
+    participant Remote as Hosted remote
+    Dev->>Local: edit and commit snapshots
+    Dev->>Remote: fetch or push when sharing
+    Remote-->>Dev: refs and collaboration updates
+```
 
 | Work on your computer | Communicate with the host |
 | --- | --- |

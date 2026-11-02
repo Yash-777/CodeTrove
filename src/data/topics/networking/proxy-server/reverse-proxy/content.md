@@ -2,7 +2,16 @@
 
 A **reverse proxy** is the client-facing endpoint for one or more origin servers. The client connects to the public hostname; the reverse proxy selects a backend and forwards the request. Backend systems can remain on private addresses, but their protection depends on network rules and correct proxy configuration.
 
-![A reverse proxy terminates client connections and routes to backend services](networking-diagram:reverse-proxy)
+```mermaid
+sequenceDiagram
+    participant Client as Client
+    participant Proxy as Reverse proxy
+    participant Backend as Selected backend
+    Client->>Proxy: connect to public hostname
+    Proxy->>Backend: terminate, filter, and route request
+    Backend-->>Proxy: return application response
+    Proxy-->>Client: return response
+```
 
 ## Example flow
 

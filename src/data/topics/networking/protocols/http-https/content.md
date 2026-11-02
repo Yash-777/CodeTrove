@@ -2,7 +2,18 @@
 
 HTTP is an application protocol: a client sends a request, and a server returns a response. The request includes a method such as `GET`, a target (path and query for HTTP/1.1), headers, and optionally a body. A response contains a status code, headers, and often a representation. In HTTPS, the HTTP exchange is protected by TLS between the relevant TLS endpoints.
 
-![Client request path from DNS through TLS to HTTP response](networking-diagram:dns-tls-http)
+```mermaid
+sequenceDiagram
+    participant Client as Client
+    participant DNS as DNS resolver
+    participant Server as HTTPS server
+    Client->>DNS: resolve hostname
+    DNS-->>Client: return address
+    Client->>Server: open TCP connection
+    Server-->>Client: complete TLS authentication and key agreement
+    Client->>Server: send encrypted HTTP request
+    Server-->>Client: return HTTP response
+```
 
 ## Exact walkthrough 1: GitHub Desktop
 

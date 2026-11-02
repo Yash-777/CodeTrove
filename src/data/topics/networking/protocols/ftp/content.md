@@ -2,7 +2,16 @@
 
 **FTP (File Transfer Protocol)** uses a control connection to carry commands and replies, and a separate data connection to carry file listings and contents. Classic FTP does not encrypt credentials or data. It is easy to block or misconfigure through firewalls because the data connection behaves differently in active and passive modes.
 
-![FTP control connection and separate file data connection](networking-diagram:ftp-connections)
+```mermaid
+sequenceDiagram
+    participant Client as FTP client
+    participant Server as FTP server
+    Client->>Server: open control connection
+    Server-->>Client: accept commands and replies
+    Client->>Server: request a listing or file
+    Server-->>Client: open separate data connection
+    Server-->>Client: transfer listing or file data
+```
 
 ## Control and data connections
 

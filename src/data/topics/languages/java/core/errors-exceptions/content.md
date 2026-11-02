@@ -2,7 +2,18 @@
 
 Java reports an abnormal situation by throwing an object from the `Throwable` hierarchy. The two main branches are `Error` and `Exception`. This lesson explains how the hierarchy works, when the compiler requires handling, how failures move through the call stack, and how to write safe recovery code.
 
-![Java Throwable hierarchy](java-diagram:throwable-hierarchy)
+```mermaid
+sequenceDiagram
+    participant App as Application code
+    participant Throwable as Throwable
+    participant Error as Error branch
+    participant Exception as Exception branch
+    App->>Throwable: report a throwable condition
+    Throwable->>Error: classify serious JVM or environment failure
+    Throwable->>Exception: classify recoverable application condition
+    Error-->>App: usually do not recover
+    Exception-->>App: catch, declare, or propagate
+```
 
 ## 1. The `Throwable` hierarchy
 
@@ -101,7 +112,19 @@ When a method throws a `Throwable`:
 4. If none matches, the JVM returns to the caller and repeats the search up the call stack.
 5. If no handler is found, the current thread terminates and the JVM prints an uncaught-exception report.
 
-![Exception propagation through the call stack](java-diagram:exception-propagation)
+```mermaid
+sequenceDiagram
+    participant Main as main()
+    participant Caller as caller()
+    participant Service as service()
+    participant Handler as boundary handler
+    Main->>Caller: invoke caller()
+    Caller->>Service: invoke service()
+    Service-->>Caller: throw exception
+    Caller-->>Main: propagate when not handled
+    Main->>Handler: catch at application boundary
+    Handler-->>Main: log, recover, or return an error
+```
 
 ### Runnable: propagation and the call stack
 

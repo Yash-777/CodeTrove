@@ -4,7 +4,15 @@ A **remote** is a named URL for another Git repository. It may be hosted by GitH
 
 Git uses remote-tracking references such as `origin/main` to remember the last fetched state of a remote branch. These references are local snapshots; they do not update just because a teammate pushed. Fetching connects to the host and updates them.
 
-![Fetch updates local remote-tracking refs. Pull then integrates; push sends local commits to a remote branch.](git-diagram:remote-flow)
+```mermaid
+sequenceDiagram
+    participant Local as Local repository
+    participant Remote as Hosted remote
+    Local->>Remote: fetch remote refs
+    Remote-->>Local: update remote-tracking refs
+    Local->>Local: pull integrates fetched commits
+    Local->>Remote: push publishes local commits
+```
 
 Learn each workflow:
 

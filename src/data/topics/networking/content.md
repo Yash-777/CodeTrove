@@ -2,7 +2,19 @@
 
 A network request is not one action. A browser parses a URL, identifies a hostname, asks local name-resolution layers for an address, establishes a transport connection, negotiates encryption when HTTPS is used, sends an application request, and then interprets a response. Redirects can repeat part of that journey with a new URL.
 
-![High-level request lifecycle from URL to response](networking-diagram:request-lifecycle)
+```mermaid
+sequenceDiagram
+    participant Browser as Browser
+    participant Cache as Local caches
+    participant DNS as DNS resolver
+    participant Server as Web server
+    Browser->>Cache: check URL, service worker, and connection cache
+    Cache-->>Browser: reuse result or continue
+    Browser->>DNS: resolve hostname
+    DNS-->>Browser: return an address
+    Browser->>Server: establish transport and send request
+    Server-->>Browser: response or redirect
+```
 
 ## Follow the lessons in order
 
@@ -19,7 +31,18 @@ Every lesson keeps a short explanation beside runnable examples or copyable loca
 
 For a fresh HTTPS connection, the browser must obtain or reuse an IP address before it can open a socket to the server. It then completes TCP setup (unless a different transport is used), performs TLS authentication and key agreement, and only after the secure channel is ready sends the HTTP request. Existing DNS answers, sockets, or TLS sessions may be reused, so not every page view repeats every handshake.
 
-![Name resolution, transport setup, TLS, and HTTP request sequence](networking-diagram:dns-tls-http)
+```mermaid
+sequenceDiagram
+    participant Client as Client
+    participant DNS as DNS resolver
+    participant Server as HTTPS server
+    Client->>DNS: resolve hostname
+    DNS-->>Client: return address
+    Client->>Server: open TCP connection
+    Server-->>Client: complete TLS authentication and key agreement
+    Client->>Server: send encrypted HTTP request
+    Server-->>Client: return HTTP response
+```
 
 ## Learn with diagrams and Markdown
 

@@ -26,7 +26,16 @@ A---B---C  main
           D′---E′  feature/report
 ```
 
-![Rebase replays feature commits onto the target branch, producing new commit IDs.](git-diagram:rebase)
+```mermaid
+sequenceDiagram
+    participant Feature as Feature branch
+    participant Target as Target branch
+    participant Git as Git rebase
+    Feature->>Git: select unpublished commits
+    Target->>Git: provide new base
+    Git->>Feature: replay commits in order
+    Git-->>Feature: create new commit IDs
+```
 
 ## Resolve a rebase conflict
 

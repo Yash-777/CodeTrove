@@ -2,7 +2,16 @@
 
 A **socket** is an operating-system programming interface for sending and receiving data over a network. A TCP server binds a local address and port, listens, and accepts incoming connections. A client resolves the server name, chooses a local ephemeral port, and connects to the server address and port. The server's listening socket remains ready for new clients; `accept` returns a separate connected socket for each client.
 
-![A client and server socket exchange data over TCP](networking-diagram:socket-lifecycle)
+```mermaid
+sequenceDiagram
+    participant Client as Client socket
+    participant Server as Listening socket
+    Client->>Server: resolve address and connect
+    Server-->>Client: complete TCP handshake
+    Client->>Server: send bytes
+    Server-->>Client: receive and respond
+    Client->>Server: close connected socket
+```
 
 ## TCP connection lifecycle
 

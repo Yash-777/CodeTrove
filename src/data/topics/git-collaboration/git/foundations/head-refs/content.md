@@ -4,7 +4,17 @@ A **commit** is an immutable history object containing a snapshot, parent commit
 
 A **branch** is a movable reference to a commit. When you commit on a branch, that branch reference advances. `HEAD` tells Git what you currently have checked out. Normally it points to a branch name, which then points to a commit. This is called **attached HEAD**.
 
-![HEAD points to the current branch; each branch name points to a commit, while a commit hash identifies a specific history object.](git-diagram:head-branches)
+```mermaid
+sequenceDiagram
+    participant Dev as Developer
+    participant HEAD as HEAD
+    participant Branch as Branch ref
+    participant Commit as Commit graph
+    Dev->>HEAD: checkout branch
+    HEAD->>Branch: identify current branch
+    Branch->>Commit: point to current commit
+    Commit-->>Dev: resolve history and parent commits
+```
 
 ## Inspect history and references
 

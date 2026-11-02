@@ -22,7 +22,16 @@ https://user:secret@shop.example.co.uk:8443/products/42?color=blue&tag=a%3Db#rev
 
 The **origin** is scheme + host + port (with default-port normalization). `https://example.com` and `http://example.com` are different origins. A path can be case-sensitive depending on the server. Percent-encoding represents characters that cannot safely appear literally in a URL component.
 
-![Anatomy of a web URL and the DNS boundary](networking-diagram:url-anatomy)
+```mermaid
+sequenceDiagram
+    participant Browser as Browser
+    participant URL as URL parser
+    participant DNS as DNS resolver
+    Browser->>URL: parse scheme, host, port, path, query, fragment
+    URL->>DNS: resolve only the hostname
+    DNS-->>URL: return address
+    URL-->>Browser: keep path, query, and fragment for the request
+```
 
 ## TLD and domain labels
 

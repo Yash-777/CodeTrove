@@ -2,7 +2,19 @@
 
 A **proxy** is an intermediary that receives a client's request and makes or routes a request on its behalf. The words *forward* and *reverse* describe which side the proxy represents in the system design. Both can cache, authenticate, filter, log, transform traffic, or conceal an address, but those capabilities depend on configuration and protocol. A proxy is not automatically encrypted or anonymous.
 
-![Forward proxy represents clients; reverse proxy represents origin servers](networking-diagram:proxy-comparison)
+```mermaid
+sequenceDiagram
+    participant Client as Client
+    participant Forward as Forward proxy
+    participant Reverse as Reverse proxy
+    participant Origin as Origin server
+    Client->>Forward: send outbound request when configured
+    Forward->>Origin: make request for the client
+    Client->>Reverse: send request to public service endpoint
+    Reverse->>Origin: route request to selected backend
+    Origin-->>Reverse: return response
+    Reverse-->>Client: return response
+```
 
 ## Learn each direction
 

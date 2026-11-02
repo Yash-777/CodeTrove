@@ -2,7 +2,17 @@
 
 The **Simple Mail Transfer Protocol (SMTP)** transfers email from a sending application to a submission server and between mail servers. It is not generally the protocol a client uses to read its mailbox; IMAP or POP3 commonly serve that purpose. SMTP servers use DNS **MX** records to identify a next-hop mail exchanger, then connect to that mail server. Messages can pass through multiple relays before delivery.
 
-![Mail delivery from sender through SMTP submission and MX-selected relays](networking-diagram:smtp-flow)
+```mermaid
+sequenceDiagram
+    participant Mail as Mail client
+    participant Submit as Submission server
+    participant SenderMX as Sender or relay MX
+    participant RecipientMX as Recipient MX
+    Mail->>Submit: submit message
+    Submit->>SenderMX: relay using SMTP
+    SenderMX->>RecipientMX: deliver through MX route
+    RecipientMX-->>Mail: make message available to mailbox
+```
 
 ## A simplified message path
 

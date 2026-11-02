@@ -15,7 +15,15 @@ Git is a **distributed version-control system**. A repository stores committed s
 
 > **Rule of thumb:** `commit` saves history locally; `push` publishes commits to a remote. `fetch` downloads remote history without integrating it into your checked-out branch. `pull` fetches and then integrates by merge or, when requested/configured, rebase.
 
-![Git moves from working files to staged changes to local commits; fetch and push connect the local repository to a hosted remote.](git-diagram:overview)
+```mermaid
+sequenceDiagram
+    participant Dev as Developer
+    participant Local as Local repository
+    participant Remote as Hosted remote
+    Dev->>Local: edit and commit snapshots
+    Dev->>Remote: fetch or push when sharing
+    Remote-->>Dev: refs and collaboration updates
+```
 
 ## Expand the Git lessons
 

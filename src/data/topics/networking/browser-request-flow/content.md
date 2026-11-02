@@ -2,7 +2,19 @@
 
 This page puts the concepts side by side. The phases describe a **fresh** HTTPS request; a real browser may reuse cached DNS, a connection, a TLS session, a service-worker result, or a cached redirect and skip some network activity.
 
-![End-to-end request life cycle](networking-diagram:request-lifecycle)
+```mermaid
+sequenceDiagram
+    participant Browser as Browser
+    participant Cache as Local caches
+    participant DNS as DNS resolver
+    participant Server as Web server
+    Browser->>Cache: check URL, service worker, and connection cache
+    Cache-->>Browser: reuse result or continue
+    Browser->>DNS: resolve hostname
+    DNS-->>Browser: return an address
+    Browser->>Server: establish transport and send request
+    Server-->>Browser: response or redirect
+```
 
 | Phase | What happens | What to look for |
 |---|---|---|

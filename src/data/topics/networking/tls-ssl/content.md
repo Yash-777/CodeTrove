@@ -2,7 +2,18 @@
 
 **TLS (Transport Layer Security)** protects data in transit and can authenticate a server using certificates. “SSL” is the older predecessor; modern web connections should use TLS, even though interfaces still say “SSL certificate.” HTTPS is HTTP carried inside TLS. TLS protects confidentiality and integrity between the TLS endpoints, but does not prove that a website's content is honest or that an endpoint is uncompromised.
 
-![TLS handshake and certificate trust chain](networking-diagram:tls-trust)
+```mermaid
+sequenceDiagram
+    participant Client as TLS client
+    participant Server as TLS server
+    participant CA as Trusted CA store
+    Client->>Server: ClientHello
+    Server-->>Client: certificate and ServerHello
+    Client->>CA: validate hostname, dates, issuer, and chain
+    CA-->>Client: certificate trusted or rejected
+    Client->>Server: complete key exchange
+    Server-->>Client: exchange encrypted application data
+```
 
 ## What the browser verifies
 

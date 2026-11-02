@@ -46,7 +46,16 @@ Your computer                                  Hosted service
 └─────────────────────────────┘                └──────────────────────┘
 ```
 
-![A local repository and hosted remote are separate repository copies connected over the network.](git-diagram:local-remote)
+```mermaid
+sequenceDiagram
+    participant Dev as Developer
+    participant Local as Local repository
+    participant Remote as Hosted remote
+    Dev->>Remote: clone or fetch
+    Remote-->>Local: repository objects and refs
+    Dev->>Local: commit locally
+    Dev->>Remote: push selected commits
+```
 
 ## Configure commit identity
 

@@ -10,9 +10,29 @@ git merge feature/search-filter
 
 The example merges your **local** `feature/search-filter` into your local `main`. If you want the latest hosted `main`, fetch first, then merge `origin/main` instead. Always check which branch is current with `git status -sb` before merging.
 
-![A merge joins two lines of commits and preserves both histories.](git-diagram:merge)
+```mermaid
+sequenceDiagram
+    participant Main as Target branch
+    participant Feature as Feature branch
+    participant Git as Git merge
+    Feature->>Git: provide feature commits
+    Main->>Git: select target tip
+    Git->>Main: create merge commit or fast-forward
+    Git-->>Feature: preserve source history
+```
 
-![When both branches change the same line, Git asks the user to resolve the conflict and continue the merge.](git-diagram:conflict)
+```mermaid
+sequenceDiagram
+    participant Main as Current branch
+    participant Feature as Incoming branch
+    participant Git as Git
+    participant Dev as Developer
+    Main->>Git: start merge
+    Feature->>Git: supply competing changes
+    Git-->>Dev: report conflict markers
+    Dev->>Git: edit, stage, and continue
+    Git->>Main: complete merge
+```
 
 ## Why a conflict happens
 

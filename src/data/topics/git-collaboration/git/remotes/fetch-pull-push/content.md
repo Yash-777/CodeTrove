@@ -40,7 +40,15 @@ Push asks the server to update the named remote branch with reachable local comm
 | `git pull origin main` | Fetches remote objects | Yes: merge/rebase according to options/config | No |
 | `git push origin main` | Sends local objects/ref update request | No | Yes, if accepted |
 
-![The network round trip distinguishes fetch, pull's integration step, and push publication.](git-diagram:remote-flow)
+```mermaid
+sequenceDiagram
+    participant Local as Local repository
+    participant Remote as Hosted remote
+    Local->>Remote: fetch remote refs
+    Remote-->>Local: update remote-tracking refs
+    Local->>Local: pull integrates fetched commits
+    Local->>Remote: push publishes local commits
+```
 
 ## A safe update workflow
 

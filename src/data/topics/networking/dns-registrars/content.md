@@ -8,7 +8,19 @@ A **registry** operates a top-level domain such as `.com`; registrars sell regis
 
 For example, a customer can register a domain at Namecheap, delegate it to Cloudflare nameservers, and have a laptop use the ISP resolver. Those are three distinct service roles.
 
-![DNS resolution from local lookup through the recursive resolver hierarchy](networking-diagram:dns-resolution)
+```mermaid
+sequenceDiagram
+    participant Client as Client
+    participant Resolver as Recursive resolver
+    participant Root as Root or TLD servers
+    participant Auth as Authoritative server
+    Client->>Resolver: request hostname address
+    Resolver->>Root: follow referral when uncached
+    Root-->>Resolver: identify next nameserver
+    Resolver->>Auth: request authoritative record
+    Auth-->>Resolver: return record and TTL
+    Resolver-->>Client: return and cache answer
+```
 
 ## Learn these subsections
 

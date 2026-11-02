@@ -2,7 +2,16 @@
 
 A **forward proxy** sits on the outbound side of clients. The client or its network configuration chooses to send requests through it. The proxy applies policy and sends requests onward, then returns the response.
 
-![Client request routed through an outbound forward proxy](networking-diagram:forward-proxy)
+```mermaid
+sequenceDiagram
+    participant Client as Client
+    participant Proxy as Forward proxy
+    participant Destination as Destination server
+    Client->>Proxy: send outbound request
+    Proxy->>Destination: apply policy and forward request
+    Destination-->>Proxy: return response
+    Proxy-->>Client: return response
+```
 
 ## Example flow
 

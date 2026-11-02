@@ -246,30 +246,21 @@ JWT authentication generally involves three main components:
 ### 9.2 JWT Authentication – UML Component Diagram
 
 ```mermaid
-flowchart TB
-    U[User] --> C[Client / Browser]
-
-    C -->|1. Login credentials| AS[Authorization Server]
-
-    AS --> AUTH[Authenticate User]
-    AUTH --> SIGN[Generate and Sign JWT]
-    SIGN -->|2. Access Token| C
-
-    AS -.->|JWKS Endpoint: Public Keys| RS
-
-    C -->|3. Bearer JWT| RS[Resource Server - Spring Boot API]
-
-    RS --> DEC[JWT Decoder]
-    DEC --> VER[Signature Verification]
-    VER --> VAL[Claims Validation]
-    VAL --> AZ[Authorization / Roles]
-
-    AZ -->|Authorized| API[Protected REST Controller]
-    API --> DB[(Database)]
-
-    VER -->|Invalid signature| E401[401 Unauthorized]
-    VAL -->|Invalid claims| E401
-    AZ -->|Insufficient permissions| E403[403 Forbidden]
+sequenceDiagram
+    participant User
+    participant Client as Client / Browser
+    participant AS as Authorization Server
+    participant RS as Resource Server
+    participant API as Protected API
+    User->>Client: submit login credentials
+    Client->>AS: authenticate user
+    AS-->>Client: return signed JWT access token
+    Client->>RS: send Bearer JWT
+    RS->>AS: obtain or refresh trusted JWKS keys when needed
+    AS-->>RS: return public verification keys
+    RS->>RS: verify signature and validate claims
+    RS->>API: authorize request with roles
+    API-->>Client: return protected response
 ```
 
 ### 9.3 Real-World Example

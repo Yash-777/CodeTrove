@@ -10,7 +10,15 @@ git push -u origin feature/add-search
 
 The first command creates a branch locally. The final command sends its commits to `origin` and requests the remote branch `feature/add-search` be updated or created. If accepted, Git configures the upstream relationship. Later, plain `git push` and `git pull` can infer the remote and branch.
 
-![A local feature branch is pushed to a new hosted branch, which becomes its upstream tracking branch.](git-diagram:publish-branch)
+```mermaid
+sequenceDiagram
+    participant Local as Local repository
+    participant Remote as Hosted remote
+    Local->>Remote: push -u origin feature
+    Remote-->>Local: create remote feature branch
+    Local->>Local: record upstream tracking
+    Local-->>Remote: future pushes use the upstream
+```
 
 Inspect the tracking configuration:
 

@@ -9,7 +9,15 @@ git cherry-pick a1b2c3d
 
 First confirm the destination branch with `git status -sb` and inspect the candidate with `git show a1b2c3d`. The resulting commit usually has a different hash because it has a different parent, even when its file change is identical.
 
-![Cherry-pick transfers one selected change to another line of history as a new commit.](git-diagram:cherry-pick)
+```mermaid
+sequenceDiagram
+    participant Source as Source history
+    participant Git as Git cherry-pick
+    participant Target as Target branch
+    Source->>Git: select one commit
+    Git->>Target: apply the selected patch
+    Target-->>Git: record a new commit ID
+```
 
 ## If it conflicts
 
