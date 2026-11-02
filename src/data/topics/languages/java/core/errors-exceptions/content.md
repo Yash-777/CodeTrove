@@ -543,10 +543,4 @@ Catch the narrowest type you can handle. Catching `Exception` can be appropriate
 
 </details>
 
-## References
-
-[1]: https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Throwable.html "Java SE 21 Throwable API"
-[2]: https://docs.oracle.com/javase/tutorial/essential/exceptions/ "Oracle Java exceptions tutorial"
-[3]: https://docs.oracle.com/javase/specs/jls/se21/html/jls-11.html "Java Language Specification: Exceptions"
-[4]: https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Error.html "Java SE 21 Error API"
-[5]: https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html "Java SE 21 Exception API"
+Further reading: [Java SE 21 Throwable API](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Throwable.html); [Oracle Java exceptions tutorial](https://docs.oracle.com/javase/tutorial/essential/exceptions/); [Java Language Specification: Exceptions](https://docs.oracle.com/javase/specs/jls/se21/html/jls-11.html); [Java SE 21 Error API](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Error.html); [Java SE 21 Exception API](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html).

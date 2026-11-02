@@ -49,7 +49,7 @@ The following statements are **MySQL/InnoDB syntax and behavior**, not a portabl
 2. Otherwise, the first `UNIQUE` index whose columns are all `NOT NULL`.
 3. Otherwise, an internal hidden clustered key named `GEN_CLUST_INDEX` (its name is an implementation detail).
 
-The InnoDB documentation describes this choice and the important consequence: a secondary-index record carries the secondary key plus the primary-key value needed to reach the clustered record. [4]
+The InnoDB documentation describes this choice and the important consequence: a secondary-index record carries the secondary key plus the primary-key value needed to reach the clustered record. [MySQL 8.4 Reference Manual: InnoDB Index Types](https://dev.mysql.com/doc/refman/8.4/en/innodb-index-types.html)
 
 ```text
 InnoDB clustered index on PRIMARY KEY (employee_id)
@@ -72,7 +72,7 @@ This is why a secondary index is not just a pointer to a stable disk address. If
 
 ### InnoDB row layout and long values
 
-A maximum declared row size is not the same thing as the bytes occupied by an actual row. InnoDB records include internal metadata, null information, variable-length fields, and length information. Large variable-length columns can have part of their value stored on overflow pages, with information in the row record that leads to the off-page data. The details depend on row format, column type, value length, page size, and version; do not infer exact physical size by simply adding `VARCHAR(N)` maxima. [5]
+A maximum declared row size is not the same thing as the bytes occupied by an actual row. InnoDB records include internal metadata, null information, variable-length fields, and length information. Large variable-length columns can have part of their value stored on overflow pages, with information in the row record that leads to the off-page data. The details depend on row format, column type, value length, page size, and version; do not infer exact physical size by simply adding `VARCHAR(N)` maxima. [MySQL 8.4 Reference Manual: InnoDB Row Formats](https://dev.mysql.com/doc/refman/8.4/en/innodb-row-format.html)
 
 ```text
 clustered leaf record
@@ -105,13 +105,13 @@ FROM employees
 WHERE email = 'ana@example.test';
 ```
 
-`EXPLAIN` reports optimizer estimates; `EXPLAIN ANALYZE` executes a supported statement and reports observed iterator timing and row counts. `ANALYZE TABLE` refreshes statistics that can affect the choice between a scan and an index access path. [6] Treat `EXPLAIN ANALYZE` as an executing command: use it only when running the statement is safe and acceptable in the target environment.
+`EXPLAIN` reports optimizer estimates; `EXPLAIN ANALYZE` executes a supported statement and reports observed iterator timing and row counts. `ANALYZE TABLE` refreshes statistics that can affect the choice between a scan and an index access path. [MySQL 8.4 Reference Manual: EXPLAIN Statement](https://dev.mysql.com/doc/refman/8.4/en/explain.html) Treat `EXPLAIN ANALYZE` as an executing command: use it only when running the statement is safe and acceptable in the target environment.
 
-For metadata, `INFORMATION_SCHEMA.COLUMNS` exposes declared type, character and byte-length metadata, nullability, and `COLUMN_KEY`; an empty `COLUMN_KEY` is not a universal proof that a column is unindexed because a column can be a later component of a non-unique composite key. [7] `INFORMATION_SCHEMA.STATISTICS` exposes ordered index columns, uniqueness, and estimated cardinality; statistics can be cached, so inspect or refresh them before drawing conclusions. [8]
+For metadata, `INFORMATION_SCHEMA.COLUMNS` exposes declared type, character and byte-length metadata, nullability, and `COLUMN_KEY`; an empty `COLUMN_KEY` is not a universal proof that a column is unindexed because a column can be a later component of a non-unique composite key. [MySQL 8.4 Reference Manual: The INFORMATION_SCHEMA COLUMNS Table](https://dev.mysql.com/doc/refman/8.4/en/information-schema-columns-table.html) `INFORMATION_SCHEMA.STATISTICS` exposes ordered index columns, uniqueness, and estimated cardinality; statistics can be cached, so inspect or refresh them before drawing conclusions. [MySQL 8.4 Reference Manual: The INFORMATION_SCHEMA STATISTICS Table](https://dev.mysql.com/doc/refman/8.4/en/information-schema-statistics-table.html)
 
 ## 3. MariaDB: similar InnoDB ideas, explicit version and engine boundaries
 
-The following is **MariaDB syntax**. MariaDB commonly uses InnoDB, and its indexing advice is similar for that engine: start with equality predicates, then consider range, grouping, ordering, and the actual query shape. Low-cardinality indexes, such as a flag with only two values, may not reduce enough work to justify their maintenance cost. [9]
+The following is **MariaDB syntax**. MariaDB commonly uses InnoDB, and its indexing advice is similar for that engine: start with equality predicates, then consider range, grouping, ordering, and the actual query shape. Low-cardinality indexes, such as a flag with only two values, may not reduce enough work to justify their maintenance cost. [MariaDB: Building the Best Index for a Given SELECT](https://mariadb.com/docs/server/ha-and-performance/optimization-and-tuning/optimization-and-indexes/building-the-best-index-for-a-given-select)
 
 ```sql
 -- MariaDB: a read-only plan check.
@@ -188,7 +188,7 @@ A nonclustered leaf that includes all requested columns can make the query cover
 
 ## 5. SQLite: page types in a single database file
 
-SQLite stores a database as fixed-size pages in one file. The page size is part of the database format and is configurable within SQLite’s supported range; page 1 also contains the database header. SQLite distinguishes B-tree table and index pages, interior and leaf pages, and separate overflow and freelist pages. [1]
+SQLite stores a database as fixed-size pages in one file. The page size is part of the database format and is configurable within SQLite’s supported range; page 1 also contains the database header. SQLite distinguishes B-tree table and index pages, interior and leaf pages, and separate overflow and freelist pages. [SQLite File Format](https://www.sqlite.org/fileformat2.html)
 
 The key B-tree page-type values in SQLite’s file format are:
 
@@ -215,7 +215,7 @@ schema/root page -> index interior pages -> index leaf pages
 
 The payload may use overflow pages when it does not fit locally. A rowid table’s table B-tree leaf stores the record payload keyed by rowid; an ordinary index leaf stores index keys and enough information to identify the table row. `WITHOUT ROWID` tables use a different table representation, so do not assume the rowid diagram applies to every SQLite table.
 
-SQLite’s query planner documentation explains the general benefit of a B-tree index: searching an ordered structure can avoid examining every row, while a covering index can satisfy a query directly from index content. [2] Use the SQLite-specific diagnostic command below; its output is a high-level interactive format and can change between SQLite versions. [3]
+SQLite’s query planner documentation explains the general benefit of a B-tree index: searching an ordered structure can avoid examining every row, while a covering index can satisfy a query directly from index content. [The SQLite Query Planner](https://www.sqlite.org/queryplanner.html) Use the SQLite-specific diagnostic command below; its output is a high-level interactive format and can change between SQLite versions. [EXPLAIN QUERY PLAN](https://www.sqlite.org/eqp.html)
 
 ```sql
 -- SQLite: read-only plan inspection.
@@ -295,10 +295,10 @@ For that reason, a calculation such as `VARCHAR(50) × 4 + 1` is at most a rough
 
 Use the engine’s own plan and metadata tools, and label every command by engine:
 
-- **MySQL:** `SHOW CREATE TABLE`, `SHOW INDEX`, `INFORMATION_SCHEMA.STATISTICS`, `EXPLAIN`, and supported `EXPLAIN ANALYZE`. Refresh statistics with `ANALYZE TABLE` when stale statistics are a plausible cause. [6] [8]
-- **MariaDB:** `SHOW CREATE TABLE`, `SHOW INDEX`, `INFORMATION_SCHEMA`, and `EXPLAIN`; verify MariaDB version and storage engine before applying MySQL-specific assumptions. [9]
+- **MySQL:** `SHOW CREATE TABLE`, `SHOW INDEX`, `INFORMATION_SCHEMA.STATISTICS`, `EXPLAIN`, and supported `EXPLAIN ANALYZE`. Refresh statistics with `ANALYZE TABLE` when stale statistics are a plausible cause. [MySQL 8.4 Reference Manual: EXPLAIN Statement](https://dev.mysql.com/doc/refman/8.4/en/explain.html) [MySQL 8.4 Reference Manual: The INFORMATION_SCHEMA STATISTICS Table](https://dev.mysql.com/doc/refman/8.4/en/information-schema-statistics-table.html)
+- **MariaDB:** `SHOW CREATE TABLE`, `SHOW INDEX`, `INFORMATION_SCHEMA`, and `EXPLAIN`; verify MariaDB version and storage engine before applying MySQL-specific assumptions. [MariaDB: Building the Best Index for a Given SELECT](https://mariadb.com/docs/server/ha-and-performance/optimization-and-tuning/optimization-and-indexes/building-the-best-index-for-a-given-select)
 - **SQL Server:** actual or estimated execution plans, `SET STATISTICS IO`, and SQL Server catalog/DMV tooling; distinguish a key lookup from a RID lookup and check whether the index is covering.
-- **SQLite:** `EXPLAIN QUERY PLAN`, then benchmark with representative data; distinguish `SCAN` from `SEARCH` and check for temporary sorting structures. [3]
+- **SQLite:** `EXPLAIN QUERY PLAN`, then benchmark with representative data; distinguish `SCAN` from `SEARCH` and check for temporary sorting structures. [EXPLAIN QUERY PLAN](https://www.sqlite.org/eqp.html)
 
 A disciplined experiment changes one variable at a time: predicate shape, index column order, selected columns, data distribution, or statistics. Compare logical reads, actual rows, and elapsed time rather than trusting an index name or assuming that “seek” always means fast. An index that helps a read query also consumes space and must be maintained during inserts, updates, and deletes.
 
@@ -311,26 +311,6 @@ A disciplined experiment changes one variable at a time: predicate shape, index 
 - Saying that a primary key always means clustered storage. That is a scoped InnoDB statement here; other engines and table organizations differ.
 - Treating declared maximum sizes as measured row sizes. Actual values and internal metadata matter, and long values may use overflow pages.
 - Assuming a scan means an index was ignored incorrectly. A scan can be cheaper for a small table or an unselective predicate.
-- Assuming `COLUMN_KEY` empty means “definitely no index” in MySQL. Composite-key position and metadata semantics require checking the full index definition. [7]
+- Assuming `COLUMN_KEY` empty means “definitely no index” in MySQL. Composite-key position and metadata semantics require checking the full index definition. [MySQL 8.4 Reference Manual: The INFORMATION_SCHEMA COLUMNS Table](https://dev.mysql.com/doc/refman/8.4/en/information-schema-columns-table.html)
 - Using one engine’s `EXPLAIN` syntax in another engine. MySQL, MariaDB, SQL Server, and SQLite expose different commands and output formats.
 - Thinking a clustered key’s logical order guarantees adjacent physical sectors or pages. Splits, free space, partitioning, and maintenance affect physical placement.
-
-## References
-
-[1]: https://www.sqlite.org/fileformat2.html "SQLite File Format"
-
-[2]: https://www.sqlite.org/queryplanner.html "The SQLite Query Planner"
-
-[3]: https://www.sqlite.org/eqp.html "EXPLAIN QUERY PLAN"
-
-[4]: https://dev.mysql.com/doc/refman/8.4/en/innodb-index-types.html "MySQL 8.4 Reference Manual: InnoDB Index Types"
-
-[5]: https://dev.mysql.com/doc/refman/8.4/en/innodb-row-format.html "MySQL 8.4 Reference Manual: InnoDB Row Formats"
-
-[6]: https://dev.mysql.com/doc/refman/8.4/en/explain.html "MySQL 8.4 Reference Manual: EXPLAIN Statement"
-
-[7]: https://dev.mysql.com/doc/refman/8.4/en/information-schema-columns-table.html "MySQL 8.4 Reference Manual: The INFORMATION_SCHEMA COLUMNS Table"
-
-[8]: https://dev.mysql.com/doc/refman/8.4/en/information-schema-statistics-table.html "MySQL 8.4 Reference Manual: The INFORMATION_SCHEMA STATISTICS Table"
-
-[9]: https://mariadb.com/docs/server/ha-and-performance/optimization-and-tuning/optimization-and-indexes/building-the-best-index-for-a-given-select "MariaDB: Building the Best Index for a Given SELECT"

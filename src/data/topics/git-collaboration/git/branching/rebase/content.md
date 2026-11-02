@@ -58,11 +58,7 @@ git rebase --abort
 
 Rebasing unpublished local commits is a common way to update your feature branch. Rebasing commits already used by teammates rewrites shared history. They may have based work on the old commit IDs, so coordinate first. If you have already pushed the branch, publishing rewritten history may require a force update; see the [force-push safety lesson](/content/tree/git-collaboration/git/remotes/force-push).
 
-## References
-
-- [Git `rebase`](https://git-scm.com/docs/git-rebase)
-- [Atlassian: Git rebase](https://www.atlassian.com/git/tutorials/rewriting-history/git-rebase)
-
+Further reading: [Git `rebase`](https://git-scm.com/docs/git-rebase); [Atlassian: Git rebase](https://www.atlassian.com/git/tutorials/rewriting-history/git-rebase).
 ## Questions and answers
 
 <details>

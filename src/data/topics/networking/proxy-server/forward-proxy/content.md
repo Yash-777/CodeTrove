@@ -38,7 +38,4 @@ printf 'HTTP_PROXY=%s\\nHTTPS_PROXY=%s\\nNO_PROXY=%s\\n' "$HTTP_PROXY" "$HTTPS_P
 
 Proxy settings are often sensitive infrastructure information; redact credentials and internal hostnames before sharing output. A local proxy test only applies to requests made by tools configured to use it.
 
-## References
-
-[1]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Proxy_servers_and_tunneling "MDN: Proxy servers and tunneling"
-[2]: https://www.rfc-editor.org/rfc/rfc9110 "RFC 9110: HTTP Semantics (CONNECT)"
+Further reading: [MDN: Proxy servers and tunneling](https://developer.mozilla.org/en-US/docs/Web/HTTP/Proxy_servers_and_tunneling); [RFC 9110: HTTP Semantics (CONNECT)](https://www.rfc-editor.org/rfc/rfc9110).

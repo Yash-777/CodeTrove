@@ -27,7 +27,4 @@ The accompanying lessons include text diagrams and concrete flow examples. The s
 
 A NAT gateway rewrites network addresses; it is not necessarily an HTTP proxy. A DNS resolver answers names; it is not an HTTP proxy. A load balancer may operate at layer 4 or layer 7 and can be implemented alongside a reverse proxy. A VPN carries traffic through a tunnel but is not necessarily an application-layer proxy. A TLS-intercepting enterprise proxy can inspect traffic only under specific client trust and policy arrangements and should be disclosed and authorized.
 
-## References
-
-[1]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Proxy_servers_and_tunneling "MDN: Proxy servers and tunneling"
-[2]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Proxies "MDN: Proxies"
+Further reading: [MDN: Proxy servers and tunneling](https://developer.mozilla.org/en-US/docs/Web/HTTP/Proxy_servers_and_tunneling); [MDN: Proxies](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Proxies).

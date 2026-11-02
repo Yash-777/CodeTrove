@@ -76,11 +76,7 @@ git merge --abort
 
 Check for unrelated edits before beginning. Aborting an operation restores its pre-merge state, including the state of files at merge start; it is not a general undo for arbitrary later work.
 
-## References
-
-- [Git `merge`](https://git-scm.com/docs/git-merge)
-- [Git merge conflicts overview](https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging)
-
+Further reading: [Git `merge`](https://git-scm.com/docs/git-merge); [Git merge conflicts overview](https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging).
 ## Questions and answers
 
 <details>

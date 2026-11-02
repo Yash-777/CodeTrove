@@ -63,12 +63,7 @@ git merge --ff-only origin/main
 
 `--ff-only` updates the local branch only if it can advance without creating a merge commit. If it refuses, inspect why local and remote histories diverged instead of forcing the update.
 
-## References
-
-- [Git `fetch`](https://git-scm.com/docs/git-fetch)
-- [Git `pull`](https://git-scm.com/docs/git-pull)
-- [Git `push`](https://git-scm.com/docs/git-push)
-
+Further reading: [Git `fetch`](https://git-scm.com/docs/git-fetch); [Git `pull`](https://git-scm.com/docs/git-pull); [Git `push`](https://git-scm.com/docs/git-push).
 ## Questions and answers
 
 <details>

@@ -38,8 +38,4 @@ The order and caches vary by operating system, browser, VPN, enterprise policy, 
 
 The [Build → Tools → Network DNS tab](/build/tools/network) can query Cloudflare or Google DNS-over-HTTPS for selected record types. It sends the hostname to the selected resolver when you press the lookup button; this browser tool is not identical to your computer's configured resolver.
 
-## References
-
-[1]: https://www.rfc-editor.org/rfc/rfc1034 "RFC 1034: Domain Names—Concepts and Facilities"
-[2]: https://man7.org/linux/man-pages/man5/hosts.5.html "Linux hosts(5) manual"
-[3]: https://www.rfc-editor.org/rfc/rfc8484 "RFC 8484: DNS Queries over HTTPS"
+Further reading: [RFC 1034: Domain Names—Concepts and Facilities](https://www.rfc-editor.org/rfc/rfc1034); [Linux hosts(5) manual](https://man7.org/linux/man-pages/man5/hosts.5.html); [RFC 8484: DNS Queries over HTTPS](https://www.rfc-editor.org/rfc/rfc8484).

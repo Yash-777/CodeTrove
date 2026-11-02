@@ -65,8 +65,4 @@ Test-NetConnection 127.0.0.1 -Port 5000
 
 On Linux/macOS, `ss -ltnp` (Linux) or `lsof -nP -iTCP:5000 -sTCP:LISTEN` (macOS) can inspect a listening process. A port's being open locally does not prove the remote path, firewall, name resolution, TLS, or application protocol works.
 
-## References
-
-[1]: https://nodejs.org/api/net.html "Node.js: net module"
-[2]: https://www.rfc-editor.org/rfc/rfc9293 "RFC 9293: TCP"
-[3]: https://man7.org/linux/man-pages/man2/socket.2.html "Linux socket(2) manual"
+Further reading: [Node.js: net module](https://nodejs.org/api/net.html); [RFC 9293: TCP](https://www.rfc-editor.org/rfc/rfc9293); [Linux socket(2) manual](https://man7.org/linux/man-pages/man2/socket.2.html).

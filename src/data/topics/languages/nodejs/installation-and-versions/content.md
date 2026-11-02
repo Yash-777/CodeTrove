@@ -1,6 +1,6 @@
 # Installation and Version Management
 
-Node.js installations include the `node` runtime and the npm command-line package manager. Select a release supported by the framework and project you intend to use. For new work, a supported LTS release is usually the safest default; use a different line only when a project's compatibility matrix requires it. [1]
+Node.js installations include the `node` runtime and the npm command-line package manager. Select a release supported by the framework and project you intend to use. For new work, a supported LTS release is usually the safest default; use a different line only when a project's compatibility matrix requires it. [Download Node.js](https://nodejs.org/en/download)
 
 ## Install and verify Node.js
 
@@ -17,7 +17,7 @@ A version manager is useful when different projects require different Node.js ve
 
 ## nvm-windows: recommended installer
 
-The official nvm-windows project recommends its installer for most people. If Node.js was installed directly before, follow the nvm-windows guidance for removing or resolving that installation first. Two Node installations competing on PATH can make `node`, `npm`, and global commands appear to switch unpredictably. Do not delete a folder until you have confirmed which program owns it. [2]
+The official nvm-windows project recommends its installer for most people. If Node.js was installed directly before, follow the nvm-windows guidance for removing or resolving that installation first. Two Node installations competing on PATH can make `node`, `npm`, and global commands appear to switch unpredictably. Do not delete a folder until you have confirmed which program owns it. [nvm-windows installation guide](https://github.com/coreybutler/nvm-windows/wiki)
 
 Once nvm-windows is installed, open a new terminal and use its command prompt to inspect available releases, install a specific version, activate it, and verify the result:
 
@@ -31,11 +31,11 @@ npm --version
 where.exe node
 ```
 
-Replace `<version>` with a version listed by `nvm list available`. The active version is the one selected by `nvm use`; the installed versions can remain side by side. If switching fails with a permissions message, open an elevated terminal or approve the elevation prompt. nvm-windows updates a symlink when changing versions, and that operation can require administrator privileges. [2]
+Replace `<version>` with a version listed by `nvm list available`. The active version is the one selected by `nvm use`; the installed versions can remain side by side. If switching fails with a permissions message, open an elevated terminal or approve the elevation prompt. nvm-windows updates a symlink when changing versions, and that operation can require administrator privileges. [nvm-windows installation guide](https://github.com/coreybutler/nvm-windows/wiki)
 
 ## Advanced: manual nvm-windows installation
 
-Manual installation is for people who need to manage the portable archive themselves. The official project publishes a `nvm-noinstall.zip` archive. Extract it into a dedicated directory and keep the required `nvm.exe`, `elevate.vbs`, and `elevate.cmd` files together. The installer is simpler for ordinary workstation setup. [2]
+Manual installation is for people who need to manage the portable archive themselves. The official project publishes a `nvm-noinstall.zip` archive. Extract it into a dedicated directory and keep the required `nvm.exe`, `elevate.vbs`, and `elevate.cmd` files together. The installer is simpler for ordinary workstation setup. [nvm-windows installation guide](https://github.com/coreybutler/nvm-windows/wiki)
 
 For a manual setup, configure the paths consistently:
 
@@ -53,7 +53,7 @@ proxy: none
 arch: 64
 ```
 
-Use Windows Environment Variables to set the variables and append both locations to PATH. Open a new terminal after changing environment variables. A full restart may be needed if the new shell still inherits the old PATH. [2]
+Use Windows Environment Variables to set the variables and append both locations to PATH. Open a new terminal after changing environment variables. A full restart may be needed if the new shell still inherits the old PATH. [nvm-windows installation guide](https://github.com/coreybutler/nvm-windows/wiki)
 
 ## Diagnose version and PATH conflicts
 
@@ -69,8 +69,3 @@ $env:Path -split ';'
 ```
 
 If `where.exe node` prints multiple locations, the first match is normally the one used by the shell. Confirm that it is the nvm-windows symlink target you expect. Avoid appending duplicate paths blindly; correct the conflicting installation or PATH order instead. After switching versions, verify `node --version` and `npm --version` again, because global npm tools may be installed under a different runtime's prefix.
-
-## References
-
-[1]: https://nodejs.org/en/download "Download Node.js"
-[2]: https://github.com/coreybutler/nvm-windows/wiki "nvm-windows installation guide"

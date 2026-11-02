@@ -44,13 +44,7 @@ If you meant to move a branch to an earlier commit, that is a different and pote
 
 For a tracking branch, `main` is your local branch. `origin/main` is your local record of the remote branch's last fetched position. It does not update continuously while someone else pushes. Run `git fetch origin` to refresh remote-tracking refs.
 
-## References
-
-- [Git `revisions`](https://git-scm.com/docs/gitrevisions)
-- [Git `log`](https://git-scm.com/docs/git-log)
-- [Git `switch`](https://git-scm.com/docs/git-switch)
-- [Git `checkout`](https://git-scm.com/docs/git-checkout)
-
+Further reading: [Git `revisions`](https://git-scm.com/docs/gitrevisions); [Git `log`](https://git-scm.com/docs/git-log); [Git `switch`](https://git-scm.com/docs/git-switch); [Git `checkout`](https://git-scm.com/docs/git-checkout).
 ## Questions and answers
 
 <details>

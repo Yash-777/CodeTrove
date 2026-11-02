@@ -77,13 +77,7 @@ sequenceDiagram
     Receiver-->>Author: verify with diff and tests
 ```
 
-## References
-
-- [Git `apply`](https://git-scm.com/docs/git-apply)
-- [Git `diff`](https://git-scm.com/docs/git-diff)
-- [Git `format-patch`](https://git-scm.com/docs/git-format-patch)
-- [Git `am`](https://git-scm.com/docs/git-am)
-
+Further reading: [Git `apply`](https://git-scm.com/docs/git-apply); [Git `diff`](https://git-scm.com/docs/git-diff); [Git `format-patch`](https://git-scm.com/docs/git-format-patch); [Git `am`](https://git-scm.com/docs/git-am).
 ## Questions and answers
 
 <details>

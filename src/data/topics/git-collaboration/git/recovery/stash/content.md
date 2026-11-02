@@ -76,11 +76,7 @@ sequenceDiagram
     Stash-->>Work: restore selected changes
 ```
 
-## References
-
-- [Git `stash`](https://git-scm.com/docs/git-stash)
-- [Git `restore`](https://git-scm.com/docs/git-restore)
-
+Further reading: [Git `stash`](https://git-scm.com/docs/git-stash); [Git `restore`](https://git-scm.com/docs/git-restore).
 ## Questions and answers
 
 <details>

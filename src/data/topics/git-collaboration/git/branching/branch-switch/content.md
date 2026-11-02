@@ -52,12 +52,7 @@ git diff
 git diff --cached
 ```
 
-## References
-
-- [Git `switch`](https://git-scm.com/docs/git-switch)
-- [Git `branch`](https://git-scm.com/docs/git-branch)
-- [Git `checkout`](https://git-scm.com/docs/git-checkout)
-
+Further reading: [Git `switch`](https://git-scm.com/docs/git-switch); [Git `branch`](https://git-scm.com/docs/git-branch); [Git `checkout`](https://git-scm.com/docs/git-checkout).
 ## Questions and answers
 
 <details>

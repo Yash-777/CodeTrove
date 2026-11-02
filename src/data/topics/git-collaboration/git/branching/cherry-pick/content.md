@@ -43,11 +43,7 @@ git cherry-pick --abort
 
 For routine ongoing collaboration, merging or rebasing the branch is usually easier for teammates to understand. Cherry-pick is often a targeted backport or hotfix mechanism.
 
-## References
-
-- [Git `cherry-pick`](https://git-scm.com/docs/git-cherry-pick)
-- [Atlassian: Git cherry-pick](https://www.atlassian.com/git/tutorials/cherry-pick)
-
+Further reading: [Git `cherry-pick`](https://git-scm.com/docs/git-cherry-pick); [Atlassian: Git cherry-pick](https://www.atlassian.com/git/tutorials/cherry-pick).
 ## Questions and answers
 
 <details>

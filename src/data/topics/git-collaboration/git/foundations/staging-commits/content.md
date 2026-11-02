@@ -84,13 +84,7 @@ git status
 
 This stages two named files and creates one commit locally. It does not publish the commit until a later `git push`.
 
-## References
-
-- [Git `status`](https://git-scm.com/docs/git-status)
-- [Git `add`](https://git-scm.com/docs/git-add)
-- [Git `diff`](https://git-scm.com/docs/git-diff)
-- [Git `commit`](https://git-scm.com/docs/git-commit)
-
+Further reading: [Git `status`](https://git-scm.com/docs/git-status); [Git `add`](https://git-scm.com/docs/git-add); [Git `diff`](https://git-scm.com/docs/git-diff); [Git `commit`](https://git-scm.com/docs/git-commit).
 ## Questions and answers
 
 <details>

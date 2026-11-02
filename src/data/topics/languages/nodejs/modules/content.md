@@ -1,6 +1,6 @@
 # Modules: CommonJS and ES Modules
 
-A module is a file or package with an explicit interface that other code can load. Modules let an application split responsibilities, reuse code, and isolate local variables. Node.js provides built-in modules, project files, and packages installed into `node_modules`. [1]
+A module is a file or package with an explicit interface that other code can load. Modules let an application split responsibilities, reuse code, and isolate local variables. Node.js provides built-in modules, project files, and packages installed into `node_modules`. [CommonJS modules](https://nodejs.org/api/modules.html)
 
 ## Three module sources
 
@@ -33,7 +33,7 @@ Assigning a property to `exports` adds a named export, but assigning a completel
 
 ## ECMAScript modules
 
-ES modules use `import` and `export`. Use `.mjs` to force an ES module, or set `"type": "module"` in the nearest `package.json` so `.js` files in that package scope are interpreted as ES modules. Use `.cjs` or `"type": "commonjs"` to be explicit about CommonJS. Make the choice clear rather than mixing styles unpredictably. [1] [2]
+ES modules use `import` and `export`. Use `.mjs` to force an ES module, or set `"type": "module"` in the nearest `package.json` so `.js` files in that package scope are interpreted as ES modules. Use `.cjs` or `"type": "commonjs"` to be explicit about CommonJS. Make the choice clear rather than mixing styles unpredictably. [CommonJS modules](https://nodejs.org/api/modules.html) [ECMAScript modules](https://nodejs.org/api/esm.html)
 
 ```json
 {
@@ -68,8 +68,3 @@ When converting a project, do it consistently: set the package `type`, update fi
 - `require is not defined`: the file is running as an ES module; use `import` or change the package/file module type intentionally.
 - `Cannot use import statement outside a module`: Node is interpreting that file as CommonJS; set `"type": "module"` or use `.mjs` if that is the intended system.
 - A package works in one folder but not another: check which `package.json` is nearest to each file and whether each environment installed dependencies.
-
-## References
-
-[1]: https://nodejs.org/api/modules.html "CommonJS modules"
-[2]: https://nodejs.org/api/esm.html "ECMAScript modules"

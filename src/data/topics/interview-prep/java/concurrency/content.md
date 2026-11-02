@@ -137,8 +137,4 @@ while (running) { poll(); }
 Ask whether multiple fields must change consistently. If yes, a volatile flag alone is insufficient; use a lock, an atomic state object, or an appropriate concurrent abstraction.
 </details>
 
-## References
-
-- [Thread.State API](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Thread.State.html)
-- [ExecutorService API](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/ExecutorService.html)
-- [CompletableFuture API](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/CompletableFuture.html)
+Further reading: [Thread.State API](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Thread.State.html); [ExecutorService API](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/ExecutorService.html); [CompletableFuture API](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/CompletableFuture.html).

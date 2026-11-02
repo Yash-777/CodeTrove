@@ -14,7 +14,7 @@ A B-tree has three useful page roles:
 - **Intermediate pages** — directory pages between the root and leaves. Each entry routes a key range to a lower-level page. A large tree can have several intermediate levels.
 - **Leaf pages** — the bottom level, in key order. Leaf contents depend on the index and engine: they may be complete table records or index records containing a key and a locator.
 
-A lookup follows the key from root to intermediate pages and then to a leaf. A range lookup can continue through neighboring leaf pages, which is why an index whose key order matches a range or sort can avoid extra work. B-tree files can also contain non-tree pages such as overflow or freelist pages; those are not ordinary root, intermediate, or leaf nodes. SQLite documents separate table/index interior and leaf page types explicitly [1].
+A lookup follows the key from root to intermediate pages and then to a leaf. A range lookup can continue through neighboring leaf pages, which is why an index whose key order matches a range or sort can avoid extra work. B-tree files can also contain non-tree pages such as overflow or freelist pages; those are not ordinary root, intermediate, or leaf nodes. SQLite documents separate table/index interior and leaf page types explicitly [SQLite Database File Format](https://www.sqlite.org/fileformat2.html).
 
 A compact conceptual view is:
 
@@ -120,7 +120,7 @@ InnoDB stores a table as a clustered index:
 2. If there is no primary key, InnoDB chooses the first suitable `UNIQUE NOT NULL` index.
 3. If neither exists, InnoDB creates a hidden six-byte row identifier and a generated clustered index commonly shown as `GEN_CLUST_INDEX`.
 
-The first two choices are preferable because the application controls the identifier and can use it consistently. The hidden fallback is an implementation detail, not a column that application SQL can use as a normal primary key. These selection rules and the secondary-index behavior are documented by MySQL [5].
+The first two choices are preferable because the application controls the identifier and can use it consistently. The hidden fallback is an implementation detail, not a column that application SQL can use as a normal primary key. These selection rules and the secondary-index behavior are documented by MySQL [MySQL 8.4 Reference Manual: InnoDB Index Types](https://dev.mysql.com/doc/refman/8.4/en/innodb-index-types.html).
 
 An InnoDB clustered leaf contains the full row record together with the clustered key. A **secondary index** contains its secondary key columns plus a copy of the clustered key. A secondary lookup therefore has two conceptual steps:
 
@@ -163,7 +163,7 @@ WHERE customer_id = 42
   AND created_at >= '2026-01-01';
 ```
 
-`EXPLAIN` is an estimate; `EXPLAIN ANALYZE` executes supported statements and reports runtime observations. Refreshing statistics with `ANALYZE TABLE orders;` can change optimizer choices, but it does not create an index and does not force one to be used [6] [8].
+`EXPLAIN` is an estimate; `EXPLAIN ANALYZE` executes supported statements and reports runtime observations. Refreshing statistics with `ANALYZE TABLE orders;` can change optimizer choices, but it does not create an index and does not force one to be used [MySQL 8.4 Reference Manual: EXPLAIN Statement](https://dev.mysql.com/doc/refman/8.4/en/explain.html) [MySQL 8.4 Reference Manual: The INFORMATION_SCHEMA STATISTICS Table](https://dev.mysql.com/doc/refman/8.4/en/information-schema-statistics-table.html).
 
 ## 5. MariaDB: similar InnoDB idea, separately labeled
 
@@ -191,11 +191,11 @@ WHERE account_id = 7
 SHOW INDEX FROM invoice;
 ```
 
-MariaDB’s index-selection guidance starts with equality predicates, then considers range predicates and the query’s `GROUP BY`/`ORDER BY` shape. A low-cardinality flag by itself is often a weak index candidate, and every maintained index adds write work [4]. Validate with the MariaDB version’s `EXPLAIN`, data distribution, and workload rather than copying a rule mechanically.
+MariaDB’s index-selection guidance starts with equality predicates, then considers range predicates and the query’s `GROUP BY`/`ORDER BY` shape. A low-cardinality flag by itself is often a weak index candidate, and every maintained index adds write work [MariaDB: Building the Best Index for a Given SELECT](https://mariadb.com/docs/server/ha-and-performance/optimization-and-tuning/optimization-and-indexes/building-the-best-index-for-a-given-select). Validate with the MariaDB version’s `EXPLAIN`, data distribution, and workload rather than copying a rule mechanically.
 
 ## 6. SQLite: B-tree terminology without SQL Server clustering
 
-**SQLite** has its own file format and planner. A rowid table and an index are separate B-trees: table B-tree leaves hold table records, while index B-tree leaves hold indexed keys and row references. SQLite’s file-format documentation distinguishes table interior/leaf pages from index interior/leaf pages [1]. SQLite does **not** use SQL Server’s clustered/nonclustered index and RID vocabulary as a portable semantic model.
+**SQLite** has its own file format and planner. A rowid table and an index are separate B-trees: table B-tree leaves hold table records, while index B-tree leaves hold indexed keys and row references. SQLite’s file-format documentation distinguishes table interior/leaf pages from index interior/leaf pages [SQLite Database File Format](https://www.sqlite.org/fileformat2.html). SQLite does **not** use SQL Server’s clustered/nonclustered index and RID vocabulary as a portable semantic model.
 
 ```sql
 -- SQLite: rowid table plus an ordinary index.
@@ -215,7 +215,7 @@ FROM customer
 WHERE email = 'ana@example.test';
 ```
 
-`INTEGER PRIMARY KEY` has special rowid behavior in SQLite rowid tables; that is not the same statement as “SQLite has a SQL Server-style clustered index.” `WITHOUT ROWID` tables use a different B-tree layout and should be studied separately. `EXPLAIN QUERY PLAN` reports high-level `SCAN` versus `SEARCH`, and may identify covering-index use; SQLite warns that its displayed format can change between releases [3]. The query planner’s goal is to improve lookup work without changing query results [2].
+`INTEGER PRIMARY KEY` has special rowid behavior in SQLite rowid tables; that is not the same statement as “SQLite has a SQL Server-style clustered index.” `WITHOUT ROWID` tables use a different B-tree layout and should be studied separately. `EXPLAIN QUERY PLAN` reports high-level `SCAN` versus `SEARCH`, and may identify covering-index use; SQLite warns that its displayed format can change between releases [The SQLite Query Planner](https://www.sqlite.org/eqp.html). The query planner’s goal is to improve lookup work without changing query results [SQLite Query Planning](https://www.sqlite.org/queryplanner.html).
 
 ## 7. Reading the diagram across engines
 
@@ -256,7 +256,7 @@ Start with the workload, not with the number of columns in a table:
 6. Account for writes. `INSERT`, `UPDATE`, and `DELETE` operations may update several B-trees; wide or redundant indexes increase storage and maintenance costs.
 7. Revisit indexes after data growth, schema changes, and query changes. Refresh statistics using the engine’s documented command before concluding that an index is ignored.
 
-For MySQL, `INFORMATION_SCHEMA.COLUMNS` exposes metadata such as type, character length, charset, nullability, and `COLUMN_KEY` [7]. Treat a rough `VARCHAR(N)` byte calculation as a maximum estimate, not an exact InnoDB row size: record metadata, null maps, length fields, page overhead, and off-page storage matter [9]. Likewise, `COLUMN_KEY` is not a perfect per-column “is indexed” boolean: a column that appears only later in a nonunique composite index can have an empty value in that metadata view [7].
+For MySQL, `INFORMATION_SCHEMA.COLUMNS` exposes metadata such as type, character length, charset, nullability, and `COLUMN_KEY` [MySQL 8.4 Reference Manual: The INFORMATION_SCHEMA COLUMNS Table](https://dev.mysql.com/doc/refman/8.4/en/information-schema-columns-table.html). Treat a rough `VARCHAR(N)` byte calculation as a maximum estimate, not an exact InnoDB row size: record metadata, null maps, length fields, page overhead, and off-page storage matter [MySQL 8.4 Reference Manual: InnoDB Row Formats](https://dev.mysql.com/doc/refman/8.4/en/innodb-row-format.html). Likewise, `COLUMN_KEY` is not a perfect per-column “is indexed” boolean: a column that appears only later in a nonunique composite index can have an empty value in that metadata view [MySQL 8.4 Reference Manual: The INFORMATION_SCHEMA COLUMNS Table](https://dev.mysql.com/doc/refman/8.4/en/information-schema-columns-table.html).
 
 Index names do not make duplicate structures useful. Compare ordered key columns, uniqueness, included columns, predicates, and workload evidence before declaring two indexes redundant. Review an index-usage report and query plans before any cleanup.
 
@@ -272,15 +272,3 @@ The portable idea is simple: an ordered access path can reduce search work, whil
 - **SQLite:** table and index B-trees have SQLite-specific rowid/`WITHOUT ROWID` behavior; do not call an ordinary SQLite index “nonclustered” as though it were SQL Server syntax.
 
 Keeping those labels attached prevents a diagram that is useful for learning from becoming a misleading claim about every database engine.
-
-## References
-
-[1]: https://www.sqlite.org/fileformat2.html "SQLite Database File Format"
-[2]: https://www.sqlite.org/queryplanner.html "SQLite Query Planning"
-[3]: https://www.sqlite.org/eqp.html "The SQLite Query Planner"
-[4]: https://mariadb.com/docs/server/ha-and-performance/optimization-and-tuning/optimization-and-indexes/building-the-best-index-for-a-given-select "MariaDB: Building the Best Index for a Given SELECT"
-[5]: https://dev.mysql.com/doc/refman/8.4/en/innodb-index-types.html "MySQL 8.4 Reference Manual: InnoDB Index Types"
-[6]: https://dev.mysql.com/doc/refman/8.4/en/explain.html "MySQL 8.4 Reference Manual: EXPLAIN Statement"
-[7]: https://dev.mysql.com/doc/refman/8.4/en/information-schema-columns-table.html "MySQL 8.4 Reference Manual: The INFORMATION_SCHEMA COLUMNS Table"
-[8]: https://dev.mysql.com/doc/refman/8.4/en/information-schema-statistics-table.html "MySQL 8.4 Reference Manual: The INFORMATION_SCHEMA STATISTICS Table"
-[9]: https://dev.mysql.com/doc/refman/8.4/en/innodb-row-format.html "MySQL 8.4 Reference Manual: InnoDB Row Formats"

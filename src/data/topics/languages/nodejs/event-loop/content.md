@@ -1,6 +1,6 @@
 # Event Loop and Asynchronous Work
 
-The event loop lets Node.js make progress on many I/O operations without creating a JavaScript thread for every connection. JavaScript callbacks run one at a time by default. When the program starts asynchronous I/O, the operating system or Node's supporting runtime can perform or wait for that work; when it completes, Node schedules code to resume the task. This model can handle many concurrent requests, but it does not make CPU-heavy JavaScript run in parallel. [1]
+The event loop lets Node.js make progress on many I/O operations without creating a JavaScript thread for every connection. JavaScript callbacks run one at a time by default. When the program starts asynchronous I/O, the operating system or Node's supporting runtime can perform or wait for that work; when it completes, Node schedules code to resume the task. This model can handle many concurrent requests, but it does not make CPU-heavy JavaScript run in parallel. [The Node.js Event Loop](https://nodejs.org/en/learn/asynchronous-work/event-loop-timers-and-nexttick)
 
 ## The lifecycle of an asynchronous request
 
@@ -10,7 +10,7 @@ The event loop lets Node.js make progress on many I/O operations without creatin
 4. When the operation completes, Node queues a callback or promise continuation.
 5. The callback runs when the event loop reaches the relevant queue; its synchronous code must finish before another JavaScript callback can run.
 
-Some operations use operating-system facilities; some use libuv's worker pool. The implementation differs by API and platform. Application code should use asynchronous APIs for I/O and avoid assuming every asynchronous operation consumes a separate JavaScript thread. [1]
+Some operations use operating-system facilities; some use libuv's worker pool. The implementation differs by API and platform. Application code should use asynchronous APIs for I/O and avoid assuming every asynchronous operation consumes a separate JavaScript thread. [The Node.js Event Loop](https://nodejs.org/en/learn/asynchronous-work/event-loop-timers-and-nexttick)
 
 ## A small scheduling example
 
@@ -23,7 +23,7 @@ Promise.resolve().then(() => console.log('promise callback'));
 console.log('sync: end');
 ```
 
-The synchronous lines run first. The promise continuation is then processed as a microtask, and the timer callback runs in a later event-loop turn. A zero-millisecond timer does not mean “run immediately”; timer delays are minimum thresholds and can be extended by other work. Avoid relying on exact timing between different scheduling APIs. [1]
+The synchronous lines run first. The promise continuation is then processed as a microtask, and the timer callback runs in a later event-loop turn. A zero-millisecond timer does not mean “run immediately”; timer delays are minimum thresholds and can be extended by other work. Avoid relying on exact timing between different scheduling APIs. [The Node.js Event Loop](https://nodejs.org/en/learn/asynchronous-work/event-loop-timers-and-nexttick)
 
 ## Phases, at a useful level
 
@@ -51,7 +51,3 @@ During that calculation, unrelated requests, timers, and completed I/O callbacks
 - Set reasonable timeouts and limits for requests, uploads, and queued work.
 - Measure event-loop delay and request latency under representative load; a benchmark that only measures one request can hide queueing effects.
 - Use streams for large input instead of reading the entire file into one buffer; see [Streams and Backpressure](/content/tree/languages/nodejs/streams).
-
-## References
-
-[1]: https://nodejs.org/en/learn/asynchronous-work/event-loop-timers-and-nexttick "The Node.js Event Loop"

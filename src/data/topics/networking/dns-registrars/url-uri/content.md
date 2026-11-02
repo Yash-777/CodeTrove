@@ -1,6 +1,6 @@
 # TLD, domain names, URLs, and URIs
 
-A **URI** identifies a resource. A **URL** is a URI that also describes how to locate it. In everyday web development, people often say “URL” for an HTTP or HTTPS address. The supplied [Document URL guide][1] demonstrates the main pieces and includes a legacy `window.open()` sample and a JavaScript parser; this lesson keeps the same concepts but uses the browser's standard `URL` and `URLSearchParams` APIs to avoid fragile manual splitting.
+A **URI** identifies a resource. A **URL** is a URI that also describes how to locate it. In everyday web development, people often say “URL” for an HTTP or HTTPS address. The supplied [Document URL guide](https://developer.mozilla.org/en-US/docs/Web/API/URL) demonstrates the main pieces and includes a legacy `window.open()` sample and a JavaScript parser; this lesson keeps the same concepts but uses the browser's standard `URL` and `URLSearchParams` APIs to avoid fragile manual splitting.
 
 ## URL parts
 
@@ -99,7 +99,4 @@ For **Windows Command Prompt**, `nslookup windows.github.com` asks the configure
 
 On **macOS/Linux**, use `dig windows.github.com A`, `dig windows.github.com AAAA`, or `getent hosts windows.github.com`. `getent` follows the host lookup sources configured by the system, not only public DNS.
 
-## References
-
-[1]: https://developer.mozilla.org/en-US/docs/Web/API/URL "MDN: URL API"
-[2]: https://www.rfc-editor.org/rfc/rfc3986 "RFC 3986: Uniform Resource Identifier Syntax"
+Further reading: [RFC 3986: Uniform Resource Identifier Syntax](https://www.rfc-editor.org/rfc/rfc3986).

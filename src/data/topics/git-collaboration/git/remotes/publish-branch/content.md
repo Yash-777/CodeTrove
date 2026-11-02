@@ -47,12 +47,7 @@ git push -u origin feature/add-search
 
 If Git reports a non-fast-forward update, integrate the remote branch rather than overwriting it. See [fetch, pull, and push](/content/tree/git-collaboration/git/remotes/fetch-pull-push).
 
-## References
-
-- [Git `push`](https://git-scm.com/docs/git-push)
-- [Git `branch`](https://git-scm.com/docs/git-branch)
-- [GitHub: creating a pull request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request)
-
+Further reading: [Git `push`](https://git-scm.com/docs/git-push); [Git `branch`](https://git-scm.com/docs/git-branch); [GitHub: creating a pull request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request).
 ## Questions and answers
 
 <details>

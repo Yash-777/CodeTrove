@@ -562,13 +562,4 @@ Avoid it when the relationship is only code reuse, when the child cannot honor t
 `super()` or `super(arguments)` invokes a superclass constructor and is legal only as the first constructor invocation. `super.method(arguments)` invokes an accessible superclass instance method and can be used inside an instance method or constructor after the constructor invocation rules are satisfied.
 </details>
 
-## References
-
-- [dev.java: What Is Inheritance?](https://dev.java/learn/language/oop/inheritance/what-is-inheritance/)
-- [dev.java: Overriding and Hiding Methods](https://dev.java/learn/language/oop/inheritance/overriding/)
-- [dev.java: Polymorphism](https://dev.java/learn/language/oop/inheritance/polymorphism/)
-- [Oracle Java Tutorial: Inheritance](https://docs.oracle.com/javase/tutorial/java/IandI/subclasses.html)
-- [Oracle Java Tutorial: Multiple Inheritance of State, Implementation, and Type](https://docs.oracle.com/javase/tutorial/java/IandI/multipleinheritance.html)
-- [Java Language Specification: Class Members](https://docs.oracle.com/javase/specs/jls/se21/html/jls-8.html)
-- [Java Language Specification: Constructors](https://docs.oracle.com/javase/specs/jls/se21/html/jls-8.html#jls-8.8)
-- [Java `Class.isInstance` and `isAssignableFrom`](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Class.html)
+Further reading: [dev.java: What Is Inheritance?](https://dev.java/learn/language/oop/inheritance/what-is-inheritance/); [dev.java: Overriding and Hiding Methods](https://dev.java/learn/language/oop/inheritance/overriding/); [dev.java: Polymorphism](https://dev.java/learn/language/oop/inheritance/polymorphism/); [Oracle Java Tutorial: Inheritance](https://docs.oracle.com/javase/tutorial/java/IandI/subclasses.html); [Oracle Java Tutorial: Multiple Inheritance of State, Implementation, and Type](https://docs.oracle.com/javase/tutorial/java/IandI/multipleinheritance.html); [Java Language Specification: Class Members](https://docs.oracle.com/javase/specs/jls/se21/html/jls-8.html); [Java Language Specification: Constructors](https://docs.oracle.com/javase/specs/jls/se21/html/jls-8.html#jls-8.8); [Java `Class.isInstance` and `isAssignableFrom`](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Class.html).

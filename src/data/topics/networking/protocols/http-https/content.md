@@ -100,8 +100,4 @@ curl.exe -sS -D - -o NUL -L --max-redirs 10 https://windows.github.com/
 
 `-I` sends HEAD rather than GET; some servers handle HEAD differently. `-D -` prints response headers and `-L` follows redirects. A `curl` trace does not reproduce browser cache entries, browser HTTPS-upgrade policy, or browser service workers. Use the browser Network panel with “Preserve log” enabled to compare those details.
 
-## References
-
-[1]: https://www.rfc-editor.org/rfc/rfc9110 "RFC 9110: HTTP Semantics"
-[2]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Redirections "MDN: Redirections in HTTP"
-[3]: https://developer.chrome.com/docs/devtools/network/reference/ "Chrome DevTools: Network panel"
+Further reading: [RFC 9110: HTTP Semantics](https://www.rfc-editor.org/rfc/rfc9110); [MDN: Redirections in HTTP](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Redirections); [Chrome DevTools: Network panel](https://developer.chrome.com/docs/devtools/network/reference/).

@@ -85,8 +85,4 @@ dig @8.8.8.8 example.com AAAA
 
 If resolvers disagree, compare the queried record type, response code, TTL, CNAME chain, DNSSEC behavior, and authoritative data. A difference does not automatically mean one resolver is malicious or that the website is down.
 
-## References
-
-[1]: https://www.rfc-editor.org/rfc/rfc1034 "RFC 1034: Domain Names—Concepts and Facilities"
-[2]: https://man7.org/linux/man-pages/man5/hosts.5.html "Linux hosts(5) manual"
-[3]: https://www.rfc-editor.org/rfc/rfc8484 "RFC 8484: DNS Queries over HTTPS"
+Further reading: [RFC 1034: Domain Names—Concepts and Facilities](https://www.rfc-editor.org/rfc/rfc1034); [Linux hosts(5) manual](https://man7.org/linux/man-pages/man5/hosts.5.html); [RFC 8484: DNS Queries over HTTPS](https://www.rfc-editor.org/rfc/rfc8484).

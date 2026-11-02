@@ -136,8 +136,4 @@ Supplier<Instant> clock = Instant::now;
 Ask whether the lambda is pure, whether it can throw, and whether it captures mutable state. Side effects inside `map` or `filter` make reasoning and parallel execution harder.
 </details>
 
-## References
-
-- [Stream API](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/stream/Stream.html)
-- [Collectors API](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/stream/Collectors.html)
-- [Functional interfaces](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/function/package-summary.html)
+Further reading: [Stream API](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/stream/Stream.html); [Collectors API](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/stream/Collectors.html); [Functional interfaces](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/function/package-summary.html).

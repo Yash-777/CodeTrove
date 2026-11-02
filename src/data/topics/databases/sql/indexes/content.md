@@ -29,15 +29,15 @@ Cart View  -> row locator for id 3
 Home      -> row locator for id 2
 ```
 
-The real representation contains page and record metadata, and the row locator depends on the engine. SQLite describes table and index B-trees as page-based structures with interior and leaf pages [1] [2]. In MySQL InnoDB, a primary key is the clustered index when one exists; a secondary-index record includes the primary-key value used to reach the clustered row [3]. If an InnoDB table has no primary key, InnoDB chooses a suitable `UNIQUE NOT NULL` index or creates a hidden clustered index named `GEN_CLUST_INDEX`; defining an intentional primary key is clearer and usually preferable [3]. InnoDB row formats also affect the physical representation of records and large values [9].
+The real representation contains page and record metadata, and the row locator depends on the engine. SQLite describes table and index B-trees as page-based structures with interior and leaf pages [SQLite Query Planning](https://www.sqlite.org/queryplanner.html) [SQLite EXPLAIN QUERY PLAN](https://www.sqlite.org/eqp.html). In MySQL InnoDB, a primary key is the clustered index when one exists; a secondary-index record includes the primary-key value used to reach the clustered row [MySQL 8.4 Reference Manual: InnoDB Index Types](https://dev.mysql.com/doc/refman/8.4/en/innodb-index-types.html). If an InnoDB table has no primary key, InnoDB chooses a suitable `UNIQUE NOT NULL` index or creates a hidden clustered index named `GEN_CLUST_INDEX`; defining an intentional primary key is clearer and usually preferable [MySQL 8.4 Reference Manual: InnoDB Index Types](https://dev.mysql.com/doc/refman/8.4/en/innodb-index-types.html). InnoDB row formats also affect the physical representation of records and large values [MySQL 8.4 Reference Manual: InnoDB Row Formats](https://dev.mysql.com/doc/refman/8.4/en/innodb-row-format.html).
 
 A secondary index can therefore reduce the search for `name = 'Cart View'`, but a `SELECT *` may still require a second lookup to fetch columns that are not stored in that secondary index. An index containing every column needed by a query is sometimes called a **covering index**; coverage can avoid that extra table-row lookup, but it increases index width and write/storage cost.
 
 ### Engine terminology is not interchangeable
 
 - **MySQL/InnoDB:** “clustered index” means the table records are stored in the leaf pages of the primary-key B-tree. It does not mean rows have an immutable physical position. Secondary indexes point through the primary key.
-- **SQLite:** tables and indexes are B-trees in the database file; the rowid table and index B-trees have engine-specific details. Do not copy InnoDB clustered-index rules into SQLite [1] [2] [4].
-- **MariaDB:** InnoDB commonly has the same primary-key/secondary-key model described above, but optimizer output and available features depend on MariaDB version and storage engine [5].
+- **SQLite:** tables and indexes are B-trees in the database file; the rowid table and index B-trees have engine-specific details. Do not copy InnoDB clustered-index rules into SQLite [SQLite Query Planning](https://www.sqlite.org/queryplanner.html) [SQLite EXPLAIN QUERY PLAN](https://www.sqlite.org/eqp.html) [SQLite Database File Format](https://www.sqlite.org/fileformat2.html).
+- **MariaDB:** InnoDB commonly has the same primary-key/secondary-key model described above, but optimizer output and available features depend on MariaDB version and storage engine [MariaDB: Building the Best Index for a Given SELECT](https://mariadb.com/docs/server/ha-and-performance/optimization-and-tuning/optimization-and-indexes/building-the-best-index-for-a-given-select).
 - **SQL Server:** a clustered index defines the table’s leaf-level row organization, and a table has at most one. A heap has RID locators; a nonclustered index on a heap uses a RID, while a nonclustered index on a clustered table generally uses the clustered key as its row locator. “Clustered” here is SQL Server terminology and is not a portable `CREATE INDEX` clause.
 
 ## 2. Scan, lookup, seek, and what the row counts mean
@@ -66,7 +66,7 @@ Start with the workload, not with a rule such as “index every column.” Candi
 - `ORDER BY` and `GROUP BY` expressions when the same query shape is frequent;
 - uniqueness constraints, where the index also enforces data integrity.
 
-Selectivity matters. An index on a flag with two values may be unattractive if nearly half of the table matches either value. A low-cardinality index can still be useful for a highly skewed distribution, a selective combined predicate, or a covering access path. MariaDB’s indexing guidance recommends considering equality columns first, then range, grouping, and ordering needs, while accounting for index maintenance on writes [5].
+Selectivity matters. An index on a flag with two values may be unattractive if nearly half of the table matches either value. A low-cardinality index can still be useful for a highly skewed distribution, a selective combined predicate, or a covering access path. MariaDB’s indexing guidance recommends considering equality columns first, then range, grouping, and ordering needs, while accounting for index maintenance on writes [MariaDB: Building the Best Index for a Given SELECT](https://mariadb.com/docs/server/ha-and-performance/optimization-and-tuning/optimization-and-indexes/building-the-best-index-for-a-given-select).
 
 ### Column order and the leftmost prefix
 
@@ -97,7 +97,7 @@ CREATE UNIQUE INDEX uq_feature_external_key
     ON feature (external_key);
 ```
 
-MySQL’s `CREATE INDEX` syntax is not the generic SQL Server form: do not add `CLUSTERED` or `NONCLUSTERED` to a MySQL statement. In InnoDB, whether an index is clustered follows the table’s primary-key design, not a MySQL `CLUSTERED` keyword [3].
+MySQL’s `CREATE INDEX` syntax is not the generic SQL Server form: do not add `CLUSTERED` or `NONCLUSTERED` to a MySQL statement. In InnoDB, whether an index is clustered follows the table’s primary-key design, not a MySQL `CLUSTERED` keyword [MySQL 8.4 Reference Manual: InnoDB Index Types](https://dev.mysql.com/doc/refman/8.4/en/innodb-index-types.html).
 
 ### Inspect the table and its indexes
 
@@ -124,9 +124,9 @@ WHERE TABLE_SCHEMA = DATABASE()
 ORDER BY INDEX_NAME, SEQ_IN_INDEX;
 ```
 
-`SHOW INDEX` and `INFORMATION_SCHEMA.STATISTICS` describe definitions and estimates; they are not a direct measure of whether a specific production query used an index. `CARDINALITY` is an estimate and can be stale until statistics are refreshed [6].
+`SHOW INDEX` and `INFORMATION_SCHEMA.STATISTICS` describe definitions and estimates; they are not a direct measure of whether a specific production query used an index. `CARDINALITY` is an estimate and can be stale until statistics are refreshed [MySQL 8.4 Reference Manual: The INFORMATION_SCHEMA STATISTICS Table](https://dev.mysql.com/doc/refman/8.4/en/information-schema-statistics-table.html).
 
-For column metadata, MySQL’s `INFORMATION_SCHEMA.COLUMNS` exposes type, length, character set, nullability, and `COLUMN_KEY` [7]. `COLUMN_KEY` values such as `PRI`, `UNI`, and `MUL` are useful clues, but an empty value should not be overinterpreted: a column can be a later part of a composite non-unique index and still have an empty `COLUMN_KEY` in some metadata presentations [7].
+For column metadata, MySQL’s `INFORMATION_SCHEMA.COLUMNS` exposes type, length, character set, nullability, and `COLUMN_KEY` [MySQL 8.4 Reference Manual: The INFORMATION_SCHEMA COLUMNS Table](https://dev.mysql.com/doc/refman/8.4/en/information-schema-columns-table.html). `COLUMN_KEY` values such as `PRI`, `UNI`, and `MUL` are useful clues, but an empty value should not be overinterpreted: a column can be a later part of a composite non-unique index and still have an empty `COLUMN_KEY` in some metadata presentations [MySQL 8.4 Reference Manual: The INFORMATION_SCHEMA COLUMNS Table](https://dev.mysql.com/doc/refman/8.4/en/information-schema-columns-table.html).
 
 ### Refresh MySQL statistics
 
@@ -135,7 +135,7 @@ For column metadata, MySQL’s `INFORMATION_SCHEMA.COLUMNS` exposes type, length
 ANALYZE TABLE feature;
 ```
 
-`ANALYZE TABLE` does not create an index. It refreshes statistics that influence row-count and cost estimates, so a plan can change after substantial data changes even when the schema did not. Re-check the plan after running it; the newest statistics are estimates, not a guarantee of a faster result [6] [8].
+`ANALYZE TABLE` does not create an index. It refreshes statistics that influence row-count and cost estimates, so a plan can change after substantial data changes even when the schema did not. Re-check the plan after running it; the newest statistics are estimates, not a guarantee of a faster result [MySQL 8.4 Reference Manual: The INFORMATION_SCHEMA STATISTICS Table](https://dev.mysql.com/doc/refman/8.4/en/information-schema-statistics-table.html) [MySQL 8.4 Reference Manual: EXPLAIN Statement](https://dev.mysql.com/doc/refman/8.4/en/explain.html).
 
 ## 5. Before and after: reading a MySQL plan
 
@@ -186,7 +186,7 @@ A representative post-index shape could be:
       (cost=1.75 rows=5) (actual time=0.095..0.099 rows=5 loops=1)
 ```
 
-This plan navigates to the `name` key instead of scanning every table row. For `SELECT *`, InnoDB may use the secondary index’s primary-key value to fetch the full clustered row [3]. The example shows an estimated cost of `1.75` and five matching rows, but those numbers are illustrative; do not compare them as universal units across engines or servers. Also remember that an equality predicate returning a large fraction of the table may still make a scan cheaper.
+This plan navigates to the `name` key instead of scanning every table row. For `SELECT *`, InnoDB may use the secondary index’s primary-key value to fetch the full clustered row [MySQL 8.4 Reference Manual: InnoDB Index Types](https://dev.mysql.com/doc/refman/8.4/en/innodb-index-types.html). The example shows an estimated cost of `1.75` and five matching rows, but those numbers are illustrative; do not compare them as universal units across engines or servers. Also remember that an equality predicate returning a large fraction of the table may still make a scan cheaper.
 
 ## 6. `EXPLAIN` versus `EXPLAIN ANALYZE`
 
@@ -206,7 +206,7 @@ EXPLAIN ANALYZE
 SELECT * FROM feature WHERE name = 'Cart View';
 ```
 
-Plain `EXPLAIN` asks the optimizer what it plans to do. Its row counts and costs are estimates based on statistics; it is appropriate when you need a plan without running the query. MySQL `EXPLAIN ANALYZE` actually executes supported statement forms and reports observed iterator behavior, including timing and rows [8]. It is therefore **not** a dry run. Use it carefully with statements that could modify data, and prefer a read-only `SELECT` while learning. If your MySQL version does not support the statement form or `EXPLAIN ANALYZE`, use the version’s documented alternative.
+Plain `EXPLAIN` asks the optimizer what it plans to do. Its row counts and costs are estimates based on statistics; it is appropriate when you need a plan without running the query. MySQL `EXPLAIN ANALYZE` actually executes supported statement forms and reports observed iterator behavior, including timing and rows [MySQL 8.4 Reference Manual: EXPLAIN Statement](https://dev.mysql.com/doc/refman/8.4/en/explain.html). It is therefore **not** a dry run. Use it carefully with statements that could modify data, and prefer a read-only `SELECT` while learning. If your MySQL version does not support the statement form or `EXPLAIN ANALYZE`, use the version’s documented alternative.
 
 A useful diagnostic sequence is:
 
@@ -230,7 +230,7 @@ ANALYZE FORMAT=JSON
 SELECT * FROM feature WHERE name = 'Cart View';
 ```
 
-`EXPLAIN` is also available in MariaDB, but output fields and supported actual-analysis syntax are not identical to MySQL. MariaDB’s index advice and InnoDB behavior should be checked against MariaDB documentation [5].
+`EXPLAIN` is also available in MariaDB, but output fields and supported actual-analysis syntax are not identical to MySQL. MariaDB’s index advice and InnoDB behavior should be checked against MariaDB documentation [MariaDB: Building the Best Index for a Given SELECT](https://mariadb.com/docs/server/ha-and-performance/optimization-and-tuning/optimization-and-indexes/building-the-best-index-for-a-given-select).
 
 ### SQLite
 
@@ -240,7 +240,7 @@ EXPLAIN QUERY PLAN
 SELECT * FROM feature WHERE name = 'Cart View';
 ```
 
-SQLite’s `EXPLAIN QUERY PLAN` is an interactive/debugging format that commonly distinguishes `SCAN` from `SEARCH`, can identify an index or covering index, and can reveal temporary sorting structures [2]. It is not MySQL `EXPLAIN ANALYZE`, and its output format can change between SQLite versions. SQLite’s separate `EXPLAIN` command exposes virtual-machine bytecode rather than MySQL-style iterator timing [2].
+SQLite’s `EXPLAIN QUERY PLAN` is an interactive/debugging format that commonly distinguishes `SCAN` from `SEARCH`, can identify an index or covering index, and can reveal temporary sorting structures [SQLite EXPLAIN QUERY PLAN](https://www.sqlite.org/eqp.html). It is not MySQL `EXPLAIN ANALYZE`, and its output format can change between SQLite versions. SQLite’s separate `EXPLAIN` command exposes virtual-machine bytecode rather than MySQL-style iterator timing [SQLite EXPLAIN QUERY PLAN](https://www.sqlite.org/eqp.html).
 
 ### SQL Server
 
@@ -312,15 +312,3 @@ Compare this with the unforced plan. If the forced plan is better for representa
 > ```
 
 SQLite, MariaDB, and SQL Server have different index-drop forms and constraint behavior; do not copy the MySQL statement without labeling and checking the target engine.
-
-## References
-
-[1]: https://www.sqlite.org/queryplanner.html "SQLite Query Planning"
-[2]: https://www.sqlite.org/eqp.html "SQLite EXPLAIN QUERY PLAN"
-[3]: https://dev.mysql.com/doc/refman/8.4/en/innodb-index-types.html "MySQL 8.4 Reference Manual: InnoDB Index Types"
-[4]: https://www.sqlite.org/fileformat2.html "SQLite Database File Format"
-[5]: https://mariadb.com/docs/server/ha-and-performance/optimization-and-tuning/optimization-and-indexes/building-the-best-index-for-a-given-select "MariaDB: Building the Best Index for a Given SELECT"
-[6]: https://dev.mysql.com/doc/refman/8.4/en/information-schema-statistics-table.html "MySQL 8.4 Reference Manual: The INFORMATION_SCHEMA STATISTICS Table"
-[7]: https://dev.mysql.com/doc/refman/8.4/en/information-schema-columns-table.html "MySQL 8.4 Reference Manual: The INFORMATION_SCHEMA COLUMNS Table"
-[8]: https://dev.mysql.com/doc/refman/8.4/en/explain.html "MySQL 8.4 Reference Manual: EXPLAIN Statement"
-[9]: https://dev.mysql.com/doc/refman/8.4/en/innodb-row-format.html "MySQL 8.4 Reference Manual: InnoDB Row Formats"

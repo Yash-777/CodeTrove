@@ -46,12 +46,7 @@ git bisect reset               # return to the original branch
 
 Git checks out candidate commits. Do not make normal feature commits during bisect. If the test can be automated, `git bisect run <test-command>` can repeat it; ensure the test returns exit status 0 for good and nonzero for bad.
 
-## References
-
-- [Git `status`](https://git-scm.com/docs/git-status)
-- [Git `bisect`](https://git-scm.com/docs/git-bisect)
-- [Git merge conflict guidance](https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging)
-
+Further reading: [Git `status`](https://git-scm.com/docs/git-status); [Git `bisect`](https://git-scm.com/docs/git-bisect); [Git merge conflict guidance](https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging).
 ## Questions and answers
 
 <details>

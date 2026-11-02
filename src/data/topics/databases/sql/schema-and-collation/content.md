@@ -61,7 +61,7 @@ CREATE TABLE Employees (
   COLLATE = utf8mb4_unicode_ci;
 ```
 
-`PRIMARY KEY` makes `Id` the row identifier for an InnoDB clustered index. The unique constraint makes duplicate `Email` values unacceptable (subject to the engine's `NULL` rules; this example declares it `NOT NULL`). `Department` has a nonunique index, so repeated department values are allowed. InnoDB secondary-index records contain the primary-key value used to reach the clustered record. [2]
+`PRIMARY KEY` makes `Id` the row identifier for an InnoDB clustered index. The unique constraint makes duplicate `Email` values unacceptable (subject to the engine's `NULL` rules; this example declares it `NOT NULL`). `Department` has a nonunique index, so repeated department values are allowed. InnoDB secondary-index records contain the primary-key value used to reach the clustered record. [MySQL 8.4 Reference Manual: InnoDB Index Types](https://dev.mysql.com/doc/refman/8.4/en/innodb-index-types.html)
 
 The statement is an example, not a recommendation to use this exact collation in every new system. Choose a collation that matches the application's language, case, accent, and sorting requirements, and test equality and ordering with representative data.
 
@@ -80,7 +80,7 @@ CREATE TABLE Employees (
 CREATE INDEX ix_employees_department ON Employees(Department);
 ```
 
-SQLite has named collations such as `BINARY`, `NOCASE`, and `RTRIM` in its core, and applications can register more. A `COLLATE` clause belongs on an expression or column definition; there is no MySQL-style database character-set default. SQLite indexes are B-trees, and the query planner can choose a scan or an index search based on the available index and statistics. [6]
+SQLite has named collations such as `BINARY`, `NOCASE`, and `RTRIM` in its core, and applications can register more. A `COLLATE` clause belongs on an expression or column definition; there is no MySQL-style database character-set default. SQLite indexes are B-trees, and the query planner can choose a scan or an index search based on the available index and statistics. [SQLite Query Planning](https://www.sqlite.org/queryplanner.html)
 
 ### SQL Server
 
@@ -113,7 +113,7 @@ SHOW COLUMNS FROM Employees;
 
 Typical output contains `Field`, `Type`, `Null`, `Key`, `Default`, and `Extra`. It is a useful first pass, but it is not a complete schema dump: it does not show every index column in order, every constraint option, or all table options.
 
-For a durable inspection report, query `INFORMATION_SCHEMA.COLUMNS`, which exposes positions, data types, character and byte lengths, character set, nullability, defaults, `COLUMN_KEY`, and extra/generated-column metadata. [1]
+For a durable inspection report, query `INFORMATION_SCHEMA.COLUMNS`, which exposes positions, data types, character and byte lengths, character set, nullability, defaults, `COLUMN_KEY`, and extra/generated-column metadata. [MySQL 8.4 Reference Manual: The INFORMATION_SCHEMA COLUMNS Table](https://dev.mysql.com/doc/refman/8.4/en/information-schema-columns-table.html)
 
 ### SQLite
 
@@ -202,8 +202,8 @@ Fields commonly include `Name`, `Engine`, `Rows`, `Avg_row_length`, `Data_length
 
 - For InnoDB, `Rows` is commonly an estimate, not a guaranteed current `COUNT(*)`.
 - `Avg_row_length`, `Data_length`, and `Index_length` describe storage estimates or allocated/managed structures, not a promise that every logical row occupies that many bytes.
-- Statistics may be stale. `ANALYZE TABLE` can refresh optimizer statistics, but it does not turn all table-status values into exact byte accounting. [3]
-- Actual InnoDB records include record metadata, null maps, length fields, and possible off-page storage for large variable values. A simple sum of declared maximums is therefore not an exact row-size calculation. [4]
+- Statistics may be stale. `ANALYZE TABLE` can refresh optimizer statistics, but it does not turn all table-status values into exact byte accounting. [MySQL 8.4 Reference Manual: The INFORMATION_SCHEMA STATISTICS Table](https://dev.mysql.com/doc/refman/8.4/en/information-schema-statistics-table.html)
+- Actual InnoDB records include record metadata, null maps, length fields, and possible off-page storage for large variable values. A simple sum of declared maximums is therefore not an exact row-size calculation. [MySQL 8.4 Reference Manual: InnoDB Row Formats](https://dev.mysql.com/doc/refman/8.4/en/innodb-row-format.html)
 
 For an exact logical count, run a count query (understanding its cost):
 
@@ -249,7 +249,7 @@ WHERE TABLE_SCHEMA = DATABASE()
 ORDER BY ORDINAL_POSITION;
 ```
 
-`CHARACTER_MAXIMUM_LENGTH` is expressed in characters for character columns; `CHARACTER_OCTET_LENGTH` is expressed in bytes. For `utf8mb3`, a character can require up to 3 bytes; for `utf8mb4`, up to 4 bytes. Thus `VARCHAR(50)` has a larger possible encoded payload under `utf8mb4`, but its actual row contribution depends on the stored values and row-format overhead. Do not present `50 × 4 + 1` as an exact InnoDB size. [1] [4]
+`CHARACTER_MAXIMUM_LENGTH` is expressed in characters for character columns; `CHARACTER_OCTET_LENGTH` is expressed in bytes. For `utf8mb3`, a character can require up to 3 bytes; for `utf8mb4`, up to 4 bytes. Thus `VARCHAR(50)` has a larger possible encoded payload under `utf8mb4`, but its actual row contribution depends on the stored values and row-format overhead. Do not present `50 × 4 + 1` as an exact InnoDB size. [MySQL 8.4 Reference Manual: The INFORMATION_SCHEMA COLUMNS Table](https://dev.mysql.com/doc/refman/8.4/en/information-schema-columns-table.html) [MySQL 8.4 Reference Manual: InnoDB Row Formats](https://dev.mysql.com/doc/refman/8.4/en/innodb-row-format.html)
 
 To inspect available MySQL collations rather than guessing a name:
 
@@ -357,7 +357,7 @@ WHERE b.TABLE_SCHEMA = @db_b
 ORDER BY position;
 ```
 
-For a broader audit, compare `INFORMATION_SCHEMA.TABLES` for table defaults and `INFORMATION_SCHEMA.STATISTICS` for indexes. `STATISTICS` exposes the index name, sequence within the index, column name, uniqueness, and estimated cardinality; group or order by `SEQ_IN_INDEX` so a composite index is read in its actual left-to-right order. Cardinality is an estimate and can be cached until statistics are refreshed. [3]
+For a broader audit, compare `INFORMATION_SCHEMA.TABLES` for table defaults and `INFORMATION_SCHEMA.STATISTICS` for indexes. `STATISTICS` exposes the index name, sequence within the index, column name, uniqueness, and estimated cardinality; group or order by `SEQ_IN_INDEX` so a composite index is read in its actual left-to-right order. Cardinality is an estimate and can be cached until statistics are refreshed. [MySQL 8.4 Reference Manual: The INFORMATION_SCHEMA STATISTICS Table](https://dev.mysql.com/doc/refman/8.4/en/information-schema-statistics-table.html)
 
 ```sql
 -- MySQL / MariaDB: compare ordered index metadata for one table.
@@ -429,7 +429,7 @@ In `INFORMATION_SCHEMA.COLUMNS`, `COLUMN_KEY` is a compact hint, not a substitut
 - `MUL`: the column participates in a nonunique key in the metadata's summary.
 - Empty: no qualifying key is reported at that column position, but **do not conclude automatically that the column is unindexed**.
 
-The last rule matters for composite indexes. A nonunique index such as `(Department, Email)` can make `Department` the leading indexed column while `Email` is only a later component. Depending on the metadata presentation and version, the later component can have an empty `COLUMN_KEY`; inspect `INFORMATION_SCHEMA.STATISTICS` to prove whether it is indexed. The leftmost-prefix order also affects which predicates can efficiently use the composite index. [1] [3]
+The last rule matters for composite indexes. A nonunique index such as `(Department, Email)` can make `Department` the leading indexed column while `Email` is only a later component. Depending on the metadata presentation and version, the later component can have an empty `COLUMN_KEY`; inspect `INFORMATION_SCHEMA.STATISTICS` to prove whether it is indexed. The leftmost-prefix order also affects which predicates can efficiently use the composite index. [MySQL 8.4 Reference Manual: The INFORMATION_SCHEMA COLUMNS Table](https://dev.mysql.com/doc/refman/8.4/en/information-schema-columns-table.html) [MySQL 8.4 Reference Manual: The INFORMATION_SCHEMA STATISTICS Table](https://dev.mysql.com/doc/refman/8.4/en/information-schema-statistics-table.html)
 
 Use this pair of queries when an empty value is surprising:
 
@@ -486,18 +486,8 @@ ORDER BY i.name, ic.key_ordinal;
 2. **Inspect the definition.** On MySQL/MariaDB, run `SHOW CREATE TABLE`, then `DESCRIBE`; on SQLite or SQL Server, use the labeled catalog alternatives.
 3. **Inspect effective text metadata.** Check each text column's character set and collation, not only the database or table default.
 4. **Inspect key order.** Use `INFORMATION_SCHEMA.STATISTICS` in MySQL/MariaDB, SQLite index pragmas, or SQL Server catalog views. This catches composite-key cases that `COLUMN_KEY` summarizes poorly.
-5. **Treat estimates as estimates.** Table status, index cardinality, and optimizer row counts can be stale or approximate. `ANALYZE TABLE` in MySQL/MariaDB refreshes relevant statistics; SQLite's planner also relies on statistics and can report a high-level `SCAN` versus `SEARCH` plan through `EXPLAIN QUERY PLAN`. [3] [5] [7]
+5. **Treat estimates as estimates.** Table status, index cardinality, and optimizer row counts can be stale or approximate. `ANALYZE TABLE` in MySQL/MariaDB refreshes relevant statistics; SQLite's planner also relies on statistics and can report a high-level `SCAN` versus `SEARCH` plan through `EXPLAIN QUERY PLAN`. [MySQL 8.4 Reference Manual: The INFORMATION_SCHEMA STATISTICS Table](https://dev.mysql.com/doc/refman/8.4/en/information-schema-statistics-table.html) [MariaDB Documentation: Building the Best Index for a Given SELECT](https://mariadb.com/docs/server/ha-and-performance/optimization-and-tuning/optimization-and-indexes/building-the-best-index-for-a-given-select) [SQLite EXPLAIN QUERY PLAN](https://www.sqlite.org/eqp.html)
 6. **Test comparison semantics.** Insert representative case, accent, Unicode, and whitespace values in a test environment, then run equality and `ORDER BY` queries under the intended collation. A collation change can alter uniqueness checks and ordering.
 7. **Review before changing.** Schema changes can rebuild data or invalidate assumptions in applications. In production, use your migration and backup process.
 
 > **Warning — destructive SQL:** Statements such as `DROP TABLE`, `DROP INDEX`, and some `ALTER TABLE` operations can destroy data, constraints, or query performance. Do not run them from this lesson against a production database. First capture `SHOW CREATE TABLE`/catalog output, confirm dependencies, test in a disposable copy, and use an approved migration with a rollback plan.
-
-## References
-
-[1]: https://dev.mysql.com/doc/refman/8.4/en/information-schema-columns-table.html "MySQL 8.4 Reference Manual: The INFORMATION_SCHEMA COLUMNS Table"
-[2]: https://dev.mysql.com/doc/refman/8.4/en/innodb-index-types.html "MySQL 8.4 Reference Manual: InnoDB Index Types"
-[3]: https://dev.mysql.com/doc/refman/8.4/en/information-schema-statistics-table.html "MySQL 8.4 Reference Manual: The INFORMATION_SCHEMA STATISTICS Table"
-[4]: https://dev.mysql.com/doc/refman/8.4/en/innodb-row-format.html "MySQL 8.4 Reference Manual: InnoDB Row Formats"
-[5]: https://mariadb.com/docs/server/ha-and-performance/optimization-and-tuning/optimization-and-indexes/building-the-best-index-for-a-given-select "MariaDB Documentation: Building the Best Index for a Given SELECT"
-[6]: https://www.sqlite.org/queryplanner.html "SQLite Query Planning"
-[7]: https://www.sqlite.org/eqp.html "SQLite EXPLAIN QUERY PLAN"

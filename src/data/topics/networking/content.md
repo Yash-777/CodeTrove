@@ -54,8 +54,4 @@ Use the diagrams in these lessons as a quick visual map, then read each step: a 
 
 Open **Networking** in the Learn navigation and expand **DNS & Registrars**, **TLS/SSL**, **Types of Protocols**, **Socket Connections**, **Proxy Server**, or **Browser Request Walkthroughs**. Each topic has its own Markdown page, so its deep link can be shared and bookmarked.
 
-## References
-
-[1]: https://markdown.org/tools/ "Markdown.org tools"
-[2]: https://www.rfc-editor.org/rfc/rfc1034 "RFC 1034: Domain Names—Concepts and Facilities"
-[3]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Redirections "MDN: Redirections in HTTP"
+Further reading: [Markdown.org tools](https://markdown.org/tools/); [RFC 1034: Domain Names—Concepts and Facilities](https://www.rfc-editor.org/rfc/rfc1034); [MDN: Redirections in HTTP](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Redirections).

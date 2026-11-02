@@ -110,8 +110,4 @@ use((Integer) null);
 This is a compile-time rule, not runtime overload selection. Include primitive overloads and autoboxing in a careful explanation because they can change the selected method.
 </details>
 
-## References
-
-- [JLS classes and members](https://docs.oracle.com/javase/specs/jls/se21/html/jls-8.html)
-- [Object equals and hashCode contracts](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Object.html)
-- [Dev.java object-oriented programming](https://dev.java/learn/language/oop/)
+Further reading: [JLS classes and members](https://docs.oracle.com/javase/specs/jls/se21/html/jls-8.html); [Object equals and hashCode contracts](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Object.html); [Dev.java object-oriented programming](https://dev.java/learn/language/oop/).

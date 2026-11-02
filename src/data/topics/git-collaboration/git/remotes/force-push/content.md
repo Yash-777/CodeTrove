@@ -28,11 +28,7 @@ Do not force-push shared branches such as `main`, release branches, or a teammat
 
 Avoid plain `git push --force` when `--force-with-lease` is available. Plain force tells Git to overwrite the remote ref without the safety comparison.
 
-## References
-
-- [Git `push` — `--force-with-lease`](https://git-scm.com/docs/git-push#Documentation/git-push.txt---force-with-lease)
-- [Atlassian: force-pushing](https://www.atlassian.com/git/tutorials/rewriting-history)
-
+Further reading: [Git `push` — `--force-with-lease`](https://git-scm.com/docs/git-push#Documentation/git-push.txt---force-with-lease); [Atlassian: force-pushing](https://www.atlassian.com/git/tutorials/rewriting-history).
 ## Questions and answers
 
 <details>

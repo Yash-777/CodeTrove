@@ -1,6 +1,6 @@
 # Streams and Backpressure
 
-A stream processes data incrementally. Instead of loading an entire file, upload, or response into memory first, a stream passes manageable chunks from a source to a destination. Node.js uses streams for filesystem, network, compression, and process I/O. [1]
+A stream processes data incrementally. Instead of loading an entire file, upload, or response into memory first, a stream passes manageable chunks from a source to a destination. Node.js uses streams for filesystem, network, compression, and process I/O. [Stream API](https://nodejs.org/api/stream.html)
 
 ## Four stream types
 
@@ -25,13 +25,13 @@ await pipeline(
 );
 ```
 
-Run this example from an ES module (for example, a project with `"type": "module"` in `package.json`). A production pipeline may add transform streams for parsing, validation, redaction, or compression. Handle errors at the operation boundary and ensure temporary output files are cleaned up if a pipeline fails. [1]
+Run this example from an ES module (for example, a project with `"type": "module"` in `package.json`). A production pipeline may add transform streams for parsing, validation, redaction, or compression. Handle errors at the operation boundary and ensure temporary output files are cleaned up if a pipeline fails. [Stream API](https://nodejs.org/api/stream.html)
 
 ## Backpressure protects memory
 
 A fast producer can generate data faster than a slow consumer can store, transmit, or transform it. Without flow control, buffers can grow until the process uses too much memory. Backpressure is the mechanism that lets a slower downstream stage tell the producer to pause until it can accept more data.
 
-When manually writing to a writable stream, `write(chunk)` can return `false`. Stop writing until the stream emits `drain`; ignoring this signal can accumulate data in memory. When possible, use `pipe()` or `pipeline()` rather than implementing flow control yourself. [1]
+When manually writing to a writable stream, `write(chunk)` can return `false`. Stop writing until the stream emits `drain`; ignoring this signal can accumulate data in memory. When possible, use `pipe()` or `pipeline()` rather than implementing flow control yourself. [Stream API](https://nodejs.org/api/stream.html)
 
 ## When streams help
 
@@ -44,7 +44,3 @@ Streams are useful for large log files, generated reports, uploads, downloads, H
 - **Assuming chunks align with records**: a chunk can end in the middle of a line or UTF-8 character. Use a parser/decoder designed to handle boundaries.
 - **Collecting every chunk**: concatenating the entire stream recreates the memory problem streams were intended to avoid.
 - **Forgetting cancellation**: for long transfers, propagate an `AbortSignal` when the client disconnects or the request is cancelled.
-
-## References
-
-[1]: https://nodejs.org/api/stream.html "Stream API"

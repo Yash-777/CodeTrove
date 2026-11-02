@@ -31,7 +31,7 @@ Not the same ordering:
   (created_at, tenant_id)  -- different leading key
 ```
 
-The optimizer may still choose a scan or another index. An index definition describes possible ordering; it is not a promise that every query will use it. SQLite documents this distinction through `SCAN` versus `SEARCH` in `EXPLAIN QUERY PLAN` output [4] [5]. MySQL similarly estimates alternatives from statistics and cost, and `EXPLAIN ANALYZE` can compare estimates with observed execution for supported statements [2].
+The optimizer may still choose a scan or another index. An index definition describes possible ordering; it is not a promise that every query will use it. SQLite documents this distinction through `SCAN` versus `SEARCH` in `EXPLAIN QUERY PLAN` output [SQLite Query Planning](https://www.sqlite.org/queryplanner.html) [SQLite EXPLAIN QUERY PLAN](https://www.sqlite.org/eqp.html). MySQL similarly estimates alternatives from statistics and cost, and `EXPLAIN ANALYZE` can compare estimates with observed execution for supported statements [MySQL 8.4 Reference Manual: EXPLAIN Statement](https://dev.mysql.com/doc/refman/8.4/en/explain.html).
 
 ## 2. MySQL and MariaDB: start with `SHOW INDEXES`
 
@@ -58,7 +58,7 @@ Useful fields include:
 - `Index_type`: for example, `BTREE` (engine and version determine available types).
 - `Collation`: key sort direction/ordering information where reported.
 
-`Cardinality` should be treated as a statistic that can be stale or approximate. MySQL documents `INFORMATION_SCHEMA.STATISTICS` as metadata with estimated cardinality and notes that statistics may be cached [1]. MariaDB likewise recommends considering selectivity/cardinality and query shape rather than creating indexes mechanically [6].
+`Cardinality` should be treated as a statistic that can be stale or approximate. MySQL documents `INFORMATION_SCHEMA.STATISTICS` as metadata with estimated cardinality and notes that statistics may be cached [MySQL 8.4 Reference Manual: The INFORMATION_SCHEMA STATISTICS Table](https://dev.mysql.com/doc/refman/8.4/en/information-schema-statistics-table.html). MariaDB likewise recommends considering selectivity/cardinality and query shape rather than creating indexes mechanically [MariaDB: Building the Best Index for a Given SELECT](https://mariadb.com/docs/server/ha-and-performance/optimization-and-tuning/optimization-and-indexes/building-the-best-index-for-a-given-select).
 
 ### MySQL / MariaDB `INFORMATION_SCHEMA.STATISTICS`
 
@@ -91,7 +91,7 @@ one index name
        -> ordered COLUMN_NAME values
 ```
 
-`SEQ_IN_INDEX` is not a row identifier and not a selectivity rank; it is the position of the key part. `NON_UNIQUE` describes uniqueness of the index as a whole, not whether an individual column happens to contain duplicates. `CARDINALITY` is an estimate for the index/key part and can differ from a `COUNT(DISTINCT ...)` taken at query time. Refreshing statistics can change estimates without changing the index definition [1] [2].
+`SEQ_IN_INDEX` is not a row identifier and not a selectivity rank; it is the position of the key part. `NON_UNIQUE` describes uniqueness of the index as a whole, not whether an individual column happens to contain duplicates. `CARDINALITY` is an estimate for the index/key part and can differ from a `COUNT(DISTINCT ...)` taken at query time. Refreshing statistics can change estimates without changing the index definition [MySQL 8.4 Reference Manual: The INFORMATION_SCHEMA STATISTICS Table](https://dev.mysql.com/doc/refman/8.4/en/information-schema-statistics-table.html) [MySQL 8.4 Reference Manual: EXPLAIN Statement](https://dev.mysql.com/doc/refman/8.4/en/explain.html).
 
 A compact readable inventory can be built with `GROUP_CONCAT`:
 
@@ -120,7 +120,7 @@ GROUP BY TABLE_SCHEMA, TABLE_NAME, INDEX_NAME, NON_UNIQUE, INDEX_TYPE
 ORDER BY INDEX_NAME;
 ```
 
-Do not infer that an index exists merely because a column is mentioned in an application query. Check the actual ordered key parts. Also, a MySQL `PRIMARY` key is not interchangeable with an ordinary secondary index in InnoDB: the primary key is the clustered row organization; secondary records carry primary-key values used to locate the clustered row [3]. An ordinary secondary key on the same primary-key column can therefore add maintenance and storage without adding a useful lookup path.
+Do not infer that an index exists merely because a column is mentioned in an application query. Check the actual ordered key parts. Also, a MySQL `PRIMARY` key is not interchangeable with an ordinary secondary index in InnoDB: the primary key is the clustered row organization; secondary records carry primary-key values used to locate the clustered row [MySQL 8.4 Reference Manual: InnoDB Index Types](https://dev.mysql.com/doc/refman/8.4/en/innodb-index-types.html). An ordinary secondary key on the same primary-key column can therefore add maintenance and storage without adding a useful lookup path.
 
 ## 3. Exact duplicate candidate report (MySQL 8.0.13+)
 
@@ -201,7 +201,7 @@ KEY ix_customer_id (id)              -- ordinary non-unique access path
 KEY ix_customer_id_status (id,status)
 ```
 
-Even when the first three have the same visible key column, they do not have the same constraint meaning. In InnoDB, the primary key also determines clustered row organization [3]. A report is evidence for review, not permission to remove a key.
+Even when the first three have the same visible key column, they do not have the same constraint meaning. In InnoDB, the primary key also determines clustered row organization [MySQL 8.4 Reference Manual: InnoDB Index Types](https://dev.mysql.com/doc/refman/8.4/en/innodb-index-types.html). A report is evidence for review, not permission to remove a key.
 
 ## 4. Leftmost-prefix redundancy: useful test, not automatic verdict
 
@@ -230,7 +230,7 @@ A longer index can often support a predicate on its leading columns, but “can 
 - be required by a foreign-key or migration convention;
 - behave differently under the engine’s optimizer and statistics.
 
-MariaDB’s index guidance starts with equality predicates and then considers range, grouping, ordering, selectivity, and write cost [6]. SQLite similarly explains that multi-column indexes depend on their column order and that a covering index can avoid an additional table lookup [4]. Therefore, a leftmost-prefix report should be reviewed against real plans and workload history, not used as a drop generator.
+MariaDB’s index guidance starts with equality predicates and then considers range, grouping, ordering, selectivity, and write cost [MariaDB: Building the Best Index for a Given SELECT](https://mariadb.com/docs/server/ha-and-performance/optimization-and-tuning/optimization-and-indexes/building-the-best-index-for-a-given-select). SQLite similarly explains that multi-column indexes depend on their column order and that a covering index can avoid an additional table lookup [SQLite Query Planning](https://www.sqlite.org/queryplanner.html). Therefore, a leftmost-prefix report should be reviewed against real plans and workload history, not used as a drop generator.
 
 A simple MySQL/MariaDB prefix report can find possible relationships among non-unique, non-primary indexes. It is intentionally conservative and does not claim that every reported shorter key is redundant:
 
@@ -299,7 +299,7 @@ FROM app.orders
 WHERE account_id = 42 AND state = 'open';
 ```
 
-`EXPLAIN` is an estimate; `EXPLAIN ANALYZE` executes the statement and reports actual iterator timing/rows for supported statements [2]. A plan changing after `ANALYZE TABLE` may mean stale statistics were the problem, not that an index is redundant.
+`EXPLAIN` is an estimate; `EXPLAIN ANALYZE` executes the statement and reports actual iterator timing/rows for supported statements [MySQL 8.4 Reference Manual: EXPLAIN Statement](https://dev.mysql.com/doc/refman/8.4/en/explain.html). A plan changing after `ANALYZE TABLE` may mean stale statistics were the problem, not that an index is redundant.
 
 ### SQLite
 
@@ -323,7 +323,7 @@ FROM orders
 WHERE account_id = 42 AND state = 'open';
 ```
 
-SQLite’s `PRAGMA index_list` output can identify whether an index is associated with a unique constraint, while `index_info`/`index_xinfo` expose ordered key details. `EXPLAIN QUERY PLAN` is intended for interactive/debugging use and its output format can change between SQLite versions [5]. Do not paste `SHOW INDEXES`, `INFORMATION_SCHEMA.STATISTICS`, or `ANALYZE TABLE` into SQLite.
+SQLite’s `PRAGMA index_list` output can identify whether an index is associated with a unique constraint, while `index_info`/`index_xinfo` expose ordered key details. `EXPLAIN QUERY PLAN` is intended for interactive/debugging use and its output format can change between SQLite versions [SQLite EXPLAIN QUERY PLAN](https://www.sqlite.org/eqp.html). Do not paste `SHOW INDEXES`, `INFORMATION_SCHEMA.STATISTICS`, or `ANALYZE TABLE` into SQLite.
 
 ### SQL Server
 
@@ -366,20 +366,20 @@ In SQL Server, `key_ordinal` is the ordered key position; `is_included_column = 
 ### MySQL
 
 - Inspect with `SHOW INDEXES`, `SHOW CREATE TABLE`, or `INFORMATION_SCHEMA.STATISTICS`.
-- InnoDB uses the primary key as the clustered index; if no suitable primary/unique key exists, InnoDB can create a hidden clustered index [3].
-- Refresh statistics with `ANALYZE TABLE`; inspect estimates with `EXPLAIN` and observed execution with supported `EXPLAIN ANALYZE` [2].
-- A secondary index includes primary-key values for the row lookup in InnoDB [3].
+- InnoDB uses the primary key as the clustered index; if no suitable primary/unique key exists, InnoDB can create a hidden clustered index [MySQL 8.4 Reference Manual: InnoDB Index Types](https://dev.mysql.com/doc/refman/8.4/en/innodb-index-types.html).
+- Refresh statistics with `ANALYZE TABLE`; inspect estimates with `EXPLAIN` and observed execution with supported `EXPLAIN ANALYZE` [MySQL 8.4 Reference Manual: EXPLAIN Statement](https://dev.mysql.com/doc/refman/8.4/en/explain.html).
+- A secondary index includes primary-key values for the row lookup in InnoDB [MySQL 8.4 Reference Manual: InnoDB Index Types](https://dev.mysql.com/doc/refman/8.4/en/innodb-index-types.html).
 
 ### MariaDB
 
 - `SHOW INDEX`/`SHOW INDEXES` and `INFORMATION_SCHEMA.STATISTICS` are MariaDB syntax, not portable syntax.
 - InnoDB/XtraDB behavior and available optimizer features depend on the MariaDB release and storage engine. Confirm `SHOW CREATE TABLE`, engine, version, and documentation before comparing keys.
-- Use `ANALYZE TABLE` for MariaDB statistics refresh, and use the MariaDB-specific `EXPLAIN` features supported by the installed release [6].
+- Use `ANALYZE TABLE` for MariaDB statistics refresh, and use the MariaDB-specific `EXPLAIN` features supported by the installed release [MariaDB: Building the Best Index for a Given SELECT](https://mariadb.com/docs/server/ha-and-performance/optimization-and-tuning/optimization-and-indexes/building-the-best-index-for-a-given-select).
 
 ### SQLite
 
-- Inspect with `PRAGMA index_list`, `PRAGMA index_info`, and `PRAGMA index_xinfo`; inspect plans with `EXPLAIN QUERY PLAN` [5].
-- SQLite has table and index B-trees in its page-based file format; its rowid/table organization is not the same as InnoDB or SQL Server [4].
+- Inspect with `PRAGMA index_list`, `PRAGMA index_info`, and `PRAGMA index_xinfo`; inspect plans with `EXPLAIN QUERY PLAN` [SQLite EXPLAIN QUERY PLAN](https://www.sqlite.org/eqp.html).
+- SQLite has table and index B-trees in its page-based file format; its rowid/table organization is not the same as InnoDB or SQL Server [SQLite Query Planning](https://www.sqlite.org/queryplanner.html).
 - Use `ANALYZE`, not `ANALYZE TABLE`.
 - `CREATE INDEX` names and SQLite schema constraints must be evaluated from `sqlite_schema` and the PRAGMA output; do not assume MySQL index metadata columns exist.
 
@@ -421,12 +421,3 @@ The following statements are **examples only** and are intentionally commented o
 ```
 
 The syntax is deliberately labeled because these are not portable statements. Even when two keys look identical, retain the one with the required constraint or operational role and verify that removing the other does not change a plan or break a migration. If uncertainty remains, keep both and gather better evidence.
-
-## References
-
-[1]: https://dev.mysql.com/doc/refman/8.4/en/information-schema-statistics-table.html "MySQL 8.4 Reference Manual: The INFORMATION_SCHEMA STATISTICS Table"
-[2]: https://dev.mysql.com/doc/refman/8.4/en/explain.html "MySQL 8.4 Reference Manual: EXPLAIN Statement"
-[3]: https://dev.mysql.com/doc/refman/8.4/en/innodb-index-types.html "MySQL 8.4 Reference Manual: InnoDB Index Types"
-[4]: https://www.sqlite.org/queryplanner.html "SQLite Query Planning"
-[5]: https://www.sqlite.org/eqp.html "SQLite EXPLAIN QUERY PLAN"
-[6]: https://mariadb.com/docs/server/ha-and-performance/optimization-and-tuning/optimization-and-indexes/building-the-best-index-for-a-given-select "MariaDB: Building the Best Index for a Given SELECT"

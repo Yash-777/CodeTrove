@@ -39,13 +39,7 @@ A hosted pull request (GitHub) or merge request (GitLab/Bitbucket) is a review w
 
 For a visual, interactive sandbox, use **Build → Tools → Git → Learn Git Branching**. It visualizes simulated commit graphs and teaches commands with challenges. It does not access your local files or your hosted account.
 
-## References
-
-- [Official Git cheat sheet](https://git-scm.com/cheat-sheet/)
-- [GitHub Education Git cheat sheet](https://education.github.com/git-cheat-sheet-education.pdf)
-- [Atlassian Git cheat sheet](https://www.atlassian.com/git/tutorials/atlassian-git-cheatsheet)
-- [Learn Git Branching open-source project](https://github.com/pcottle/learnGitBranching)
-
+Further reading: [Official Git cheat sheet](https://git-scm.com/cheat-sheet/); [GitHub Education Git cheat sheet](https://education.github.com/git-cheat-sheet-education.pdf); [Atlassian Git cheat sheet](https://www.atlassian.com/git/tutorials/atlassian-git-cheatsheet); [Learn Git Branching open-source project](https://github.com/pcottle/learnGitBranching).
 ## Questions and answers
 
 <details>

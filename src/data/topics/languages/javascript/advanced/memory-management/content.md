@@ -11,8 +11,3 @@
 - Performance and scalability considerations
 - Security considerations
 - Testing strategy
-
-## References
-
-- Prefer official documentation and primary sources.
-- If this concept is covered in another CodeTrove section, add an internal reference using a new-tab HTML link.

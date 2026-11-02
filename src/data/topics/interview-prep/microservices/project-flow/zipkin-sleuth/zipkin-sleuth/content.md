@@ -42,8 +42,4 @@ The edge can establish or accept a safe correlation identifier, while the tracin
 
 </details>
 
-## References
-
-- [Spring Microservices](https://spring.io/microservices)
-- [Zipkin](https://zipkin.io/)
-- [Micrometer Tracing](https://micrometer.io/docs/tracing)
+Further reading: [Spring Microservices](https://spring.io/microservices); [Zipkin](https://zipkin.io/); [Micrometer Tracing](https://micrometer.io/docs/tracing).

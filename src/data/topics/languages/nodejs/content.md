@@ -1,6 +1,6 @@
 # Node.js
 
-Node.js is a cross-platform JavaScript runtime built on the V8 engine. It lets JavaScript run outside a browser, with APIs for files, networking, processes, and other operating-system work. The runtime is especially useful for HTTP services, command-line tools, build tools, and applications that spend much of their time waiting for I/O. [1]
+Node.js is a cross-platform JavaScript runtime built on the V8 engine. It lets JavaScript run outside a browser, with APIs for files, networking, processes, and other operating-system work. The runtime is especially useful for HTTP services, command-line tools, build tools, and applications that spend much of their time waiting for I/O. [Introduction to Node.js](https://nodejs.org/en/learn/getting-started/introduction-to-nodejs)
 
 Node.js is not a separate programming language and it is not a web framework. Node.js provides the runtime and built-in modules; npm manages packages; frameworks such as Express add conveniences for building web applications.
 
@@ -49,13 +49,8 @@ node --version
 npm --version
 ```
 
-Choose a Node.js release supported by your framework and deployment platform. For new applications, prefer a currently supported LTS release unless a project's compatibility requirements say otherwise. The selected Node.js version also determines which JavaScript language features and runtime APIs are available. [1] [2]
+Choose a Node.js release supported by your framework and deployment platform. For new applications, prefer a currently supported LTS release unless a project's compatibility requirements say otherwise. The selected Node.js version also determines which JavaScript language features and runtime APIs are available. [Introduction to Node.js](https://nodejs.org/en/learn/getting-started/introduction-to-nodejs) [Download Node.js](https://nodejs.org/en/download)
 
 ## When Node.js is a good fit
 
 Node.js is a strong fit for APIs, real-time services, network tools, and file-processing pipelines where asynchronous I/O and JavaScript reuse are valuable. It is not automatically the best choice for every workload: CPU-heavy work in a request handler can block the event loop. Large data should often be processed with streams, and sustained CPU-parallel work may need worker threads, separate processes, or a dedicated compute service.
-
-## References
-
-[1]: https://nodejs.org/en/learn/getting-started/introduction-to-nodejs "Introduction to Node.js"
-[2]: https://nodejs.org/en/download "Download Node.js"

@@ -90,13 +90,7 @@ git push -u origin main
 
 Replace `main` if your local branch has another name. `-u` records the upstream relationship for later `git push` and `git pull` commands.
 
-## References
-
-- [Git `init`](https://git-scm.com/docs/git-init)
-- [Git `clone`](https://git-scm.com/docs/git-clone)
-- [Git `remote`](https://git-scm.com/docs/git-remote)
-- [Git configuration](https://git-scm.com/docs/git-config)
-
+Further reading: [Git `init`](https://git-scm.com/docs/git-init); [Git `clone`](https://git-scm.com/docs/git-clone); [Git `remote`](https://git-scm.com/docs/git-remote); [Git configuration](https://git-scm.com/docs/git-config).
 ## Questions and answers
 
 <details>
