@@ -92,6 +92,7 @@ export const CATEGORIES = [
     topics: [],
     tools: [
       { name: 'Cryptography Tools', description: 'Compare symmetric and asymmetric encryption, reproduce compatible AES formats, and generate hashes or HMAC signatures.', internalTool: 'cryptography', externalUrl: null },
+      { name: 'URL (Encode ⇄ Decode)', description: 'Percent-encode and decode URL text locally with RFC 3986 character mappings and selectable replacements.', internalTool: 'url-encode-decode', externalUrl: null },
     ],
   },
   {

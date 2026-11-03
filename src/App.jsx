@@ -23,6 +23,7 @@ import CharacterCounterPage from './pages/build/CharacterCounterPage.jsx';
 import StringUtilitiesPage from './pages/build/StringUtilitiesPage.jsx';
 import RegexMatchPage from './pages/build/RegexMatchPage.jsx';
 import CryptographyToolsPage from './pages/build/CryptographyToolsPage.jsx';
+import UrlEncodeDecodePage from './pages/build/UrlEncodeDecodePage.jsx';
 import PomFormatterPage from './pages/build/PomFormatterPage.jsx';
 import PropertiesYamlConverterPage from './pages/build/PropertiesYamlConverterPage.jsx';
 import UnixTimestampConverterPage from './pages/build/UnixTimestampConverterPage.jsx';
@@ -67,6 +68,7 @@ export default function App() {
           <Route path="/build/tools/string-utilities" element={<StringUtilitiesPage />} />
           <Route path="/build/tools/regex-match" element={<RegexMatchPage />} />
           <Route path="/build/tools/cryptography" element={<CryptographyToolsPage />} />
+          <Route path="/build/tools/url-encode-decode" element={<UrlEncodeDecodePage />} />
           <Route path="/build/tools/pom-formatter" element={<PomFormatterPage />} />
           <Route path="/build/tools/properties-yaml-converter" element={<PropertiesYamlConverterPage />} />
           <Route path="/build/tools/unix-timestamp-converter" element={<UnixTimestampConverterPage />} />
