@@ -194,6 +194,7 @@ export const CATEGORIES = [
     topics: [],
     tools: [
       { name: 'Unix Timestamp ⇄ Date Time Converter', description: 'Convert epoch timestamps and human-readable dates with seconds, milliseconds, microseconds, nanoseconds, custom patterns, and local/GMT time zones.', internalTool: 'unix-timestamp-converter', externalUrl: null },
+      { name: 'World Clock & Time Zone Converter', description: 'Compare live world clocks, convert between IANA time zones, calculate time differences from local dates or timestamps, and add or remove time with daylight-saving validation.', internalTool: 'world-clock', externalUrl: null },
     ],
   },
   {

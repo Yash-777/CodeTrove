@@ -25,6 +25,7 @@ import CryptographyToolsPage from './pages/build/CryptographyToolsPage.jsx';
 import PomFormatterPage from './pages/build/PomFormatterPage.jsx';
 import PropertiesYamlConverterPage from './pages/build/PropertiesYamlConverterPage.jsx';
 import UnixTimestampConverterPage from './pages/build/UnixTimestampConverterPage.jsx';
+import WorldClockPage from './pages/build/WorldClockPage.jsx';
 import HtmlXmlJsonToolPage from './pages/build/HtmlXmlJsonToolPage.jsx';
 import JsonCrackPage from './pages/build/JsonCrackPage.jsx';
 import MarkdownEditorPage from './pages/build/MarkdownEditorPage.jsx';
@@ -67,6 +68,7 @@ export default function App() {
           <Route path="/build/tools/pom-formatter" element={<PomFormatterPage />} />
           <Route path="/build/tools/properties-yaml-converter" element={<PropertiesYamlConverterPage />} />
           <Route path="/build/tools/unix-timestamp-converter" element={<UnixTimestampConverterPage />} />
+          <Route path="/build/tools/world-clock" element={<WorldClockPage />} />
           <Route path="/build/tools/html-xml-json" element={<HtmlXmlJsonToolPage />} />
           <Route path="/build/tools/json-crack" element={<JsonCrackPage />} />
           <Route path="/build/tools/markdown-editor" element={<MarkdownEditorPage />} />
