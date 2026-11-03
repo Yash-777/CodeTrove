@@ -41,6 +41,9 @@ const tree = [
   {
     key: 'languages', label: 'Programming Languages', contentKey: 'languages', children: [
       { key: 'java', label: 'Java', data: 'content.md', children: [
+        { key: 'java-5to7', label: 'Java 5–7', contentKey: 'languages/java/java-5to7' },
+        { key: 'java-8to17', label: 'Java 8–17', contentKey: 'languages/java/java-8to17' },
+        { key: 'java-17andAbove', label: 'Java 17 and Above', contentKey: 'languages/java/java-17andAbove' },
         { key: 'core', label: 'Core', data: 'content.md', pages: { 'errors-exceptions': 'Errors & Exceptions' }, children: [
           { key: 'arrays-collections', label: 'Arrays, Collection Framework & Generics', data: 'content.md'},
           { key: 'oop', label: 'Object-Oriented Programming', data: 'content.md', children: [
