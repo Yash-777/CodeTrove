@@ -12,6 +12,32 @@ import { hasNavigationContent } from './topics/contentLoader.js';
 const humanize = (value) => value.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
 
 const tree = [
+    {
+    key: 'networking',
+    label: 'Networking',
+    children: [
+      { key: 'dns-registrars', label: 'DNS & Registrars', contentKey: 'networking/dns-registrars', children: [
+        { key: 'url-uri', label: 'TLD, Domains & URL/URI', contentKey: 'networking/dns-registrars/url-uri' },
+        { key: 'dns-resolution', label: 'DNS Resolution, Caches & TTL', contentKey: 'networking/dns-registrars/dns-resolution' },
+        { key: 'dns-records', label: 'DNS Record Types & Commands', contentKey: 'networking/dns-registrars/dns-records' },
+      ] },
+      { key: 'tls-ssl', label: 'TLS/SSL', contentKey: 'networking/tls-ssl', children: [
+        { key: 'local-testing', label: 'Local Certificates for Testing', contentKey: 'networking/tls-ssl/local-testing' },
+      ] },
+      { key: 'protocols', label: 'Types of Protocols', contentKey: 'networking/protocols', children: [
+        { key: 'http-https', label: 'HTTP/HTTPS & Redirects', contentKey: 'networking/protocols/http-https' },
+        { key: 'smtp', label: 'SMTP & Mail Delivery', contentKey: 'networking/protocols/smtp' },
+        { key: 'ftp', label: 'FTP, FTPS & SFTP', contentKey: 'networking/protocols/ftp' },
+        { key: 'tcp-udp', label: 'TCP vs UDP', contentKey: 'networking/protocols/tcp-udp' },
+      ] },
+      { key: 'socket-connections', label: 'Socket Connections', contentKey: 'networking/socket-connections' },
+      { key: 'proxy-server', label: 'Proxy Server', contentKey: 'networking/proxy-server', children: [
+        { key: 'forward-proxy', label: 'Forward Proxy', contentKey: 'networking/proxy-server/forward-proxy' },
+        { key: 'reverse-proxy', label: 'Reverse Proxy', contentKey: 'networking/proxy-server/reverse-proxy' },
+      ] },
+      { key: 'browser-request-flow', label: 'Browser Request Walkthroughs', contentKey: 'networking/browser-request-flow' },
+    ],
+    },
   {
     key: 'languages', label: 'Programming Languages', contentKey: 'languages', children: [
       { key: 'java', label: 'Java', data: 'content.md', children: [
@@ -211,6 +237,39 @@ const tree = [
       { key: 'documentation', label: 'API Documentation', pages: {'openapi-swagger': 'Openapi Swagger', 'postman': 'Postman'} },
     ],
   },
+    {
+    key: 'architecture', label: 'Architecture & Design', children: [
+      { key: 'software-architecture', label: 'Software Architecture', pages: {'layered-architecture': 'Layered Architecture', 'hexagonal-architecture': 'Hexagonal Architecture', 'clean-architecture': 'Clean Architecture', 'modular-monolith': 'Modular Monolith'} },
+      { key: 'microservices', label: 'Microservices', contentKey:'architecture/microservices', data: 'content.md', pages: {'architecture-deep-dive': {label: 'Microservice Architecture Deep Dive', contentKey: 'interview-prep/microservices/project-flow/microservice-architecture-deep-dive'}, 'microservice-boundaries': 'Microservice Boundaries', 'api-composition': 'Api Composition', 'data-ownership': 'Data Ownership', 'distributed-transactions': 'Distributed Transactions', 'service-versioning': 'Service Versioning', 'REST and GraphQL': 'REST and GraphQL'} },
+      { key: 'design-patterns', label: 'Design Patterns', pages: {'creational-patterns': 'Creational Patterns', 'structural-patterns': 'Structural Patterns', 'behavioral-patterns': 'Behavioral Patterns', 'enterprise-patterns': 'Enterprise Patterns'} },
+      { key: 'system-design', label: 'System Design', pages: {'capacity-planning': 'Capacity Planning', 'consistency': 'Consistency', 'partitioning': 'Partitioning', 'sharding': 'Sharding', 'disaster-recovery': 'Disaster Recovery'} },
+    ],
+  },
+    {
+    key: 'messaging', label: 'Messaging & Streaming', children: [
+      { key: 'kafka', label: 'Apache Kafka', pages: {'architecture': 'Architecture', 'producers-consumers': 'Producers Consumers', 'partitions-offsets': 'Partitions Offsets', 'consumer-groups': 'Consumer Groups', 'delivery-semantics': 'Delivery Semantics', 'transactions': 'Transactions', 'interview': 'Interview Questions'} },
+      { key: 'rabbitmq', label: 'RabbitMQ', pages: {'exchanges-queues': 'Exchanges Queues', 'acknowledgements': 'Acknowledgements', 'routing': 'Routing'} },
+      { key: 'patterns', label: 'Messaging Patterns', pages: {'outbox-pattern': 'Outbox Pattern', 'saga-pattern': 'Saga Pattern', 'dead-letter-queues': 'Dead Letter Queues', 'exactly-once-processing': 'Exactly Once Processing'} },
+    ],
+  },
+  {
+    key: 'distributed-systems', label: 'Distributed Systems', children: [
+      { key: 'service-discovery', label: 'Service Discovery', pages: {'eureka-server': 'Eureka Server', 'eureka-client': 'Eureka Client', 'service-registry': 'Service Registry'} },
+      { key: 'configuration', label: 'Configuration', pages: {'config-server': 'Config Server', 'vault': 'Vault', 'secrets-management': 'Secrets Management'} },
+      { key: 'resilience', label: 'Resilience Patterns', pages: {'circuit-breaker': 'Circuit Breaker', 'retry': 'Retry', 'timeout': 'Timeout', 'fallback': 'Fallback'} },
+      { key: 'observability', label: 'Observability', pages: {'logs': 'Logs', 'distributed-tracing': 'Distributed Tracing', 'sleuth': 'Sleuth', 'metrics': 'Metrics', 'health-checks': 'Health Checks'} },
+      { key: 'scaling', label: 'Scaling', pages: {'horizontal-scaling': 'Horizontal Scaling', 'vertical-scaling': 'Vertical Scaling', 'autoscaling': 'Autoscaling', 'stateless-services': 'Stateless Services'} },
+    ],
+  },
+  {
+    key: 'security', label: 'Security', children: [
+      { key: 'cryptography', label: 'Cryptography', data: 'content.md', pages: {'symmetric-encryption': 'Symmetric Encryption', 'asymmetric-encryption': 'Asymmetric Encryption', 'hashing': 'Hashing', 'digital-signatures': 'Digital Signatures'} },
+      { key: 'application-security', label: 'Application Security', pages: {'owasp-top-10': 'Owasp Top 10', 'input-validation': 'Input Validation', 'csrf': 'Csrf', 'cors': 'Cors', 'secure-headers': 'Secure Headers'} },
+      { key: 'identity', label: 'Identity & Access', pages: {'oauth2': 'Oauth2', 'openid-connect': 'Openid Connect', 'jwt': 'Jwt', 'rbac': 'Rbac', 'secrets': 'Secrets'} },
+      { key: 'api-security', label: 'API Security', pages: {'api-authentication': 'Api Authentication', 'api-authorization': 'Api Authorization', 'token-validation': 'Token Validation', 'dos-mitigation': 'Dos Mitigation'} },
+      { key: 'dependency-security', label: 'Dependency Security', pages: {'dependency-scanning': 'Dependency Scanning', 'vulnerability-management': 'Vulnerability Management'} },
+    ],
+  },
   {
     key: 'databases', label: 'Databases & Storage', children: [
       {
@@ -239,31 +298,7 @@ const tree = [
       { key: 'file-storage', label: 'File Storage', pages: {'s3': 'S3', 'firestore-storage': 'Firestore Storage', 'object-storage-patterns': 'Object Storage Patterns'} },
     ],
   },
-  {
-    key: 'messaging', label: 'Messaging & Streaming', children: [
-      { key: 'kafka', label: 'Apache Kafka', pages: {'architecture': 'Architecture', 'producers-consumers': 'Producers Consumers', 'partitions-offsets': 'Partitions Offsets', 'consumer-groups': 'Consumer Groups', 'delivery-semantics': 'Delivery Semantics', 'transactions': 'Transactions', 'interview': 'Interview Questions'} },
-      { key: 'rabbitmq', label: 'RabbitMQ', pages: {'exchanges-queues': 'Exchanges Queues', 'acknowledgements': 'Acknowledgements', 'routing': 'Routing'} },
-      { key: 'patterns', label: 'Messaging Patterns', pages: {'outbox-pattern': 'Outbox Pattern', 'saga-pattern': 'Saga Pattern', 'dead-letter-queues': 'Dead Letter Queues', 'exactly-once-processing': 'Exactly Once Processing'} },
-    ],
-  },
-  {
-    key: 'distributed-systems', label: 'Distributed Systems', children: [
-      { key: 'service-discovery', label: 'Service Discovery', pages: {'eureka-server': 'Eureka Server', 'eureka-client': 'Eureka Client', 'service-registry': 'Service Registry'} },
-      { key: 'configuration', label: 'Configuration', pages: {'config-server': 'Config Server', 'vault': 'Vault', 'secrets-management': 'Secrets Management'} },
-      { key: 'resilience', label: 'Resilience Patterns', pages: {'circuit-breaker': 'Circuit Breaker', 'retry': 'Retry', 'timeout': 'Timeout', 'fallback': 'Fallback'} },
-      { key: 'observability', label: 'Observability', pages: {'logs': 'Logs', 'distributed-tracing': 'Distributed Tracing', 'sleuth': 'Sleuth', 'metrics': 'Metrics', 'health-checks': 'Health Checks'} },
-      { key: 'scaling', label: 'Scaling', pages: {'horizontal-scaling': 'Horizontal Scaling', 'vertical-scaling': 'Vertical Scaling', 'autoscaling': 'Autoscaling', 'stateless-services': 'Stateless Services'} },
-    ],
-  },
-  {
-    key: 'security', label: 'Security', children: [
-      { key: 'cryptography', label: 'Cryptography', data: 'content.md', pages: {'symmetric-encryption': 'Symmetric Encryption', 'asymmetric-encryption': 'Asymmetric Encryption', 'hashing': 'Hashing', 'digital-signatures': 'Digital Signatures'} },
-      { key: 'application-security', label: 'Application Security', pages: {'owasp-top-10': 'Owasp Top 10', 'input-validation': 'Input Validation', 'csrf': 'Csrf', 'cors': 'Cors', 'secure-headers': 'Secure Headers'} },
-      { key: 'identity', label: 'Identity & Access', pages: {'oauth2': 'Oauth2', 'openid-connect': 'Openid Connect', 'jwt': 'Jwt', 'rbac': 'Rbac', 'secrets': 'Secrets'} },
-      { key: 'api-security', label: 'API Security', pages: {'api-authentication': 'Api Authentication', 'api-authorization': 'Api Authorization', 'token-validation': 'Token Validation', 'dos-mitigation': 'Dos Mitigation'} },
-      { key: 'dependency-security', label: 'Dependency Security', pages: {'dependency-scanning': 'Dependency Scanning', 'vulnerability-management': 'Vulnerability Management'} },
-    ],
-  },
+
   {
     key: 'testing-quality', label: 'Testing & Code Quality', children: [
       { key: 'unit-testing', label: 'Unit Testing', pages: {'junit': 'Junit', 'mockito': 'Mockito', 'test-doubles': 'Test Doubles', 'test-coverage': 'Test Coverage'} },
@@ -281,14 +316,6 @@ const tree = [
       { key: 'orchestration', label: 'Kubernetes', pages: {'pods': 'Pods', 'deployments': 'Deployments', 'services': 'Services', 'configmaps-secrets': 'Configmaps Secrets', 'ingress': 'Ingress', 'autoscaling': 'Autoscaling'} },
       { key: 'ci-cd', label: 'CI/CD', pages: {'pipeline-basics': 'Pipeline Basics', 'github-actions': 'Github Actions', 'deployment-strategies': 'Deployment Strategies'} },
       { key: 'cloud', label: 'Cloud', pages: {'aws-basics': 'Aws Basics', 'compute': 'Compute', 'managed-databases': 'Managed Databases', 'object-storage': 'Object Storage'} },
-    ],
-  },
-  {
-    key: 'architecture', label: 'Architecture & Design', children: [
-      { key: 'software-architecture', label: 'Software Architecture', pages: {'layered-architecture': 'Layered Architecture', 'hexagonal-architecture': 'Hexagonal Architecture', 'clean-architecture': 'Clean Architecture', 'modular-monolith': 'Modular Monolith'} },
-      { key: 'microservices', label: 'Microservices', contentKey:'architecture/microservices', data: 'content.md', pages: {'architecture-deep-dive': {label: 'Microservice Architecture Deep Dive', contentKey: 'interview-prep/microservices/project-flow/microservice-architecture-deep-dive'}, 'microservice-boundaries': 'Microservice Boundaries', 'api-composition': 'Api Composition', 'data-ownership': 'Data Ownership', 'distributed-transactions': 'Distributed Transactions', 'service-versioning': 'Service Versioning', 'REST and GraphQL': 'REST and GraphQL'} },
-      { key: 'design-patterns', label: 'Design Patterns', pages: {'creational-patterns': 'Creational Patterns', 'structural-patterns': 'Structural Patterns', 'behavioral-patterns': 'Behavioral Patterns', 'enterprise-patterns': 'Enterprise Patterns'} },
-      { key: 'system-design', label: 'System Design', pages: {'capacity-planning': 'Capacity Planning', 'consistency': 'Consistency', 'partitioning': 'Partitioning', 'sharding': 'Sharding', 'disaster-recovery': 'Disaster Recovery'} },
     ],
   },
   {
@@ -332,14 +359,7 @@ const tree = [
       { key: 'source-control', label: 'Source Control', pages: {'release-branching': 'Release Branching', 'semantic-versioning': 'Semantic Versioning'} },
     ],
   },
-  {
-    key: 'tools', label: 'Developer Tools', children: [
-      { key: 'Notepad++', label: 'Notepad++', data: 'content.md', /*pages: {'text-editors': 'Text Editors', 'regex': 'Regex', 'file-compare': 'File Compare'}*/ },
-      { key: 'api-tools', label: 'API Tools', pages: {'postman': 'Postman', 'swagger-ui': 'Swagger Ui', 'curl': 'Curl'} },
-      { key: 'database-tools', label: 'Database Tools', pages: {'database-clients': 'Database Clients', 'query-analyzers': 'Query Analyzers'} },
-      { key: 'developer-tools', label: 'Developer Workflow', pages: {'ide-debugging': 'Ide Debugging', 'terminal-tools': 'Terminal Tools', 'http-debugging': 'Http Debugging'} },
-    ],
-  },
+
   {
     key: 'payment-service-provider', label: 'Payment Service Provider', children: [
       { key: 'stripe', label: 'Stripe', pages: {} },
@@ -349,33 +369,6 @@ const tree = [
     ],
   },
 ];
-
-tree.push({
-  key: 'networking',
-  label: 'Networking',
-  children: [
-    { key: 'dns-registrars', label: 'DNS & Registrars', contentKey: 'networking/dns-registrars', children: [
-      { key: 'url-uri', label: 'TLD, Domains & URL/URI', contentKey: 'networking/dns-registrars/url-uri' },
-      { key: 'dns-resolution', label: 'DNS Resolution, Caches & TTL', contentKey: 'networking/dns-registrars/dns-resolution' },
-      { key: 'dns-records', label: 'DNS Record Types & Commands', contentKey: 'networking/dns-registrars/dns-records' },
-    ] },
-    { key: 'tls-ssl', label: 'TLS/SSL', contentKey: 'networking/tls-ssl', children: [
-      { key: 'local-testing', label: 'Local Certificates for Testing', contentKey: 'networking/tls-ssl/local-testing' },
-    ] },
-    { key: 'protocols', label: 'Types of Protocols', contentKey: 'networking/protocols', children: [
-      { key: 'http-https', label: 'HTTP/HTTPS & Redirects', contentKey: 'networking/protocols/http-https' },
-      { key: 'smtp', label: 'SMTP & Mail Delivery', contentKey: 'networking/protocols/smtp' },
-      { key: 'ftp', label: 'FTP, FTPS & SFTP', contentKey: 'networking/protocols/ftp' },
-      { key: 'tcp-udp', label: 'TCP vs UDP', contentKey: 'networking/protocols/tcp-udp' },
-    ] },
-    { key: 'socket-connections', label: 'Socket Connections', contentKey: 'networking/socket-connections' },
-    { key: 'proxy-server', label: 'Proxy Server', contentKey: 'networking/proxy-server', children: [
-      { key: 'forward-proxy', label: 'Forward Proxy', contentKey: 'networking/proxy-server/forward-proxy' },
-      { key: 'reverse-proxy', label: 'Reverse Proxy', contentKey: 'networking/proxy-server/reverse-proxy' },
-    ] },
-    { key: 'browser-request-flow', label: 'Browser Request Walkthroughs', contentKey: 'networking/browser-request-flow' },
-  ],
-});
 
 tree.push({
   key: 'ai',
@@ -396,7 +389,17 @@ const legacyPlatform = ['text', 'nodejs', 'json', /*'jwt',*/ 'email'].map((categ
   };
 });
 
-tree.push({ key: 'platform', label: 'Platform', children: legacyPlatform });
+tree.push(
+    {
+    key: 'tools', label: 'Developer Tools', children: [
+      { key: 'Notepad++', label: 'Notepad++', data: 'content.md', /*pages: {'text-editors': 'Text Editors', 'regex': 'Regex', 'file-compare': 'File Compare'}*/ },
+      { key: 'api-tools', label: 'API Tools', pages: {'postman': 'Postman', 'swagger-ui': 'Swagger Ui', 'curl': 'Curl'} },
+      { key: 'database-tools', label: 'Database Tools', pages: {'database-clients': 'Database Clients', 'query-analyzers': 'Query Analyzers'} },
+      { key: 'developer-tools', label: 'Developer Workflow', pages: {'ide-debugging': 'Ide Debugging', 'terminal-tools': 'Terminal Tools', 'http-debugging': 'Http Debugging'} },
+    ],
+  },
+  { key: 'platform', label: 'Platform', children: legacyPlatform }
+);
 
 function normalizeNode(node, parentPath = []) {
   const path = [...parentPath, node.key];
