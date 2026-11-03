@@ -1,0 +1,112 @@
+.regex-page {
+  min-height: calc(100vh - 80px);
+  padding: 22px 24px 42px;
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+.regex-intro,
+.regex-card,
+.regex-results,
+.regex-description { max-width: 1280px; margin-right: auto; margin-left: auto; }
+.regex-intro { margin-bottom: 20px; }
+.regex-kicker { display: inline-block; color: var(--color-muted); font-size: .72rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+.regex-intro h1 { margin: 6px 0; font-size: 2rem; }
+.regex-intro p { /*max-width: 78ch;*/ color: var(--color-muted); line-height: 1.6; }
+.regex-links { display: flex; flex-wrap: wrap; gap: 9px 16px; margin-top: 12px; }
+.regex-links a,
+.regex-source-note a { color: var(--color-accent); font-size: .84rem; }
+.regex-card,
+.regex-results,
+.regex-description { margin-top: 20px; padding: 20px; border: 1px solid var(--color-border); border-radius: 14px; background: var(--color-paper); box-shadow: 0 5px 24px #00000008; }
+.regex-controls { display: grid; grid-template-columns: minmax(260px, 1.8fr) 100px minmax(190px, 1fr) auto; align-items: end; gap: 12px; }
+.regex-field { display: flex; flex-direction: column; gap: 6px; color: var(--color-muted); font-size: .78rem; font-weight: 800; }
+.regex-field small { font-weight: 500; }
+.regex-field input { width: 100%; min-height: 40px; padding: 8px 10px; border: 1px solid var(--color-border); border-radius: 8px; background: var(--color-bg); color: var(--color-text); font: .9rem var(--font-mono); }
+.regex-field input:focus,
+.regex-editor:focus,
+.regex-output:focus { outline: 2px solid var(--color-accent); outline-offset: 1px; }
+.regex-actions { display: flex; gap: 7px; }
+.regex-button,
+.regex-icon-button { display: inline-flex; min-height: 38px; align-items: center; justify-content: center; gap: 6px; padding: 7px 11px; border: 1px solid var(--color-border); border-radius: 8px; background: transparent; color: var(--color-text); font: 750 .8rem var(--font-sans); cursor: pointer; }
+.regex-button:hover:not(:disabled),
+.regex-icon-button:hover:not(:disabled) { border-color: var(--color-accent); transform: translateY(-1px); }
+.regex-button:focus-visible,
+.regex-icon-button:focus-visible,
+.regex-details summary:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+.regex-button:disabled,
+.regex-icon-button:disabled { cursor: not-allowed; opacity: .48; }
+.regex-button--primary { border-color: var(--color-accent); background: var(--color-accent); color: #fff; }
+.regex-status { margin-top: 14px; padding: 9px 12px; border-radius: 8px; font-size: .82rem; }
+.regex-status--ok { background: color-mix(in srgb, var(--color-accent) 10%, var(--color-paper)); color: var(--color-muted); }
+.regex-status--error { background: color-mix(in srgb, #c2413b 12%, var(--color-paper)); color: #c2413b; }
+.regex-panes { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; margin-top: 14px; }
+.regex-pane { min-width: 0; overflow: hidden; border: 1px solid var(--color-border); border-radius: 10px; }
+.regex-pane__bar { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; padding: 7px 10px; border-bottom: 1px solid var(--color-border); background: var(--color-bg); }
+.regex-pane__bar h2 { margin: 0; font-size: .88rem; }
+.regex-pane__hint { color: var(--color-muted); font-size: .75rem; }
+.regex-editor-shell { position: relative; min-height: 310px; background: var(--color-bg); }
+.regex-highlight,
+.regex-editor,
+.regex-output { box-sizing: border-box; width: 100%; min-height: 310px; margin: 0; padding: 13px; border: 0; font: .9rem/1.65 var(--font-mono); white-space: pre-wrap; word-break: break-word; tab-size: 4; }
+.regex-highlight { overflow: auto; color: var(--color-text); pointer-events: none; }
+.regex-highlight mark { border-radius: 3px; background: #fbbf24aa; color: inherit; box-shadow: 0 0 0 1px #f59e0b66; }
+.regex-highlight__placeholder { color: var(--color-muted); opacity: .8; }
+.regex-editor { position: absolute; inset: 0; resize: vertical; overflow: auto; background: transparent; color: transparent; caret-color: var(--color-text); outline-offset: -2px; }
+.regex-editor::selection { background: #ff8a6355; color: transparent; }
+.regex-output { display: block; resize: vertical; overflow: auto; background: var(--color-bg); color: var(--color-text); outline-offset: -2px; }
+.regex-notice { margin: 12px 0 0; color: var(--color-muted); font-size: .82rem; }
+.regex-details { margin-top: 14px; border-top: 1px solid var(--color-border); padding-top: 12px; color: var(--color-muted); font-size: .84rem; line-height: 1.6; }
+.regex-details summary { color: var(--color-text); font-weight: 800; cursor: pointer; }
+.regex-details p { margin-bottom: 8px; }
+.regex-details code,
+.regex-description code,
+.regex-group code,
+.regex-match-row code { padding: 1px 4px; border-radius: 4px; background: var(--color-bg); font-family: var(--font-mono); }
+.regex-results { margin-top: 20px; }
+.regex-section-heading { display: flex; align-items: end; justify-content: space-between; gap: 16px; margin-bottom: 13px; }
+.regex-section-heading h2,
+.regex-description h2 { margin: 5px 0 0; font-size: 1.45rem; }
+.regex-section-heading > p { max-width: 55ch; margin: 0; color: var(--color-muted); font-size: .82rem; }
+.regex-match-list { display: grid; gap: 6px; }
+.regex-match-row { display: flex; align-items: center; gap: 10px; min-height: 34px; padding: 5px 8px; border: 1px solid var(--color-border); border-radius: 7px; background: var(--color-bg); font-size: .82rem; }
+.regex-match-number { width: 24px; color: var(--color-muted); font-size: .75rem; text-align: center; }
+.regex-match-position { margin-left: auto; color: var(--color-muted); font-size: .75rem; }
+.regex-empty-result,
+.regex-muted { color: var(--color-muted); font-size: .84rem; }
+.regex-groups { margin-top: 17px; }
+.regex-groups h3,
+.regex-description h3 { margin: 0 0 9px; font-size: 1rem; }
+.regex-group-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 8px; }
+.regex-group { display: flex; flex-direction: column; gap: 5px; padding: 9px; border: 1px solid var(--color-border); border-radius: 8px; background: var(--color-bg); }
+.regex-group span { color: var(--color-muted); font-size: .75rem; font-weight: 750; }
+.regex-description { line-height: 1.65; }
+.regex-description p { max-width: 95ch; margin: 10px 0; color: var(--color-muted); font-size: .88rem; }
+.regex-description ul { padding-left: 1.25rem; color: var(--color-muted); font-size: .88rem; }
+.regex-explanation-list li { margin: 5px 0; }
+.regex-reference-table { width: 100%; margin-top: 14px; border-collapse: collapse; font-size: .8rem; }
+.regex-reference-table th,
+.regex-reference-table td { padding: 8px 9px; border: 1px solid var(--color-border); text-align: left; vertical-align: top; }
+.regex-reference-table th { background: var(--color-bg); color: var(--color-text); font-weight: 800; }
+.regex-reference-table td { color: var(--color-muted); }
+.regex-reference-table td code { color: var(--color-text); }
+.regex-source-note { margin-top: 16px !important; }
+.regex-note { max-width: 1280px; margin: 16px auto 0; color: var(--color-muted); font-size: .78rem; text-align: center; }
+
+@media (max-width: 900px) {
+  .regex-controls { grid-template-columns: minmax(0, 1fr) 100px; }
+  .regex-field--pattern { grid-column: 1 / -1; }
+  .regex-field--replacement { grid-column: 1 / -1; }
+  .regex-actions { justify-content: flex-end; }
+}
+@media (max-width: 680px) {
+  .regex-page { padding: 18px 14px 30px; }
+  .regex-card,
+  .regex-results,
+  .regex-description { padding: 14px; }
+  .regex-controls { display: flex; flex-direction: column; align-items: stretch; }
+  .regex-actions { justify-content: stretch; }
+  .regex-actions .regex-button { flex: 1; }
+  .regex-panes { grid-template-columns: 1fr; }
+  .regex-section-heading { align-items: flex-start; flex-direction: column; gap: 4px; }
+  .regex-reference-table { display: block; overflow-x: auto; white-space: nowrap; }
+}
