@@ -30,21 +30,91 @@ git stash drop stash@{0}
 
 Do not run `git stash clear` unless you intentionally want to remove all stash references.
 
-## Restore just one file from a stash
+## Restore a Single File from a Git Stash
 
-`git stash apply` does not have a path argument that applies only one file. To restore one tracked file from the stashed working-tree snapshot, use:
+If you want to restore only one file from a stash, use `git restore` or `git checkout` instead of `git stash apply`.
+
+### Syntax
+
+```bash
+git checkout 'stash@{<stash_index>}' -- <file_path>
+git restore --source='stash@{<stash_index>}' --worktree -- <file_path>
+```
+
+- `<stash_index>` – The stash you want to restore from.
+- `<file_path>` – The file you want to restore.
+- `stash@{0}` – Most recent stash.
+- `stash@{1}` – Previous stash.
+
+> [!IMPORTANT]
+> Replace the stash index and file path with your actual values.
+
+### 1. Restore a file to the Working Tree (Unstaged)
 
 ```bash
 git restore --source='stash@{0}' --worktree -- src/config.yml
 ```
 
-Review `git diff -- src/config.yml` afterward. If you also need to stage that restored file, add it deliberately with `git add src/config.yml`. To inspect only that file's patch first:
+This restores the file from the stash without staging it.
+
+Review the changes:
 
 ```bash
-git stash show -p stash@{0} -- src/config.yml
+git diff -- src/config.yml
 ```
 
-A stash made with `-u` also records untracked files, but restoring an untracked file may require checking out its path carefully to avoid overwriting an existing file.
+### 2. Restore a file to the Staged Area
+
+```bash
+git restore --source='stash@{0}' --staged --worktree -- src/config.yml
+```
+
+This restores the file and stages it.
+
+Review the staged changes:
+
+```bash
+git diff --cached -- src/config.yml
+```
+
+### 3. Alternative: Restore using `git checkout`
+
+```bash
+git checkout 'stash@{0}' -- src/config.yml
+```
+
+This restores the file and stages it in the index.
+
+### 4. View a File's Changes in a Stash
+
+To inspect the stash changes before restoring the file:
+
+```bash
+git stash show -p 'stash@{0}' -- src/config.yml
+```
+
+### 5. Find and Use a Specific Stash
+
+List your available stashes:
+
+```bash
+git stash list
+```
+
+Example: Restore a file from the previous stash.
+
+```bash
+git restore --source='stash@{1}' --worktree -- src/config.yml
+```
+
+### Important Notes
+
+- These commands do not remove the stash.
+- `git restore --worktree` restores the file without staging it.
+- `git restore --staged --worktree` restores the file and stages it.
+- `git checkout` also stages the restored file.
+- Review your local changes before restoring, as existing changes to the file may be overwritten.
+- If the stash contains untracked files (saved using `git stash -u`), check the stash contents and destination carefully before restoring them.
 
 ## Export/import a stash between repositories
 

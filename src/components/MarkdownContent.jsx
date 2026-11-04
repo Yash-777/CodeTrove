@@ -25,9 +25,45 @@ function textContent(value) {
   return '';
 }
 
+import { Children, cloneElement, isValidElement } from "react";
+
+const ALERT_RE = /^\s*\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\][ \t]*\r?\n?/i;
+
+const ALERT_LABELS = {
+  note: "Note",
+  tip: "Tip",
+  important: "Important",
+  warning: "Warning",
+  caution: "Caution",
+};
+
 function alertType(children) {
-  const match = textContent(children).match(/^\s*\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]/i);
+  const match = textContent(children).match(ALERT_RE);
   return match ? match[1].toLowerCase() : null;
+}
+
+// Removes "[!TYPE]" from the first non-empty text node, however deeply nested
+// (blockquote > p > text). `state` makes sure only the first match is stripped.
+function stripAlertMarker(children, state = { done: false }) {
+  return Children.map(children, (child) => {
+    if (state.done) return child;
+
+    if (typeof child === "string") {
+      if (!child.trim()) return child; // skip "\n" nodes before the <p>
+      state.done = true;
+      return child.replace(ALERT_RE, "");
+    }
+
+    if (isValidElement(child) && child.props.children != null) {
+      return cloneElement(
+        child,
+        undefined,
+        stripAlertMarker(child.props.children, state)
+      );
+    }
+
+    return child;
+  });
 }
 
 // js/javascript -> 'javascript', ts/typescript -> 'typescript', kt/kotlin -> 'kotlin', java -> 'java'
@@ -204,13 +240,14 @@ export default function MarkdownContent({ children }) {
         },
         blockquote: ({ node, children, ...props }) => {
           const type = alertType(children);
+
           return (
             <blockquote
-              className={`markdown-blockquote${type ? ` markdown-alert markdown-alert--${type}` : ''}`}
+              className={`markdown-blockquote${type ? ` markdown-alert markdown-alert--${type}` : ""}`}
               data-alert={type || undefined}
               {...props}
             >
-              {children}
+              {type ? stripAlertMarker(children) : children}
             </blockquote>
           );
         },
