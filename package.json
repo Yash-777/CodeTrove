@@ -12,7 +12,8 @@
     "preview": "vite preview",
     "build:ghpages": "GITHUB_PAGES=true vite build",
     "test:pom": "node scripts/test-pom-converter.mjs",
-    "test:config-converter": "node scripts/test-config-format-converter.mjs"
+    "test:config-converter": "node scripts/test-config-format-converter.mjs",
+    "test:document-converter": "node scripts/test-document-converter.mjs"
   },
   "dependencies": {
     "@codemirror/lang-javascript": "^6.2.2",
@@ -27,10 +28,12 @@
     "@wasm-fmt/clang-format": "^23.1.1",
     "@wasm-fmt/ruff_fmt": "^0.15.20",
     "acorn": "^8.19.0",
+    "exceljs": "4.4.0",
     "json5": "^2.2.3",
     "lucide-react": "^0.436.0",
     "mermaid": "^12.2.0",
     "node-sql-parser": "^5.4.0",
+    "papaparse": "5.7.0",
     "prettier": "^3.9.10",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",

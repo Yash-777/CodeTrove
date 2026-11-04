@@ -200,6 +200,16 @@ export const CATEGORIES = [
     ],
   },
   {
+    key: 'data-documents',
+    label: 'Data & Documents',
+    color: '#2563EB',
+    codeLang: 'text',
+    topics: [],
+    tools: [
+      { name: 'Document Converter', description: 'Convert CSV, JSON, and Excel workbooks in your browser, map or skip fields, add a result worksheet, and download the output without uploading files.', internalTool: 'document-converter', externalUrl: null },
+    ],
+  },
+  {
     key: 'email',
     label: 'Email',
     color: '#06B6D4',
