@@ -32,6 +32,7 @@ import HtmlXmlJsonToolPage from './pages/build/HtmlXmlJsonToolPage.jsx';
 import DocumentConverterPage from './pages/build/DocumentConverterPage.jsx';
 import JsonCrackPage from './pages/build/JsonCrackPage.jsx';
 import MarkdownEditorPage from './pages/build/MarkdownEditorPage.jsx';
+import JavaDecompilerPage from './pages/build/JavaDecompilerPage.jsx';
 import NetworkToolsPage from './pages/build/NetworkToolsPage.jsx';
 import ProjectsPage from './pages/build/ProjectsPage.jsx';
 import ProfilePage from './pages/store/ProfilePage.jsx';
@@ -76,6 +77,7 @@ export default function App() {
           <Route path="/build/tools/world-clock" element={<WorldClockPage />} />
           <Route path="/build/tools/html-xml-json" element={<HtmlXmlJsonToolPage />} />
           <Route path="/build/tools/document-converter" element={<DocumentConverterPage />} />
+          <Route path="/build/tools/java-decompiler" element={<JavaDecompilerPage />} />
           <Route path="/build/tools/json-crack" element={<JsonCrackPage />} />
           <Route path="/build/tools/markdown-editor" element={<MarkdownEditorPage />} />
           <Route path="/build/tools/network" element={<NetworkToolsPage />} />
