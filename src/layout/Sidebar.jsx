@@ -11,7 +11,6 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { NavLink, useNavigate, useLocation } from 'react-router-dom';
-import { CATEGORIES } from '../data/topics/index.js';
 import { NAVIGATION_TREE, getNavigationSearchResults } from '../data/navigation.js';
 import { getRecentTopics } from '../utils/recentTopics.js';
 import { paths } from '../routes/routes.config.js';
@@ -133,21 +132,7 @@ export default function Sidebar({ open }) {
   }
 
   if (!open) {
-    return (
-      <nav className="sidebar sidebar--collapsed" aria-label="Navigation (collapsed)">
-        {CATEGORIES.map((category) => (
-          <button
-            key={category.key}
-            className="sidebar__rail-dot"
-            style={{ background: category.color }}
-            title={category.label}
-            onClick={() => navigate(paths.category(category.key))}
-          >
-            {category.label.charAt(0)}
-          </button>
-        ))}
-      </nav>
-    );
+    return null;
   }
 
   return (

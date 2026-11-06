@@ -11,6 +11,7 @@
 
 .app-shell {
   height: 100vh;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   background: var(--color-bg);
@@ -38,4 +39,47 @@
   .app-body {
     flex-direction: column;
   }
+
+  .app-content {
+    padding: 1.25rem 1rem;
+  }
+}
+
+/* Allow a user on a phone/tablet to inspect the same wide workspace used on
+   desktop, without changing the responsive default for other users. */
+html[data-view-mode='desktop'] {
+  min-width: 960px;
+  overflow-x: auto;
+}
+
+html[data-view-mode='desktop'] .app-body {
+  flex-direction: row;
+}
+
+html[data-view-mode='desktop'] .app-content {
+  padding: 2rem clamp(1.25rem, 4vw, 3rem);
+}
+
+html[data-view-mode='tablet'] .app-shell {
+  min-width: 720px;
+}
+
+html[data-view-mode='tablet'] .app-body {
+  flex-direction: row;
+}
+
+html[data-view-mode='tablet'] .app-content {
+  padding: 1.5rem;
+}
+
+html[data-view-mode='mobile'] .app-shell {
+  min-width: 0;
+}
+
+html[data-view-mode='mobile'] .app-body {
+  flex-direction: column;
+}
+
+html[data-view-mode='mobile'] .app-content {
+  padding: 1.25rem 1rem;
 }

@@ -31,6 +31,8 @@ export default function Dashboard() {
   const { user } = useAuth();
   const [selectedCategoryKey, setSelectedCategoryKey] = useState(CATEGORIES[0]?.key ?? '');
   const topicsInCategory = getCategory(selectedCategoryKey)?.topics ?? [];
+  const totalTopics = CATEGORIES.reduce((total, category) => total + category.topics.length, 0);
+  const totalTools = CATEGORIES.reduce((total, category) => total + category.tools.length, 0);
 
   function handleTopicChange(event) {
     const topicSlug = event.target.value;
@@ -50,10 +52,15 @@ export default function Dashboard() {
           <img src={codeTroveWordmark} alt="CodeTrove" />
         </h1>
         <p className="dashboard__lede">
-          Explanations, real code samples, and inline tools for Java, JavaScript,
-          Node.js, JSON, JWT, and Git - one place, so you stop bookmarking six
-          different sites.
+          Explanations, real code samples, and inline developer tools organized across the
+          CodeTrove library - one calm workspace for learning and building.
         </p>
+
+        <div className="dashboard__stats" aria-label="CodeTrove library totals">
+          <span><strong>{CATEGORIES.length}</strong> categories</span>
+          <span><strong>{totalTopics}</strong> learning topics</span>
+          <span><strong>{totalTools}</strong> tools</span>
+        </div>
 
         <div className="dashboard__jump">
           <label className="dashboard__field">
