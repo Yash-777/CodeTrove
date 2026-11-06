@@ -16,32 +16,6 @@ sequenceDiagram
     Server-->>Browser: response or redirect
 ```
 
-<details open><summary><b>Uniform Resource Locator (URL)</b></summary>
-
-### What Is a URL?
-
-A **Uniform Resource Locator (URL)**, also called a web address, is the address of a resource on the World Wide Web.
-
-It tells your web browser where to find a resource and how to access it. For example, a URL can point to a website, a file, or an email address.
-
-#### Main Components of a URL
-
-A standard URL consists of several parts:
-
-- **Scheme / Protocol:** Tells the browser how to connect to a server. For example, `https://` and `http://`.
-- **Subdomain:** An optional part that comes before the main domain name. For example, `www.` or `blog.`.
-- **Domain Name:** The main name of a website. For example, `wikipedia.org`.
-- **Top-Level Domain (TLD):** The extension at the end of a domain name. For example, `.com`, `.org`, and `.gov`.
-- **Path:** Identifies a specific page, folder, or file on a website. For example, `/wiki/URL`.
-- **Query Parameters:** Provide additional information to the server. They start with a question mark (`?`). For example, `?search=term`.
-- **Fragment / Anchor:** Points to a specific section of a webpage. It starts with a hash symbol (`#`). For example, `#History`.
-
-| URL Anatomy_ A Visual Guide | URL Structure Explained |
-| :-- | :-- |
-| ![](/public/images/URL%20Anatomy_%20A%20Visual%20Guide.png)  | ![](/public/images/URL%20Structure%20Explained.png)  |
-
-</details>
-
 ## Follow the lessons in order
 
 1. **DNS & Registrars** explains domain ownership, URL and URI anatomy, hostname lookup, records, local caches, TTL, and practical Windows/macOS/Linux commands.
