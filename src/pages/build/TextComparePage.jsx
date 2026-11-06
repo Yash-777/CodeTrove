@@ -97,31 +97,34 @@ export default function TextComparePage() {
       </header>
 
       <section className="text-compare-card text-compare-card--inputs" aria-label="Comparison inputs">
-        <div className="text-compare-input-head">
-          <div>
-            <span className="text-compare-label text-compare-label--left">File 1 / Original</span>
-            <span className="text-compare-helper">Lines removed from File 1 are highlighted red.</span>
+        <div className="text-compare-input-column">
+          <div className="text-compare-input-head">
+            <div>
+              <span className="text-compare-label text-compare-label--left">File 1 / Original</span>
+              <span className="text-compare-helper">Lines removed from File 1 are highlighted red.</span>
+            </div>
+            <div className="text-compare-input-actions">
+              <input ref={leftFileRef} type="file" accept=".txt,.md,.json,.xml,.html,.css,.js,.jsx,.ts,.tsx,.java,.py,.csv" hidden onChange={(event) => loadFile(event, setLeftText)} />
+              <button type="button" className="text-compare-icon-button" onClick={() => leftFileRef.current?.click()} title="Load File 1"><FileUp size={16} /> Load file</button>
+              <button type="button" className="text-compare-icon-button" onClick={() => copyText('File 1', leftText)} title="Copy File 1"><Copy size={16} /> Copy</button>
+            </div>
           </div>
-          <div className="text-compare-input-actions">
-            <input ref={leftFileRef} type="file" accept=".txt,.md,.json,.xml,.html,.css,.js,.jsx,.ts,.tsx,.java,.py,.csv" hidden onChange={(event) => loadFile(event, setLeftText)} />
-            <button type="button" className="text-compare-icon-button" onClick={() => leftFileRef.current?.click()} title="Load File 1"><FileUp size={16} /> Load file</button>
-            <button type="button" className="text-compare-icon-button" onClick={() => copyText('File 1', leftText)} title="Copy File 1"><Copy size={16} /> Copy</button>
-          </div>
+          <textarea aria-label="File 1 original text" value={leftText} onChange={(event) => setLeftText(event.target.value)} spellCheck="false" />
         </div>
-        <textarea aria-label="File 1 original text" value={leftText} onChange={(event) => setLeftText(event.target.value)} spellCheck="false" />
-
-        <div className="text-compare-input-head">
-          <div>
-            <span className="text-compare-label text-compare-label--right">File 2 / Updated</span>
-            <span className="text-compare-helper">Lines added to File 2 are highlighted green.</span>
+        <div className="text-compare-input-column">
+          <div className="text-compare-input-head">
+            <div>
+              <span className="text-compare-label text-compare-label--right">File 2 / Updated</span>
+              <span className="text-compare-helper">Lines added to File 2 are highlighted green.</span>
+            </div>
+            <div className="text-compare-input-actions">
+              <input ref={rightFileRef} type="file" accept=".txt,.md,.json,.xml,.html,.css,.js,.jsx,.ts,.tsx,.java,.py,.csv" hidden onChange={(event) => loadFile(event, setRightText)} />
+              <button type="button" className="text-compare-icon-button" onClick={() => rightFileRef.current?.click()} title="Load File 2"><FileUp size={16} /> Load file</button>
+              <button type="button" className="text-compare-icon-button" onClick={() => copyText('File 2', rightText)} title="Copy File 2"><Copy size={16} /> Copy</button>
+            </div>
           </div>
-          <div className="text-compare-input-actions">
-            <input ref={rightFileRef} type="file" accept=".txt,.md,.json,.xml,.html,.css,.js,.jsx,.ts,.tsx,.java,.py,.csv" hidden onChange={(event) => loadFile(event, setRightText)} />
-            <button type="button" className="text-compare-icon-button" onClick={() => rightFileRef.current?.click()} title="Load File 2"><FileUp size={16} /> Load file</button>
-            <button type="button" className="text-compare-icon-button" onClick={() => copyText('File 2', rightText)} title="Copy File 2"><Copy size={16} /> Copy</button>
-          </div>
+          <textarea aria-label="File 2 updated text" value={rightText} onChange={(event) => setRightText(event.target.value)} spellCheck="false" />
         </div>
-        <textarea aria-label="File 2 updated text" value={rightText} onChange={(event) => setRightText(event.target.value)} spellCheck="false" />
       </section>
 
       <section className="text-compare-toolbar" aria-label="Comparison options">

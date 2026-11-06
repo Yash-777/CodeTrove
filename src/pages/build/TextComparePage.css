@@ -80,6 +80,14 @@
   margin-bottom: 0.75rem;
 }
 
+.text-compare-input-column {
+  min-width: 0;
+}
+
+.text-compare-input-column + .text-compare-input-column {
+  border-left: 1px solid var(--color-border);
+}
+
 .text-compare-input-head {
   justify-content: space-between;
   gap: 0.75rem;
@@ -87,11 +95,6 @@
   padding: 0.8rem 1rem;
   border-bottom: 1px solid var(--color-border);
   background: color-mix(in srgb, var(--color-bg) 75%, var(--color-paper));
-}
-
-.text-compare-input-head:nth-of-type(2),
-.text-compare-card--inputs textarea:nth-of-type(2) {
-  border-left: 1px solid var(--color-border);
 }
 
 .text-compare-label,
@@ -350,9 +353,9 @@
     display: block;
   }
 
-  .text-compare-input-head:nth-of-type(2),
-  .text-compare-card--inputs textarea:nth-of-type(2) {
+  .text-compare-input-column + .text-compare-input-column {
     border-left: 0;
+    border-top: 1px solid var(--color-border);
   }
 
   .text-compare-button--swap {
