@@ -196,6 +196,7 @@ export const CATEGORIES = [
     topics: [],
     tools: [
       { name: 'Document Converter', description: 'Convert CSV, JSON, and Excel workbooks in your browser, map or skip fields, add a result worksheet, and download the output without uploading files.', internalTool: 'document-converter', externalUrl: null },
+      { name: 'Document Compare (CSV / Spreadsheet)', description: 'Compare two local CSV, TSV, or Excel worksheets side by side; match rows by position or a shared key and review cell, row, and column changes.', internalTool: 'document-compare', externalUrl: null },
     ],
   },
   {

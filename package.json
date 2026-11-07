@@ -14,6 +14,7 @@
     "test:pom": "node scripts/test-pom-converter.mjs",
     "test:config-converter": "node scripts/test-config-format-converter.mjs",
     "test:document-converter": "node scripts/test-document-converter.mjs",
+    "test:spreadsheet-compare": "node scripts/test-spreadsheet-compare.mjs",
     "test:java-decompiler": "node scripts/test-java-decompiler.mjs"
   },
   "dependencies": {
