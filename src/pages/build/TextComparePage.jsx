@@ -1,6 +1,6 @@
+import ToolBackLink from '../../components/ToolBackLink.jsx';
 import { useMemo, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { ArrowLeftRight, Check, Clipboard, Copy, FileDiff, FileUp, RotateCcw } from 'lucide-react';
+import { Check, Clipboard, Copy, FileDiff, FileUp, RotateCcw } from 'lucide-react';
 import { compareText, copyableLines } from '../../utils/textDiff.js';
 import './TextComparePage.css';
 
@@ -80,7 +80,7 @@ export default function TextComparePage() {
   return (
     <div className="text-compare-page">
       <div className="text-compare-page__topbar">
-        <Link to="/build/tools" className="text-compare-page__back"><ArrowLeftRight size={16} /> Back to Tools</Link>
+        <ToolBackLink className="text-compare-page__back" />
         <span className="text-compare-page__local-note"><FileDiff size={15} /> Runs locally in your browser</span>
       </div>
 

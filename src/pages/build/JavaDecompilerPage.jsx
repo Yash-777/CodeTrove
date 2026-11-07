@@ -1,3 +1,4 @@
+import ToolBackLink from '../../components/ToolBackLink.jsx';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { StreamLanguage } from '@codemirror/language';
 import { java } from '@codemirror/legacy-modes/mode/clike';
@@ -276,6 +277,7 @@ export default function JavaDecompilerPage() {
 
   return (
     <div className="java-decompiler-page">
+      <ToolBackLink />
       <header className="java-decompiler-page__heading">
         <div>
           <p className="java-decompiler-page__eyebrow">Java tools</p>

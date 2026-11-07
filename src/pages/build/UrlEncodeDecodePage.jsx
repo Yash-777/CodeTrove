@@ -1,3 +1,4 @@
+import ToolBackLink from '../../components/ToolBackLink.jsx';
 import { useMemo, useState } from 'react';
 import { Check, Copy } from 'lucide-react';
 import { copyToClipboard } from '../../utils/textActions.js';
@@ -104,6 +105,7 @@ export default function UrlEncodeDecodePage() {
 
   return (
     <main className="url-tool-page">
+      <ToolBackLink />
       <header className="url-tool__intro">
         <span className="url-tool__eyebrow">BUILD / TOOLS / CRYPTOGRAPHY</span>
         <h1>URL (Encode ⇄ Decode)</h1>

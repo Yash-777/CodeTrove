@@ -1,3 +1,4 @@
+import ToolBackLink from '../../components/ToolBackLink.jsx';
 import { useEffect, useMemo, useState } from 'react';
 import { ArrowLeftRight, CalendarDays, Check, Clock3, Copy, Globe2, Plus, RefreshCw, X } from 'lucide-react';
 import { copyToClipboard } from '../../utils/textActions.js';
@@ -299,6 +300,7 @@ export default function WorldClockPage() {
 
   return (
     <main className="content-page wc-page">
+      <ToolBackLink />
       <header className="wc-hero">
         <div className="wc-eyebrow"><Clock3 size={16} /> DATA &amp; TIME TOOL</div>
         <h1>World Clock &amp; Time Zone Converter</h1>

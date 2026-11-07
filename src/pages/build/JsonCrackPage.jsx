@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import ToolBackLink from '../../components/ToolBackLink.jsx';
 import './JsonCrackPage.css';
 
 const JSON_CRACK_EDITOR = 'https://jsoncrack.com/editor';
@@ -7,6 +7,7 @@ const JSON_CRACK_REPOSITORY = 'https://github.com/Yash-777/jsoncrack.com';
 export default function JsonCrackPage() {
   return (
     <div className="content-page json-crack-page">
+      <ToolBackLink />
       <div className="json-crack-page__head">
         <div>
           <p className="json-crack-page__eyebrow">BUILD / TOOLS / WEB</p>
@@ -22,7 +23,6 @@ export default function JsonCrackPage() {
           <a className="json-crack-page__link" href={JSON_CRACK_REPOSITORY} target="_blank" rel="noopener noreferrer">
             View GitHub repository ↗
           </a>
-          <Link className="json-crack-page__link" to="/build/tools">Back to Tools</Link>
         </div>
       </div>
 

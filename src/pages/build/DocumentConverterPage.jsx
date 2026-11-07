@@ -1,3 +1,4 @@
+import ToolBackLink from '../../components/ToolBackLink.jsx';
 import { useMemo, useRef, useState } from 'react';
 import { ArrowLeftRight, Check, ChevronDown, Copy, Download, FileSpreadsheet, FolderOpen, WandSparkles } from 'lucide-react';
 import JSON5 from 'json5';
@@ -422,6 +423,7 @@ export default function DocumentConverterPage() {
 
   return (
     <div className="content-page cp-page dc-page">
+      <ToolBackLink />
       <div className="cp-head">
         <div>
           <h1>Document Converter</h1>

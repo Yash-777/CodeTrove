@@ -1,3 +1,4 @@
+import ToolBackLink from '../../components/ToolBackLink.jsx';
 import { useMemo, useState } from 'react';
 import { Check, Copy, Sparkles, Trash2 } from 'lucide-react';
 import { copyToClipboard } from '../../utils/textActions.js';
@@ -99,6 +100,7 @@ export default function RegexMatchPage() {
 
   return (
     <main className="regex-page">
+      <ToolBackLink />
       <header className="regex-intro">
         <div className="regex-kicker">Build / Tools / Text</div>
         <h1>Regular Expression Match</h1>

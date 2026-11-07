@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import ToolBackLink from '../../components/ToolBackLink.jsx';
 import './MarkdownEditorPage.css';
 
 const MARKDOWN_EDITOR = 'https://markdown.org/tools/editors/markdown/';
@@ -6,6 +6,7 @@ const MARKDOWN_EDITOR = 'https://markdown.org/tools/editors/markdown/';
 export default function MarkdownEditorPage() {
   return (
     <div className="content-page embedded-tool-page">
+      <ToolBackLink />
       <div className="embedded-tool-page__head">
         <div>
           <p className="embedded-tool-page__eyebrow">BUILD / TOOLS / DIAGRAMS & EDITORS</p>
@@ -18,7 +19,6 @@ export default function MarkdownEditorPage() {
           <a className="embedded-tool-page__link embedded-tool-page__link--primary" href={MARKDOWN_EDITOR} target="_blank" rel="noopener noreferrer">
             Open official editor ↗
           </a>
-          <Link className="embedded-tool-page__link" to="/build/tools">Back to Tools</Link>
         </div>
       </div>
 

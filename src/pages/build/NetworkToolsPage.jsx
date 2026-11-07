@@ -1,3 +1,4 @@
+import ToolBackLink from '../../components/ToolBackLink.jsx';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Check, Copy, Globe2, Network, RefreshCw, ShieldCheck } from 'lucide-react';
@@ -470,6 +471,7 @@ function NetworkToolsPage() {
 
   return (
     <main className="network-page">
+      <ToolBackLink />
       <header className="network-intro">
         <p className="network-eyebrow">BUILD / TOOLS / NETWORKING</p>
         <div className="network-heading-row">
@@ -480,7 +482,6 @@ function NetworkToolsPage() {
           <div className="network-intro-links">
             <Link className="network-back-link" to="/content/tree/networking">Learn: Networking</Link>
             <a className="network-back-link" href="https://markdown.org/tools/" target="_blank" rel="noopener noreferrer">Markdown.org tools</a>
-            <Link className="network-back-link" to="/build/tools">Back to Tools</Link>
           </div>
         </div>
         <div className="network-safety"><strong>Privacy note:</strong> Network checks may send the hostname or public IP to a selected third-party resolver or lookup service. DNS and IP results are fetched only when you request them. The speed-test and certificate-checker panels are hosted by their respective providers.</div>

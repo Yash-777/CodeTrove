@@ -1,3 +1,4 @@
+import ToolBackLink from '../../components/ToolBackLink.jsx';
 import { useMemo, useState } from 'react';
 import { Check, Copy, RefreshCw, ShieldCheck, Sparkles } from 'lucide-react';
 import JavaPasswordCryptoPanel from './JavaPasswordCryptoPanel.jsx';
@@ -167,6 +168,7 @@ export default function CryptographyToolsPage() {
   const tabs = mode === 'symmetric' || mode === 'asymmetric' ? [['encrypt', 'Encrypt'], ['decrypt', 'Decrypt']] : mode === 'hash' ? (hashType === 'PBKDF2' ? [['hash', 'Generate hash'], ['verify', 'Verify password']] : [['hash', 'Generate hash'], ['verify', 'Verify digest']]) : mode === 'hmac' ? [['sign', 'Generate signature'], ['verify', 'Verify signature']] : [['encode', 'Encode'], ['decode', 'Decode']];
 
   return <main className="crypto-page">
+      <ToolBackLink />
     <header className="crypto-intro"><span className="crypto-eyebrow">BUILD / TOOLS / CRYPTOGRAPHY</span><h1><ShieldCheck size={30} /> Cryptography Tools</h1><p>Encrypt data, create hashes, and generate or verify HMAC signatures directly in your browser using the Web Crypto API.</p><div className="crypto-safety"><strong>Security note:</strong> Use this page for learning and local testing. Never paste production secrets or sensitive customer data into tools you do not control. Hashing is one-way; Base64 is not encryption.</div></header>
     <section className="crypto-card crypto-mode-switch">
       <div className="crypto-mode-tabs" role="tablist" aria-label="Cryptography tool categories">{MODES.map((item) => <button type="button" role="tab" aria-selected={mode === item.id} className={mode === item.id ? 'is-active' : ''} key={item.id} onClick={() => changeMode(item.id)}>{item.label}</button>)}</div>
