@@ -110,6 +110,17 @@ export const CATEGORIES = [
     ],
   },
   {
+    key: 'web',
+    label: 'Web',
+    color: '#F97316',
+    codeLang: 'html',
+    topics: [],
+    tools: [
+      { name: 'HTML / XML / JSON Formatter & Validator', description: 'Beautify, minify, validate, and explore JSON/XML in a tree view.', internalTool: 'html-xml-json', externalUrl: null },
+      { name: 'Compare Online (JSON/XML/HTML)', description: 'Format, validate, and compare two JSON, XML, or HTML documents locally with side-by-side red and green differences.', internalTool: 'compare-online', externalUrl: null },
+    ],
+  },
+  /*{
     key: 'nodejs',
     label: 'Node.js',
     color: '#3FA34D',
@@ -121,7 +132,7 @@ export const CATEGORIES = [
     tools: [
       { name: 'package.json Validator', description: 'Check for common manifest mistakes.', internalTool: null, externalUrl: 'https://www.npmjs.com/package/package-json-validator' },
     ],
-  },
+  },*/
   {
     key: 'json',
     label: 'JSON',
@@ -166,16 +177,6 @@ export const CATEGORIES = [
     ],
   },
   {
-    key: 'web',
-    label: 'Web',
-    color: '#F97316',
-    codeLang: 'html',
-    topics: [],
-    tools: [
-      { name: 'HTML / XML / JSON Formatter & Validator', description: 'Beautify, minify, validate, and explore JSON/XML in a tree view.', internalTool: 'html-xml-json', externalUrl: null },
-    ],
-  },
-  {
     key: 'diagrams-editors',
     label: 'Diagrams / Editors tools',
     color: '#8B5CF6',
@@ -188,6 +189,16 @@ export const CATEGORIES = [
     ],
   },
   {
+    key: 'data-documents',
+    label: 'Data & Documents',
+    color: '#2563EB',
+    codeLang: 'text',
+    topics: [],
+    tools: [
+      { name: 'Document Converter', description: 'Convert CSV, JSON, and Excel workbooks in your browser, map or skip fields, add a result worksheet, and download the output without uploading files.', internalTool: 'document-converter', externalUrl: null },
+    ],
+  },
+  {
     key: 'data-time',
     label: 'Data & Time',
     color: '#0D9488',
@@ -196,16 +207,6 @@ export const CATEGORIES = [
     tools: [
       { name: 'Unix Timestamp ⇄ Date Time Converter', description: 'Convert epoch timestamps and human-readable dates with seconds, milliseconds, microseconds, nanoseconds, custom patterns, and local/GMT time zones.', internalTool: 'unix-timestamp-converter', externalUrl: null },
       { name: 'World Clock & Time Zone Converter', description: 'Compare live world clocks, convert between IANA time zones, calculate time differences from local dates or timestamps, and add or remove time with daylight-saving validation.', internalTool: 'world-clock', externalUrl: null },
-    ],
-  },
-  {
-    key: 'data-documents',
-    label: 'Data & Documents',
-    color: '#2563EB',
-    codeLang: 'text',
-    topics: [],
-    tools: [
-      { name: 'Document Converter', description: 'Convert CSV, JSON, and Excel workbooks in your browser, map or skip fields, add a result worksheet, and download the output without uploading files.', internalTool: 'document-converter', externalUrl: null },
     ],
   },
   {

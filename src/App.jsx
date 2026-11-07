@@ -23,6 +23,7 @@ import CharacterCounterPage from './pages/build/CharacterCounterPage.jsx';
 import StringUtilitiesPage from './pages/build/StringUtilitiesPage.jsx';
 import RegexMatchPage from './pages/build/RegexMatchPage.jsx';
 import TextComparePage from './pages/build/TextComparePage.jsx';
+import CompareOnlinePage from './pages/build/CompareOnlinePage.jsx';
 import CryptographyToolsPage from './pages/build/CryptographyToolsPage.jsx';
 import UrlEncodeDecodePage from './pages/build/UrlEncodeDecodePage.jsx';
 import PomFormatterPage from './pages/build/PomFormatterPage.jsx';
@@ -71,6 +72,7 @@ export default function App() {
           <Route path="/build/tools/string-utilities" element={<StringUtilitiesPage />} />
           <Route path="/build/tools/regex-match" element={<RegexMatchPage />} />
           <Route path="/build/tools/text-compare" element={<TextComparePage />} />
+          <Route path="/build/tools/compare-online" element={<CompareOnlinePage />} />
           <Route path="/build/tools/cryptography" element={<CryptographyToolsPage />} />
           <Route path="/build/tools/url-encode-decode" element={<UrlEncodeDecodePage />} />
           <Route path="/build/tools/pom-formatter" element={<PomFormatterPage />} />
