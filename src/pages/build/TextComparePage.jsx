@@ -1,6 +1,6 @@
 import ToolBackLink from '../../components/ToolBackLink.jsx';
 import { useMemo, useRef, useState } from 'react';
-import { Check, Clipboard, Copy, FileDiff, FileUp, RotateCcw } from 'lucide-react';
+import { ArrowLeftRight, Check, Clipboard, Copy, FileDiff, FileUp, RotateCcw } from 'lucide-react';
 import { compareText, copyableLines } from '../../utils/textDiff.js';
 import './TextComparePage.css';
 
