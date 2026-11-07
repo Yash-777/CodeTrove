@@ -10,7 +10,17 @@ Git provides several ways to preserve, transfer, or undo work. They are not inte
 
 Read [stash local work](/content/tree/git-collaboration/git/recovery/stash), [create and apply patches](/content/tree/git-collaboration/git/recovery/patches), [undo safely](/content/tree/git-collaboration/git/recovery/undo-reset-revert), and [conflict recovery and bisect](/content/tree/git-collaboration/git/recovery/debugging). Review `git status` before and after any recovery operation.
 
-![A local stash can be reapplied; a patch transfers a diff; reset and revert have different history effects.](git-diagram:recovery)
+```mermaid
+sequenceDiagram
+    participant Dev as Developer
+    participant Work as Working tree
+    participant Git as Git recovery command
+    participant History as Commit history
+    Dev->>Git: inspect status and diff
+    Git->>Work: restore, stash, or reapply files
+    Dev->>History: choose reset or revert when needed
+    History-->>Dev: preserve or rewrite the intended state
+```
 
 ## Questions and answers
 

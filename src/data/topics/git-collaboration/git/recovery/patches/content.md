@@ -66,15 +66,18 @@ git am ../patches/0001-*.patch
 
 If `git am` encounters a conflict, inspect the files and use `git am --continue` after resolving, or `git am --abort` to stop. For a general binary-capable repository patch, a Git-generated `git diff --binary` patch may be used with `git apply`; ordinary text diffs may not represent binary changes.
 
-![A plain diff patch changes files without creating a commit; a format-patch plus git am recreates a commit.](git-diagram:patch)
+```mermaid
+sequenceDiagram
+    participant Author as Patch author
+    participant Diff as Diff or format-patch
+    participant Receiver as Receiving repository
+    Author->>Diff: create patch from changes
+    Diff-->>Receiver: transfer file changes or a commit
+    Receiver->>Receiver: apply or git am
+    Receiver-->>Author: verify with diff and tests
+```
 
-## References
-
-- [Git `apply`](https://git-scm.com/docs/git-apply)
-- [Git `diff`](https://git-scm.com/docs/git-diff)
-- [Git `format-patch`](https://git-scm.com/docs/git-format-patch)
-- [Git `am`](https://git-scm.com/docs/git-am)
-
+Further reading: [Git `apply`](https://git-scm.com/docs/git-apply); [Git `diff`](https://git-scm.com/docs/git-diff); [Git `format-patch`](https://git-scm.com/docs/git-format-patch); [Git `am`](https://git-scm.com/docs/git-am).
 ## Questions and answers
 
 <details>

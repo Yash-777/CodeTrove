@@ -2,7 +2,19 @@
 
 This page puts the concepts side by side. The phases describe a **fresh** HTTPS request; a real browser may reuse cached DNS, a connection, a TLS session, a service-worker result, or a cached redirect and skip some network activity.
 
-![End-to-end request life cycle](networking-diagram:request-lifecycle)
+```mermaid
+sequenceDiagram
+    participant Browser as Browser
+    participant Cache as Local caches
+    participant DNS as DNS resolver
+    participant Server as Web server
+    Browser->>Cache: check URL, service worker, and connection cache
+    Cache-->>Browser: reuse result or continue
+    Browser->>DNS: resolve hostname
+    DNS-->>Browser: return an address
+    Browser->>Server: establish transport and send request
+    Server-->>Browser: response or redirect
+```
 
 | Phase | What happens | What to look for |
 |---|---|---|
@@ -79,9 +91,4 @@ curl -sS -D - -o /dev/null -L --max-redirs 10 https://java.com/
 
 On Windows use `curl.exe` and replace `/dev/null` with `NUL`. `curl -L` follows server redirects but does not reproduce browser disk cache, browser-generated HTTPS upgrades, service workers, or DevTools' labels. In Chrome DevTools, open **Network**, enable **Preserve log**, and inspect request, response, and redirect entries. The client and server time stamps can help distinguish network waits from a cached response.
 
-## References
-
-[1]: https://www.rfc-editor.org/rfc/rfc9110 "RFC 9110: HTTP Semantics"
-[2]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Redirections "MDN: Redirections in HTTP"
-[3]: https://www.rfc-editor.org/rfc/rfc1034 "RFC 1034: Domain Names—Concepts and Facilities"
-[4]: https://www.rfc-editor.org/rfc/rfc8446 "RFC 8446: TLS 1.3"
+Further reading: [RFC 9110: HTTP Semantics](https://www.rfc-editor.org/rfc/rfc9110); [MDN: Redirections in HTTP](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Redirections); [RFC 1034: Domain Names—Concepts and Facilities](https://www.rfc-editor.org/rfc/rfc1034); [RFC 8446: TLS 1.3](https://www.rfc-editor.org/rfc/rfc8446).

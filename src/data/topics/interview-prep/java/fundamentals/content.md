@@ -151,8 +151,4 @@ static int total(int first, int... rest) {
 Overloads involving `null` and varargs can be ambiguous. Prefer a collection parameter when the API needs a named, validated set of values or when exposing varargs would create confusing overload resolution.
 </details>
 
-## References
-
-- [JLS type conversions](https://docs.oracle.com/javase/specs/jls/se21/html/jls-5.html)
-- [Optional API](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Optional.html)
-- [java.time API](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/time/package-summary.html)
+Further reading: [JLS type conversions](https://docs.oracle.com/javase/specs/jls/se21/html/jls-5.html); [Optional API](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Optional.html); [java.time API](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/time/package-summary.html).

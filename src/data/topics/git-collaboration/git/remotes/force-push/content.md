@@ -12,7 +12,15 @@ git push --force-with-lease origin feature/search
 
 `--force-with-lease` asks Git to update the remote only if its current reference still matches the expected remote-tracking value you observed. It helps avoid overwriting a teammate's intervening push. It does **not** make force-push harmless: a stale or updated tracking ref can still make an unexpected overwrite possible, and branch protections may reject it.
 
-![A normal push refuses to erase unseen remote commits; force-with-lease checks that the remote tip has not changed from the expected value.](git-diagram:force-push)
+```mermaid
+sequenceDiagram
+    participant Local as Local repository
+    participant Remote as Hosted remote
+    Local->>Remote: normal push
+    Remote-->>Local: reject if unseen commits would be erased
+    Local->>Remote: force-with-lease
+    Remote-->>Local: accept only if expected remote tip is unchanged
+```
 
 ## When not to force-push
 
@@ -20,11 +28,7 @@ Do not force-push shared branches such as `main`, release branches, or a teammat
 
 Avoid plain `git push --force` when `--force-with-lease` is available. Plain force tells Git to overwrite the remote ref without the safety comparison.
 
-## References
-
-- [Git `push` — `--force-with-lease`](https://git-scm.com/docs/git-push#Documentation/git-push.txt---force-with-lease)
-- [Atlassian: force-pushing](https://www.atlassian.com/git/tutorials/rewriting-history)
-
+Further reading: [Git `push` — `--force-with-lease`](https://git-scm.com/docs/git-push#Documentation/git-push.txt---force-with-lease); [Atlassian: force-pushing](https://www.atlassian.com/git/tutorials/rewriting-history).
 ## Questions and answers
 
 <details>

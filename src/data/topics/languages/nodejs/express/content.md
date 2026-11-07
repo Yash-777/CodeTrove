@@ -1,6 +1,6 @@
 # Express HTTP Services
 
-Node.js includes the low-level `node:http` API. Express is a web framework built on top of Node's HTTP capabilities. It provides routing and middleware so an application can organize request handling without manually parsing every URL and body. [1]
+Node.js includes the low-level `node:http` API. Express is a web framework built on top of Node's HTTP capabilities. It provides routing and middleware so an application can organize request handling without manually parsing every URL and body. [Installing Express](https://expressjs.com/en/starter/installing.html)
 
 ## Create a small Express project
 
@@ -56,9 +56,4 @@ A common request flow is:
 
 The example binds only to loopback and is intended for local testing. In a deployed service, follow the hosting platform's network model and put a TLS-terminating proxy or load balancer in front when appropriate. If Express runs behind a proxy, configure `trust proxy` only for the actual trusted proxy hops; trusting arbitrary forwarded headers can let clients spoof their source address or protocol.
 
-Set request-size limits, validate input, use safe database queries, and avoid returning stack traces or secrets to clients. Add a tested error-handling strategy and graceful shutdown behavior. Security is a first-class part of API design; continue with [Security Basics](/content/tree/languages/nodejs/security). [2]
-
-## References
-
-[1]: https://expressjs.com/en/starter/installing.html "Installing Express"
-[2]: https://expressjs.com/en/advanced/best-practice-security.html "Express Production Security Best Practices"
+Set request-size limits, validate input, use safe database queries, and avoid returning stack traces or secrets to clients. Add a tested error-handling strategy and graceful shutdown behavior. Security is a first-class part of API design; continue with [Security Basics](/content/tree/languages/nodejs/security). [Express Production Security Best Practices](https://expressjs.com/en/advanced/best-practice-security.html)

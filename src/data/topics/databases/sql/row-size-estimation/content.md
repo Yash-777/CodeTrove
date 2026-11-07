@@ -15,7 +15,7 @@ Those are related, but they are not interchangeable. The calculations below are 
 For a character column, a length in characters is not necessarily a length in bytes.
 
 - `CHARACTER_MAXIMUM_LENGTH` is a character count for character columns.
-- `CHARACTER_OCTET_LENGTH` is the declared maximum number of bytes for the character or binary value. It is generally the safer metadata value to use when the question is “how many bytes can this declaration represent?” [2]
+- `CHARACTER_OCTET_LENGTH` is the declared maximum number of bytes for the character or binary value. It is generally the safer metadata value to use when the question is “how many bytes can this declaration represent?” [MySQL 8.4 Reference Manual: The INFORMATION_SCHEMA COLUMNS Table](https://dev.mysql.com/doc/refman/8.4/en/information-schema-columns-table.html)
 - `DATALENGTH` in SQL Server and `length(CAST(value AS BLOB))` in SQLite measure the bytes of a particular value, not the declared maximum.
 
 For example, assuming the column's character set has the usual maximum widths:
@@ -99,7 +99,7 @@ WHERE TABLE_SCHEMA = DATABASE()
 ORDER BY ORDINAL_POSITION;
 ```
 
-`COLUMN_KEY` is useful schema metadata, but it needs careful interpretation. `PRI` indicates a primary-key column, `UNI` a unique key, and `MUL` a nonunique key. An empty value does not always prove that the column is unindexed: a column can be a later part of a nonunique composite key and still have an empty `COLUMN_KEY` in this view. Inspect the index metadata when the distinction matters. [2]
+`COLUMN_KEY` is useful schema metadata, but it needs careful interpretation. `PRI` indicates a primary-key column, `UNI` a unique key, and `MUL` a nonunique key. An empty value does not always prove that the column is unindexed: a column can be a later part of a nonunique composite key and still have an empty `COLUMN_KEY` in this view. Inspect the index metadata when the distinction matters. [MySQL 8.4 Reference Manual: The INFORMATION_SCHEMA COLUMNS Table](https://dev.mysql.com/doc/refman/8.4/en/information-schema-columns-table.html)
 
 For a quick MySQL table-level overview:
 
@@ -275,7 +275,7 @@ Again, 607 is not “allocated row size.” It leaves out the physical record's 
 
 ## 5. MySQL InnoDB: what the physical estimate must add
 
-**MySQL InnoDB behavior is engine-specific.** InnoDB uses the primary key as its clustered index. If no primary key exists, it can use a suitable `UNIQUE NOT NULL` index; otherwise it creates a hidden clustered index named `GEN_CLUST_INDEX`. Secondary-index records include the primary-key values needed to find the clustered record. [3]
+**MySQL InnoDB behavior is engine-specific.** InnoDB uses the primary key as its clustered index. If no primary key exists, it can use a suitable `UNIQUE NOT NULL` index; otherwise it creates a hidden clustered index named `GEN_CLUST_INDEX`. Secondary-index records include the primary-key values needed to find the clustered record. [MySQL 8.4 Reference Manual: InnoDB Index Types](https://dev.mysql.com/doc/refman/8.4/en/innodb-index-types.html)
 
 That means the same logical column can contribute to storage more than once:
 
@@ -295,7 +295,7 @@ A physical estimate must also account for the following, whose exact sizes depen
 - **Length entries:** variable-length fields need metadata describing the stored length. A one-byte or two-byte planning guess is not a complete InnoDB record-layout calculation.
 - **NULL bitmap:** nullable columns need presence information. A rough planning hint is one bit per nullable column, rounded up to bytes; the exact record layout and placement are row-format details.
 - **Record headers and hidden metadata:** InnoDB records have headers and may carry transaction/version information. These bytes are not represented by the sum of declared column payloads.
-- **Row format:** `COMPACT`, `DYNAMIC`, and other InnoDB formats do not have identical handling of variable-length and large values. InnoDB documentation specifically describes record metadata, NULL maps, length fields, and large-value handling. [1]
+- **Row format:** `COMPACT`, `DYNAMIC`, and other InnoDB formats do not have identical handling of variable-length and large values. InnoDB documentation specifically describes record metadata, NULL maps, length fields, and large-value handling. [MySQL 8.4 Reference Manual: InnoDB Row Formats](https://dev.mysql.com/doc/refman/8.4/en/innodb-row-format.html)
 - **Overflow/off-page storage:** large `TEXT`, `BLOB`, and long variable values may not fit entirely in the clustered record. The record can contain a pointer and/or a prefix while the remainder occupies overflow pages. “Off-page” does not mean “free”: it changes where the bytes and I/O live.
 - **Primary-key copies in secondary indexes:** a wide primary key can make every secondary index substantially larger. A narrow, stable primary key is often relevant to storage as well as lookup design.
 - **Page and allocation effects:** rows live in pages, not as individually allocated files. Page headers, record directories, free space, splits, and partially filled pages mean that summing row estimates will not equal `Data_length` exactly.
@@ -329,7 +329,7 @@ For repeatable testing, use data that resembles production: character distributi
 
 ## 7. SQLite: declared types and file pages are different concepts
 
-**SQLite behavior is not MySQL behavior.** SQLite does not provide MySQL's `INFORMATION_SCHEMA.COLUMNS`, and a declaration such as `VARCHAR(50)` does not impose MySQL-style character-length enforcement. SQLite uses dynamic typing and stores values in records using serial-type information; table and index B-trees are stored in fixed-size pages, and large records can use overflow pages. [4]
+**SQLite behavior is not MySQL behavior.** SQLite does not provide MySQL's `INFORMATION_SCHEMA.COLUMNS`, and a declaration such as `VARCHAR(50)` does not impose MySQL-style character-length enforcement. SQLite uses dynamic typing and stores values in records using serial-type information; table and index B-trees are stored in fixed-size pages, and large records can use overflow pages. [SQLite File Format: Record Format, B-Tree Pages, and Overflow Pages](https://www.sqlite.org/fileformat2.html)
 
 Use SQLite's own metadata and byte functions instead:
 
@@ -351,7 +351,7 @@ PRAGMA page_size;
 PRAGMA page_count;
 ```
 
-`length(CAST(value AS BLOB))` measures the bytes of the value currently returned by SQLite. `page_size × page_count` is a coarse database-file allocation signal; it includes page structures, indexes, freelist effects, and other objects. It is not the sum of row payloads. SQLite's query-plan inspection is also dialect-specific; `EXPLAIN QUERY PLAN` reports a high-level `SCAN`/`SEARCH` description and its output format can change between versions. [5]
+`length(CAST(value AS BLOB))` measures the bytes of the value currently returned by SQLite. `page_size × page_count` is a coarse database-file allocation signal; it includes page structures, indexes, freelist effects, and other objects. It is not the sum of row payloads. SQLite's query-plan inspection is also dialect-specific; `EXPLAIN QUERY PLAN` reports a high-level `SCAN`/`SEARCH` description and its output format can change between versions. [SQLite EXPLAIN QUERY PLAN](https://www.sqlite.org/eqp.html)
 
 ## 8. MariaDB: label the dialect and check the storage engine
 
@@ -373,7 +373,7 @@ WHERE TABLE_SCHEMA = DATABASE()
 ORDER BY ORDINAL_POSITION;
 ```
 
-If the table uses InnoDB, the physical questions remain engine questions: row format, off-page values, clustered records, secondary-index key copies, and page allocation all matter. MariaDB's indexing guidance also emphasizes that secondary InnoDB keys carry primary-key values and that index maintenance adds write cost. [6] Do not call a metadata sum an allocated-row measurement merely because the column query succeeded.
+If the table uses InnoDB, the physical questions remain engine questions: row format, off-page values, clustered records, secondary-index key copies, and page allocation all matter. MariaDB's indexing guidance also emphasizes that secondary InnoDB keys carry primary-key values and that index maintenance adds write cost. [MariaDB: Building the Best Index for a Given SELECT](https://mariadb.com/docs/server/ha-and-performance/optimization-and-tuning/optimization-and-indexes/building-the-best-index-for-a-given-select) Do not call a metadata sum an allocated-row measurement merely because the column query succeeded.
 
 ## 9. SQL Server: use byte metadata and T-SQL functions
 
@@ -415,22 +415,8 @@ A SQL Server row can include a record header, a NULL bitmap, a variable-column o
 3. **Compute declared maximum payload.** Keep `utf8mb3` and `utf8mb4` field-wise. Do not assume the table default applies to every column.
 4. **Add a clearly labeled variable-length estimate.** Length fields are overhead, not payload. Mark one-byte/two-byte rules as rough unless you are calculating a documented engine format.
 5. **Count nullable columns.** Use the count only as a rough NULL-bitmap planning hint; do not present it as the complete record header.
-6. **Inventory indexes.** Include the clustered record and secondary index entries. In InnoDB, secondary entries carry primary-key values. [3]
+6. **Inventory indexes.** Include the clustered record and secondary index entries. In InnoDB, secondary entries carry primary-key values. [MySQL 8.4 Reference Manual: InnoDB Index Types](https://dev.mysql.com/doc/refman/8.4/en/innodb-index-types.html)
 7. **Check large values and row format.** Determine whether values can move off-page or into overflow/Large Object storage, and whether compression is enabled.
 8. **Measure representative data.** Compare actual value byte lengths with engine statistics and object/page allocation. Include NULLs, non-ASCII text, long values, and production-like key widths.
 9. **Treat limits separately from averages.** A declared maximum helps test worst-case constraints; an average helps estimate workload storage. Neither alone describes every physical row.
 10. **Document uncertainty.** Record which types were modeled, which were not, and which overheads were measured rather than guessed.
-
-## References
-
-[1]: https://dev.mysql.com/doc/refman/8.4/en/innodb-row-format.html "MySQL 8.4 Reference Manual: InnoDB Row Formats"
-
-[2]: https://dev.mysql.com/doc/refman/8.4/en/information-schema-columns-table.html "MySQL 8.4 Reference Manual: The INFORMATION_SCHEMA COLUMNS Table"
-
-[3]: https://dev.mysql.com/doc/refman/8.4/en/innodb-index-types.html "MySQL 8.4 Reference Manual: InnoDB Index Types"
-
-[4]: https://www.sqlite.org/fileformat2.html "SQLite File Format: Record Format, B-Tree Pages, and Overflow Pages"
-
-[5]: https://www.sqlite.org/eqp.html "SQLite EXPLAIN QUERY PLAN"
-
-[6]: https://mariadb.com/docs/server/ha-and-performance/optimization-and-tuning/optimization-and-indexes/building-the-best-index-for-a-given-select "MariaDB: Building the Best Index for a Given SELECT"

@@ -133,8 +133,4 @@ class C implements A, B {
 
 Choose an interface when the important idea is a capability or contract and implementations may be unrelated. Choose an abstract class when descendants share meaningful state, protected behavior, construction rules, or invariants. Prefer composition when inheritance would create a fragile or artificial hierarchy.
 
-## References
-
-- [Oracle Abstract Methods and Classes](https://docs.oracle.com/javase/tutorial/java/IandI/abstract.html)
-- [Oracle Interfaces and Inheritance](https://docs.oracle.com/javase/tutorial/java/IandI/createinterface.html)
-- [dev.java Object-Oriented Programming](https://dev.java/learn/oop/)
+Further reading: [Oracle Abstract Methods and Classes](https://docs.oracle.com/javase/tutorial/java/IandI/abstract.html); [Oracle Interfaces and Inheritance](https://docs.oracle.com/javase/tutorial/java/IandI/createinterface.html); [dev.java Object-Oriented Programming](https://dev.java/learn/oop/).

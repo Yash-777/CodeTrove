@@ -38,9 +38,4 @@ nc -vz example.com 443
 
 This checks a TCP connection to that host and port. It is not a UDP test and does not prove an application-level handshake succeeds. ICMP tools such as `ping` test a different protocol and may be blocked while TCP still works.
 
-## References
-
-[1]: https://www.rfc-editor.org/rfc/rfc9293 "RFC 9293: Transmission Control Protocol"
-[2]: https://www.rfc-editor.org/rfc/rfc768 "RFC 768: User Datagram Protocol"
-[3]: https://www.rfc-editor.org/rfc/rfc9000 "RFC 9000: QUIC"
-[4]: https://www.rfc-editor.org/rfc/rfc9114 "RFC 9114: HTTP/3"
+Further reading: [RFC 9293: Transmission Control Protocol](https://www.rfc-editor.org/rfc/rfc9293); [RFC 768: User Datagram Protocol](https://www.rfc-editor.org/rfc/rfc768); [RFC 9000: QUIC](https://www.rfc-editor.org/rfc/rfc9000); [RFC 9114: HTTP/3](https://www.rfc-editor.org/rfc/rfc9114).

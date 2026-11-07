@@ -40,7 +40,7 @@ The first useful contiguous prefixes are:
 
 These are the **leftmost prefixes**. A predicate on `created_at` alone does not describe a contiguous starting section of this ordering, because rows for every customer are interleaved before the desired timestamp values can be found. A predicate on `status` alone is even farther from the left edge.
 
-This is a rule about the ordering of a B-tree, not a guarantee that every optimizer will use an index whenever a leftmost prefix exists. The optimizer estimates cost, row counts, available statistics, sort cost, and table size. It may choose a scan when that is cheaper. SQLite documents `SCAN` versus `SEARCH` and covering-index choices in its high-level plan output, and warns that the output format can change between versions [1] [2].
+This is a rule about the ordering of a B-tree, not a guarantee that every optimizer will use an index whenever a leftmost prefix exists. The optimizer estimates cost, row counts, available statistics, sort cost, and table size. It may choose a scan when that is cheaper. SQLite documents `SCAN` versus `SEARCH` and covering-index choices in its high-level plan output, and warns that the output format can change between versions [SQLite Query Planning](https://www.sqlite.org/queryplanner.html) [SQLite EXPLAIN QUERY PLAN](https://www.sqlite.org/eqp.html).
 
 ## 2. Reading the leftmost-prefix rule
 
@@ -138,7 +138,7 @@ FROM orders
 GROUP BY customer_id, created_at;
 ```
 
-The grouping example can still require a sort or temporary structure if the engine chooses a different plan, if expressions are involved, or if the query needs data outside the index. SQLite's query-planner documentation explains that multi-column indexes can satisfy lookup and ordering work, while its plan documentation exposes temporary sorting structures when one is needed [1] [2]. MariaDB's indexing guidance similarly recommends starting from the query's equality conditions and then considering range, grouping, and ordering requirements—not applying one fixed column-order formula to every query [3].
+The grouping example can still require a sort or temporary structure if the engine chooses a different plan, if expressions are involved, or if the query needs data outside the index. SQLite's query-planner documentation explains that multi-column indexes can satisfy lookup and ordering work, while its plan documentation exposes temporary sorting structures when one is needed [SQLite Query Planning](https://www.sqlite.org/queryplanner.html) [SQLite EXPLAIN QUERY PLAN](https://www.sqlite.org/eqp.html). MariaDB's indexing guidance similarly recommends starting from the query's equality conditions and then considering range, grouping, and ordering requirements—not applying one fixed column-order formula to every query [MariaDB: Building the Best Index for a Given Select](https://mariadb.com/docs/server/ha-and-performance/optimization-and-tuning/optimization-and-indexes/building-the-best-index-for-a-given-select).
 
 A query that orders by a non-prefix sequence is not automatically supported by this key:
 
@@ -186,9 +186,9 @@ WHERE customer_id = 101
 
 Engine details matter:
 
-- **SQLite:** `EXPLAIN QUERY PLAN` can report `USING COVERING INDEX`. SQLite's planner documentation describes covering indexes as a way to avoid an additional table lookup [1] [2].
-- **MySQL/InnoDB:** a secondary index record includes the primary-key value, so a query that selects the primary key plus indexed columns may be covered; selecting another non-key column usually requires reaching the clustered primary-key record. The InnoDB documentation describes this secondary-key behavior [4]. Use `EXPLAIN` and, where supported, `EXPLAIN ANALYZE` to confirm [5].
-- **MariaDB/InnoDB:** the same InnoDB primary-key locator consideration applies. MariaDB's guidance also emphasizes the storage and update cost of adding index columns [3].
+- **SQLite:** `EXPLAIN QUERY PLAN` can report `USING COVERING INDEX`. SQLite's planner documentation describes covering indexes as a way to avoid an additional table lookup [SQLite Query Planning](https://www.sqlite.org/queryplanner.html) [SQLite EXPLAIN QUERY PLAN](https://www.sqlite.org/eqp.html).
+- **MySQL/InnoDB:** a secondary index record includes the primary-key value, so a query that selects the primary key plus indexed columns may be covered; selecting another non-key column usually requires reaching the clustered primary-key record. The InnoDB documentation describes this secondary-key behavior [MySQL 8.4: InnoDB Index Types](https://dev.mysql.com/doc/refman/8.4/en/innodb-index-types.html). Use `EXPLAIN` and, where supported, `EXPLAIN ANALYZE` to confirm [MySQL 8.4: EXPLAIN Statement](https://dev.mysql.com/doc/refman/8.4/en/explain.html).
+- **MariaDB/InnoDB:** the same InnoDB primary-key locator consideration applies. MariaDB's guidance also emphasizes the storage and update cost of adding index columns [MariaDB: Building the Best Index for a Given Select](https://mariadb.com/docs/server/ha-and-performance/optimization-and-tuning/optimization-and-indexes/building-the-best-index-for-a-given-select).
 - **SQL Server:** a nonclustered index can keep search/order columns as key columns and add projected columns with `INCLUDE`, for example:
 
   ```sql
@@ -267,7 +267,7 @@ ix_a (customer_id, created_at)
 ix_b (customer_id, created_at)
 ```
 
-Different names do not make identical key definitions different access paths. Still, inspect constraints, included columns, predicates, and deployment history before removing anything. Inventory indexes using the target engine's metadata, group columns in `SEQ_IN_INDEX`/equivalent order, and compare the result with real query plans and write workload. MySQL exposes ordered index-column metadata and estimated cardinality through `INFORMATION_SCHEMA.STATISTICS` [6].
+Different names do not make identical key definitions different access paths. Still, inspect constraints, included columns, predicates, and deployment history before removing anything. Inventory indexes using the target engine's metadata, group columns in `SEQ_IN_INDEX`/equivalent order, and compare the result with real query plans and write workload. MySQL exposes ordered index-column metadata and estimated cardinality through `INFORMATION_SCHEMA.STATISTICS` [MySQL 8.4: The INFORMATION_SCHEMA STATISTICS Table](https://dev.mysql.com/doc/refman/8.4/en/information-schema-statistics-table.html).
 
 > **Warning — destructive operation:** the following statements remove schema objects. Do not run them in production from a lesson. First confirm ownership, constraints, dependencies, backup/recovery procedures, and measured plan impact in a staging environment; then use a reviewed migration.
 >
@@ -313,7 +313,7 @@ WHERE customer_id = 101
 ORDER BY created_at;
 ```
 
-`EXPLAIN` contains estimates; `EXPLAIN ANALYZE` executes supported statements and reports observed iterator behavior. MySQL documents both the distinction and the role of refreshed statistics [5]. Do not add `FORCE INDEX` as a routine fix: it can be useful as a diagnostic comparison, but it can become wrong as data and versions change.
+`EXPLAIN` contains estimates; `EXPLAIN ANALYZE` executes supported statements and reports observed iterator behavior. MySQL documents both the distinction and the role of refreshed statistics [MySQL 8.4: EXPLAIN Statement](https://dev.mysql.com/doc/refman/8.4/en/explain.html). Do not add `FORCE INDEX` as a routine fix: it can be useful as a diagnostic comparison, but it can become wrong as data and versions change.
 
 ### SQLite
 
@@ -330,7 +330,7 @@ WHERE customer_id = 101
 ORDER BY created_at;
 ```
 
-Look for a `SEARCH` using the intended index, and check whether SQLite reports a temporary sort or a covering index. Treat the textual format as diagnostic output, not a stable API [2].
+Look for a `SEARCH` using the intended index, and check whether SQLite reports a temporary sort or a covering index. Treat the textual format as diagnostic output, not a stable API [SQLite EXPLAIN QUERY PLAN](https://www.sqlite.org/eqp.html).
 
 ### MariaDB
 
@@ -345,7 +345,7 @@ WHERE customer_id = 101
 ORDER BY created_at;
 ```
 
-MariaDB's documented index-design advice is a starting heuristic. Validate with the actual schema, distribution, version, and workload rather than assuming its suggested order is universal [3].
+MariaDB's documented index-design advice is a starting heuristic. Validate with the actual schema, distribution, version, and workload rather than assuming its suggested order is universal [MariaDB: Building the Best Index for a Given Select](https://mariadb.com/docs/server/ha-and-performance/optimization-and-tuning/optimization-and-indexes/building-the-best-index-for-a-given-select).
 
 ### SQL Server
 
@@ -375,17 +375,3 @@ Before creating `(customer_id, created_at, status)`, ask:
 - Have plans and actual row counts been checked in MySQL, SQLite, MariaDB, or SQL Server as appropriate?
 
 The durable idea is simple: **a composite index is an ordered path through a workload, not a bag of independent indexes**. Design its left edge around the query shapes you need, preserve uncertainty where optimizer behavior is engine-dependent, and prove the result with plans and measurements.
-
-## References
-
-[1]: https://www.sqlite.org/queryplanner.html "SQLite Query Planning"
-
-[2]: https://www.sqlite.org/eqp.html "SQLite EXPLAIN QUERY PLAN"
-
-[3]: https://mariadb.com/docs/server/ha-and-performance/optimization-and-tuning/optimization-and-indexes/building-the-best-index-for-a-given-select "MariaDB: Building the Best Index for a Given Select"
-
-[4]: https://dev.mysql.com/doc/refman/8.4/en/innodb-index-types.html "MySQL 8.4: InnoDB Index Types"
-
-[5]: https://dev.mysql.com/doc/refman/8.4/en/explain.html "MySQL 8.4: EXPLAIN Statement"
-
-[6]: https://dev.mysql.com/doc/refman/8.4/en/information-schema-statistics-table.html "MySQL 8.4: The INFORMATION_SCHEMA STATISTICS Table"

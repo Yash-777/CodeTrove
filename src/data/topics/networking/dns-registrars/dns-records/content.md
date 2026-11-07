@@ -68,11 +68,4 @@ dig -x 8.8.8.8
 
 Compare forward A/AAAA results too; reverse DNS alone does not prove that the named host serves a particular website.
 
-## References
-
-[1]: https://www.rfc-editor.org/rfc/rfc1035 "RFC 1035: Domain Names—Implementation and Specification"
-[2]: https://www.rfc-editor.org/rfc/rfc1034 "RFC 1034: Domain Names—Concepts and Facilities"
-[3]: https://www.rfc-editor.org/rfc/rfc3596 "RFC 3596: DNS Extensions to Support IP Version 6"
-[4]: https://www.rfc-editor.org/rfc/rfc2782 "RFC 2782: A DNS RR for specifying the location of services"
-[5]: https://letsencrypt.org/docs/caa/ "Let's Encrypt: CAA records"
-[6]: https://www.rfc-editor.org/rfc/rfc5321 "RFC 5321: Simple Mail Transfer Protocol"
+Further reading: [RFC 1035: Domain Names—Implementation and Specification](https://www.rfc-editor.org/rfc/rfc1035); [RFC 1034: Domain Names—Concepts and Facilities](https://www.rfc-editor.org/rfc/rfc1034); [RFC 3596: DNS Extensions to Support IP Version 6](https://www.rfc-editor.org/rfc/rfc3596); [RFC 2782: A DNS RR for specifying the location of services](https://www.rfc-editor.org/rfc/rfc2782); [Let's Encrypt: CAA records](https://letsencrypt.org/docs/caa/); [RFC 5321: Simple Mail Transfer Protocol](https://www.rfc-editor.org/rfc/rfc5321).

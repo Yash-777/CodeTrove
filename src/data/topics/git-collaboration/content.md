@@ -17,7 +17,15 @@ SourceTree and the GitHub Secrets service-account guide remain separate sessions
 - [SourceTree](/content/tree/git-collaboration/git/sourcetree)
 - [Service Account from GitHub Secrets](/content/tree/git-collaboration/git/service-account-from-github-secrets)
 
-![Git records local snapshots and communicates with hosted repositories only during remote operations.](git-diagram:overview)
+```mermaid
+sequenceDiagram
+    participant Dev as Developer
+    participant Local as Local repository
+    participant Remote as Hosted remote
+    Dev->>Local: edit and commit snapshots
+    Dev->>Remote: fetch or push when sharing
+    Remote-->>Dev: refs and collaboration updates
+```
 
 | Work on your computer | Communicate with the host |
 | --- | --- |
@@ -31,13 +39,7 @@ A hosted pull request (GitHub) or merge request (GitLab/Bitbucket) is a review w
 
 For a visual, interactive sandbox, use **Build → Tools → Git → Learn Git Branching**. It visualizes simulated commit graphs and teaches commands with challenges. It does not access your local files or your hosted account.
 
-## References
-
-- [Official Git cheat sheet](https://git-scm.com/cheat-sheet/)
-- [GitHub Education Git cheat sheet](https://education.github.com/git-cheat-sheet-education.pdf)
-- [Atlassian Git cheat sheet](https://www.atlassian.com/git/tutorials/atlassian-git-cheatsheet)
-- [Learn Git Branching open-source project](https://github.com/pcottle/learnGitBranching)
-
+Further reading: [Official Git cheat sheet](https://git-scm.com/cheat-sheet/); [GitHub Education Git cheat sheet](https://education.github.com/git-cheat-sheet-education.pdf); [Atlassian Git cheat sheet](https://www.atlassian.com/git/tutorials/atlassian-git-cheatsheet); [Learn Git Branching open-source project](https://github.com/pcottle/learnGitBranching).
 ## Questions and answers
 
 <details>

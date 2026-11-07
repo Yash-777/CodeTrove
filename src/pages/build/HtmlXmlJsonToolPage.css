@@ -1,5 +1,5 @@
 .hxt-page { max-width: 1500px; }
-.hxt-intro { color: var(--color-muted); max-width: 95ch; margin: 0.35rem 0 1rem; line-height: 1.6; }
+.hxt-intro { color: var(--color-muted); /* max-width: 95ch; */margin: 0.35rem 0 1rem; line-height: 1.6; }
 .hxt-language-tabs { margin-bottom: 0.55rem; }
 .hxt-language-tabs .cp-tab { display: inline-flex; align-items: center; gap: 0.4rem; }
 .hxt-card { margin-top: 0.65rem; overflow: hidden; }

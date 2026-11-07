@@ -24,7 +24,7 @@ export default function AppLayout() {
   return (
     <div className="app-shell">
       <Header sidebarOpen={sidebarOpen} onToggleSidebar={() => setSidebarOpen((v) => !v)} />
-      <div className="app-body">
+      <div className={`app-body ${sidebarOpen ? 'app-body--sidebar-open' : 'app-body--sidebar-closed'}`}>
         <Sidebar open={sidebarOpen} />
         <main className="app-content">
           <Outlet />

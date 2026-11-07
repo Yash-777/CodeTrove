@@ -2,7 +2,18 @@
 
 **TLS (Transport Layer Security)** protects data in transit and can authenticate a server using certificates. “SSL” is the older predecessor; modern web connections should use TLS, even though interfaces still say “SSL certificate.” HTTPS is HTTP carried inside TLS. TLS protects confidentiality and integrity between the TLS endpoints, but does not prove that a website's content is honest or that an endpoint is uncompromised.
 
-![TLS handshake and certificate trust chain](networking-diagram:tls-trust)
+```mermaid
+sequenceDiagram
+    participant Client as TLS client
+    participant Server as TLS server
+    participant CA as Trusted CA store
+    Client->>Server: ClientHello
+    Server-->>Client: certificate and ServerHello
+    Client->>CA: validate hostname, dates, issuer, and chain
+    CA-->>Client: certificate trusted or rejected
+    Client->>Server: complete key exchange
+    Server-->>Client: exchange encrypted application data
+```
 
 ## What the browser verifies
 
@@ -30,10 +41,4 @@ The `-servername` option supplies SNI. This command diagnoses the certificate ch
 
 Use the separate **Local TLS testing** lesson for a safe, reproducible `mkcert` workflow and a self-signed OpenSSL alternative. A locally issued certificate is only trusted if its issuing local CA is installed in the trust store used by the browser. Trust only a CA you created and control; never install an unknown root CA to “fix” an error. Do not deploy development certificates or a private local root CA to production.
 
-## References
-
-[1]: https://developer.mozilla.org/en-US/docs/Web/Security/Transport_Layer_Security "MDN: Transport Layer Security"
-[2]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Overview "MDN: HTTP overview"
-[3]: https://www.rfc-editor.org/rfc/rfc8446 "RFC 8446: TLS 1.3"
-[4]: https://letsencrypt.org/how-it-works/ "Let's Encrypt: How it works"
-[5]: https://support.google.com/chrome/a/answer/3505249?hl=en "Chrome Enterprise: manage trusted certificates"
+Further reading: [MDN: Transport Layer Security](https://developer.mozilla.org/en-US/docs/Web/Security/Transport_Layer_Security); [MDN: HTTP overview](https://developer.mozilla.org/en-US/docs/Web/HTTP/Overview); [RFC 8446: TLS 1.3](https://www.rfc-editor.org/rfc/rfc8446); [Let's Encrypt: How it works](https://letsencrypt.org/how-it-works/); [Chrome Enterprise: manage trusted certificates](https://support.google.com/chrome/a/answer/3505249?hl=en).

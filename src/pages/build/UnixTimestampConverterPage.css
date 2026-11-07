@@ -2,7 +2,7 @@
 .ut-hero { padding: clamp(1.25rem, 3vw, 2.2rem); border: 1px solid var(--color-border); border-radius: 18px; background: linear-gradient(135deg, color-mix(in srgb, var(--color-accent) 9%, var(--color-paper)), var(--color-paper) 62%); }
 .ut-eyebrow { display: flex; align-items: center; gap: .5rem; color: var(--color-accent); font-size: .75rem; font-weight: 800; letter-spacing: .12em; }
 .ut-hero h1 { margin: .65rem 0 .5rem; font-size: clamp(1.8rem, 4vw, 2.55rem); letter-spacing: -.035em; }
-.ut-hero > p { max-width: 70ch; color: var(--color-muted); line-height: 1.65; }
+.ut-hero > p { /*max-width: 70ch;*/ color: var(--color-muted); line-height: 1.65; }
 .ut-live-card { display: grid; grid-template-columns: minmax(0,1fr) auto 1px minmax(0,1fr) auto; align-items: center; gap: .85rem; margin-top: 1.35rem; padding: 1rem 1.1rem; border: 1px solid var(--color-border); border-radius: 13px; background: var(--color-paper); }
 .ut-live-card > div:first-child, .ut-live-card > div:nth-of-type(3) { display: flex; flex-direction: column; gap: .2rem; min-width: 0; }
 .ut-live-card strong { font-size: clamp(1.1rem, 2.5vw, 1.65rem); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }

@@ -2,7 +2,16 @@
 
 **FTP (File Transfer Protocol)** uses a control connection to carry commands and replies, and a separate data connection to carry file listings and contents. Classic FTP does not encrypt credentials or data. It is easy to block or misconfigure through firewalls because the data connection behaves differently in active and passive modes.
 
-![FTP control connection and separate file data connection](networking-diagram:ftp-connections)
+```mermaid
+sequenceDiagram
+    participant Client as FTP client
+    participant Server as FTP server
+    Client->>Server: open control connection
+    Server-->>Client: accept commands and replies
+    Client->>Server: request a listing or file
+    Server-->>Client: open separate data connection
+    Server-->>Client: transfer listing or file data
+```
 
 ## Control and data connections
 
@@ -34,8 +43,4 @@ nc -vz ftp.example.com 21
 
 A port check only tests whether a TCP connection opens from your current network. It does not authenticate, prove TLS, confirm passive-data ports, or confirm that you are authorized to transfer a file. Use server documentation for the correct endpoint and allowed ports.
 
-## References
-
-[1]: https://www.rfc-editor.org/rfc/rfc959 "RFC 959: File Transfer Protocol"
-[2]: https://www.rfc-editor.org/rfc/rfc4217 "RFC 4217: Securing FTP with TLS"
-[3]: https://www.rfc-editor.org/rfc/rfc4253 "RFC 4253: SSH Transport Layer Protocol"
+Further reading: [RFC 959: File Transfer Protocol](https://www.rfc-editor.org/rfc/rfc959); [RFC 4217: Securing FTP with TLS](https://www.rfc-editor.org/rfc/rfc4217); [RFC 4253: SSH Transport Layer Protocol](https://www.rfc-editor.org/rfc/rfc4253).

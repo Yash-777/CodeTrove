@@ -14,14 +14,17 @@ import ReactDOM from 'react-dom/client';
 import App from './App.jsx';
 import { AuthProvider } from './modules/auth/AuthContext.jsx';
 import { ThemeProvider } from './modules/theme/ThemeContext.jsx';
+import { ViewModeProvider } from './context/ViewModeContext.jsx';
 import './index.css';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <ThemeProvider>
-      <AuthProvider>
-        <App />
-      </AuthProvider>
+      <ViewModeProvider>
+        <AuthProvider>
+          <App />
+        </AuthProvider>
+      </ViewModeProvider>
     </ThemeProvider>
   </React.StrictMode>
 );

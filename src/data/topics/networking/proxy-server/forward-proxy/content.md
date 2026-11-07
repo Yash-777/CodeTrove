@@ -2,7 +2,16 @@
 
 A **forward proxy** sits on the outbound side of clients. The client or its network configuration chooses to send requests through it. The proxy applies policy and sends requests onward, then returns the response.
 
-![Client request routed through an outbound forward proxy](networking-diagram:forward-proxy)
+```mermaid
+sequenceDiagram
+    participant Client as Client
+    participant Proxy as Forward proxy
+    participant Destination as Destination server
+    Client->>Proxy: send outbound request
+    Proxy->>Destination: apply policy and forward request
+    Destination-->>Proxy: return response
+    Proxy-->>Client: return response
+```
 
 ## Example flow
 
@@ -29,7 +38,4 @@ printf 'HTTP_PROXY=%s\\nHTTPS_PROXY=%s\\nNO_PROXY=%s\\n' "$HTTP_PROXY" "$HTTPS_P
 
 Proxy settings are often sensitive infrastructure information; redact credentials and internal hostnames before sharing output. A local proxy test only applies to requests made by tools configured to use it.
 
-## References
-
-[1]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Proxy_servers_and_tunneling "MDN: Proxy servers and tunneling"
-[2]: https://www.rfc-editor.org/rfc/rfc9110 "RFC 9110: HTTP Semantics (CONNECT)"
+Further reading: [MDN: Proxy servers and tunneling](https://developer.mozilla.org/en-US/docs/Web/HTTP/Proxy_servers_and_tunneling); [RFC 9110: HTTP Semantics (CONNECT)](https://www.rfc-editor.org/rfc/rfc9110).

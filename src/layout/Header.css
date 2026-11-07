@@ -15,17 +15,29 @@
 }
 
 .app-header__toggle {
-  border: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid transparent;
   background: transparent;
-  font-size: 1.1rem;
   cursor: pointer;
-  padding: 0.3rem 0.5rem;
+  padding: 0;
   border-radius: 6px;
   color: var(--color-muted);
 }
 
 .app-header__toggle:hover {
   background: var(--color-bg);
+  border-color: var(--color-border);
+}
+
+.app-header__toggle:focus-visible,
+.app-header__icon-btn:focus-visible,
+.app-header__action:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
 }
 
 .app-header__brand {

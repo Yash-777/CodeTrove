@@ -10,7 +10,15 @@ git push -u origin feature/add-search
 
 The first command creates a branch locally. The final command sends its commits to `origin` and requests the remote branch `feature/add-search` be updated or created. If accepted, Git configures the upstream relationship. Later, plain `git push` and `git pull` can infer the remote and branch.
 
-![A local feature branch is pushed to a new hosted branch, which becomes its upstream tracking branch.](git-diagram:publish-branch)
+```mermaid
+sequenceDiagram
+    participant Local as Local repository
+    participant Remote as Hosted remote
+    Local->>Remote: push -u origin feature
+    Remote-->>Local: create remote feature branch
+    Local->>Local: record upstream tracking
+    Local-->>Remote: future pushes use the upstream
+```
 
 Inspect the tracking configuration:
 
@@ -39,12 +47,7 @@ git push -u origin feature/add-search
 
 If Git reports a non-fast-forward update, integrate the remote branch rather than overwriting it. See [fetch, pull, and push](/content/tree/git-collaboration/git/remotes/fetch-pull-push).
 
-## References
-
-- [Git `push`](https://git-scm.com/docs/git-push)
-- [Git `branch`](https://git-scm.com/docs/git-branch)
-- [GitHub: creating a pull request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request)
-
+Further reading: [Git `push`](https://git-scm.com/docs/git-push); [Git `branch`](https://git-scm.com/docs/git-branch); [GitHub: creating a pull request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request).
 ## Questions and answers
 
 <details>

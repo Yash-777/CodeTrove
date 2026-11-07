@@ -2,7 +2,19 @@
 
 When a browser needs `www.example.com`, it needs an address before it can open a network connection. The path below is common, but modern browsers, VPNs, operating systems, enterprise agents, and encrypted DNS can change the order or add caches.
 
-![DNS resolution path with cache hits and resolver referrals](networking-diagram:dns-resolution)
+```mermaid
+sequenceDiagram
+    participant Client as Client
+    participant Resolver as Recursive resolver
+    participant Root as Root or TLD servers
+    participant Auth as Authoritative server
+    Client->>Resolver: request hostname address
+    Resolver->>Root: follow referral when uncached
+    Root-->>Resolver: identify next nameserver
+    Resolver->>Auth: request authoritative record
+    Auth-->>Resolver: return record and TTL
+    Resolver-->>Client: return and cache answer
+```
 
 ## The common lookup path
 
@@ -73,8 +85,4 @@ dig @8.8.8.8 example.com AAAA
 
 If resolvers disagree, compare the queried record type, response code, TTL, CNAME chain, DNSSEC behavior, and authoritative data. A difference does not automatically mean one resolver is malicious or that the website is down.
 
-## References
-
-[1]: https://www.rfc-editor.org/rfc/rfc1034 "RFC 1034: Domain Names—Concepts and Facilities"
-[2]: https://man7.org/linux/man-pages/man5/hosts.5.html "Linux hosts(5) manual"
-[3]: https://www.rfc-editor.org/rfc/rfc8484 "RFC 8484: DNS Queries over HTTPS"
+Further reading: [RFC 1034: Domain Names—Concepts and Facilities](https://www.rfc-editor.org/rfc/rfc1034); [Linux hosts(5) manual](https://man7.org/linux/man-pages/man5/hosts.5.html); [RFC 8484: DNS Queries over HTTPS](https://www.rfc-editor.org/rfc/rfc8484).

@@ -24,7 +24,7 @@ The important invariants are:
 - A final `COUNT(*)` is authoritative for the rows that committed; a progress message seen by the client is not.
 - A connection error such as **MySQL error 2013, “Lost connection to MySQL server during query,”** does not by itself prove that no rows were committed.
 
-InnoDB uses the primary key as its clustered index. If a table has no primary key, InnoDB may use a suitable `UNIQUE NOT NULL` index or create a hidden `GEN_CLUST_INDEX`; declaring the primary key explicitly gives the load a predictable row locator. [1]
+InnoDB uses the primary key as its clustered index. If a table has no primary key, InnoDB may use a suitable `UNIQUE NOT NULL` index or create a hidden `GEN_CLUST_INDEX`; declaring the primary key explicitly gives the load a predictable row locator. [MySQL 8.4 Reference Manual: InnoDB Index Types](https://dev.mysql.com/doc/refman/8.4/en/innodb-index-types.html)
 
 ## 2. MySQL preflight: inspect before loading
 
@@ -54,7 +54,7 @@ SHOW VARIABLES WHERE Variable_name IN
    'wait_timeout', 'interactive_timeout');
 ```
 
-`DESCRIBE` and `INFORMATION_SCHEMA.COLUMNS` expose type, character length, nullability, defaults, `EXTRA`, and `COLUMN_KEY` metadata. `PRI`, `UNI`, and `MUL` are useful hints, but an empty `COLUMN_KEY` should not be overinterpreted: a column can be a later part of a non-unique composite key without being shown as the leading key column. Inspect `SHOW INDEXES` for the complete ordered definition. [3] [4]
+`DESCRIBE` and `INFORMATION_SCHEMA.COLUMNS` expose type, character length, nullability, defaults, `EXTRA`, and `COLUMN_KEY` metadata. `PRI`, `UNI`, and `MUL` are useful hints, but an empty `COLUMN_KEY` should not be overinterpreted: a column can be a later part of a non-unique composite key without being shown as the leading key column. Inspect `SHOW INDEXES` for the complete ordered definition. [MySQL 8.4 Reference Manual: The INFORMATION_SCHEMA COLUMNS Table](https://dev.mysql.com/doc/refman/8.4/en/information-schema-columns-table.html) [MySQL 8.4 Reference Manual: The INFORMATION_SCHEMA STATISTICS Table](https://dev.mysql.com/doc/refman/8.4/en/information-schema-statistics-table.html)
 
 For a metadata-oriented check:
 
@@ -88,7 +88,7 @@ Three strings:       603 bytes
 Simple field total:  607 bytes
 ```
 
-That is an upper-bound teaching estimate for the declared fields, not an exact InnoDB record size. Actual records include record metadata, null maps, length fields, page overhead, and index entries; large variable-length values may be stored partly off-page. [5] Compare it with `SHOW TABLE STATUS` and measured data, but do not infer an exact transaction-log size from the 607-byte figure.
+That is an upper-bound teaching estimate for the declared fields, not an exact InnoDB record size. Actual records include record metadata, null maps, length fields, page overhead, and index entries; large variable-length values may be stored partly off-page. [MySQL 8.4 Reference Manual: InnoDB Row Formats](https://dev.mysql.com/doc/refman/8.4/en/innodb-row-format.html) Compare it with `SHOW TABLE STATUS` and measured data, but do not infer an exact transaction-log size from the 607-byte figure.
 
 ## 3. A safe MySQL seed schema
 
@@ -232,7 +232,7 @@ Start with a small batch, measure commit latency and lock impact, then increase 
 
 ## 7. Index timing: load first or maintain indexes during the load?
 
-Indexes speed reads by providing alternate access paths, but every inserted row may also require index-page changes. MariaDB’s indexing guidance similarly starts with the equality predicates and query shape, then considers range, grouping, ordering, cardinality, and write cost. [6]
+Indexes speed reads by providing alternate access paths, but every inserted row may also require index-page changes. MariaDB’s indexing guidance similarly starts with the equality predicates and query shape, then considers range, grouping, ordering, cardinality, and write cost. [MariaDB Documentation: Building the Best Index for a Given SELECT](https://mariadb.com/docs/server/ha-and-performance/optimization-and-tuning/optimization-and-indexes/building-the-best-index-for-a-given-select)
 
 For this `Employees` seed:
 
@@ -272,7 +272,7 @@ WHERE Name = 'ABC 7';
 SHOW INDEXES FROM Employees;
 ```
 
-`EXPLAIN` reports optimizer estimates, while `EXPLAIN ANALYZE` executes supported statements and reports observed iterator timing and rows; `ANALYZE TABLE` refreshes statistics that influence plan choices. [2] A scan can still be the right plan for a small table or a query returning most rows. Use the measured plan, not the presence of an index, as the decision criterion.
+`EXPLAIN` reports optimizer estimates, while `EXPLAIN ANALYZE` executes supported statements and reports observed iterator timing and rows; `ANALYZE TABLE` refreshes statistics that influence plan choices. [MySQL 8.4 Reference Manual: EXPLAIN Statement](https://dev.mysql.com/doc/refman/8.4/en/explain.html) A scan can still be the right plan for a small table or a query returning most rows. Use the measured plan, not the presence of an index, as the decision criterion.
 
 ## 8. Dialect boundaries: similar ideas, different engines
 
@@ -282,7 +282,7 @@ The main procedure, `START TRANSACTION`, `COMMIT`, `DO SLEEP()`, `SHOW`, `INFORM
 
 ### MariaDB
 
-**MariaDB** has similar stored-procedure and transaction concepts, and it has its own `SLEEP()` and `ANALYZE TABLE` behavior. Do not assume every MySQL 8.0 `EXPLAIN ANALYZE` detail, optimizer output field, system variable, or version requirement is identical. Port the procedure and verify it on the target MariaDB version; use MariaDB’s index guidance and plan tools for that server. [6]
+**MariaDB** has similar stored-procedure and transaction concepts, and it has its own `SLEEP()` and `ANALYZE TABLE` behavior. Do not assume every MySQL 8.0 `EXPLAIN ANALYZE` detail, optimizer output field, system variable, or version requirement is identical. Port the procedure and verify it on the target MariaDB version; use MariaDB’s index guidance and plan tools for that server. [MariaDB Documentation: Building the Best Index for a Given SELECT](https://mariadb.com/docs/server/ha-and-performance/optimization-and-tuning/optimization-and-indexes/building-the-best-index-for-a-given-select)
 
 A MariaDB-shaped transaction fragment is still explicitly MariaDB/MySQL-family syntax, not a universal loader:
 
@@ -310,7 +310,7 @@ EXPLAIN QUERY PLAN
 SELECT Id, Name FROM Employees WHERE Name = 'ABC 1';
 ```
 
-SQLite documents `SCAN` versus `SEARCH`, covering-index use, and temporary sort structures through `EXPLAIN QUERY PLAN`. [7] [8] A delay must be implemented by the host application or an appropriate host API; do not paste `DO SLEEP(0.5)` into SQLite and call it equivalent.
+SQLite documents `SCAN` versus `SEARCH`, covering-index use, and temporary sort structures through `EXPLAIN QUERY PLAN`. [SQLite Documentation: The Query Planner](https://www.sqlite.org/queryplanner.html) [SQLite Documentation: EXPLAIN QUERY PLAN](https://www.sqlite.org/eqp.html) A delay must be implemented by the host application or an appropriate host API; do not paste `DO SLEEP(0.5)` into SQLite and call it equivalent.
 
 ### SQL Server
 
@@ -383,14 +383,3 @@ Add only workload-justified indexes; re-measure read and write cost
 ```
 
 The durable lesson is not “add a sleep.” It is: **bound the transaction, make progress observable, verify what committed, diagnose the entire connection path, and treat engine-specific syntax as engine-specific.**
-
-## References
-
-[1]: https://dev.mysql.com/doc/refman/8.4/en/innodb-index-types.html "MySQL 8.4 Reference Manual: InnoDB Index Types"
-[2]: https://dev.mysql.com/doc/refman/8.4/en/explain.html "MySQL 8.4 Reference Manual: EXPLAIN Statement"
-[3]: https://dev.mysql.com/doc/refman/8.4/en/information-schema-columns-table.html "MySQL 8.4 Reference Manual: The INFORMATION_SCHEMA COLUMNS Table"
-[4]: https://dev.mysql.com/doc/refman/8.4/en/information-schema-statistics-table.html "MySQL 8.4 Reference Manual: The INFORMATION_SCHEMA STATISTICS Table"
-[5]: https://dev.mysql.com/doc/refman/8.4/en/innodb-row-format.html "MySQL 8.4 Reference Manual: InnoDB Row Formats"
-[6]: https://mariadb.com/docs/server/ha-and-performance/optimization-and-tuning/optimization-and-indexes/building-the-best-index-for-a-given-select "MariaDB Documentation: Building the Best Index for a Given SELECT"
-[7]: https://www.sqlite.org/queryplanner.html "SQLite Documentation: The Query Planner"
-[8]: https://www.sqlite.org/eqp.html "SQLite Documentation: EXPLAIN QUERY PLAN"

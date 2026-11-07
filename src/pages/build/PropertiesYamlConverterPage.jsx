@@ -1,3 +1,4 @@
+import ToolBackLink from '../../components/ToolBackLink.jsx';
 import { useMemo, useState } from 'react';
 import CodeMirror from '@uiw/react-codemirror';
 import { oneDark } from '@codemirror/theme-one-dark';
@@ -121,6 +122,7 @@ export default function PropertiesYamlConverterPage() {
 
   return (
     <div className="content-page cp-page prop-page">
+      <ToolBackLink />
       <div className="cp-head">
         <div><h1>{heading}</h1><p className="cp-subtitle">Convert Java Properties, YAML, and JSON configuration files in your browser.</p></div>
         <div className="cp-links"><a className="cp-link" href="https://yaml.org/" target="_blank" rel="noreferrer">YAML docs</a><a className="cp-link" href="https://www.json.org/" target="_blank" rel="noreferrer">JSON docs</a></div>

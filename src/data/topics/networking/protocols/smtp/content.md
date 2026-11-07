@@ -2,7 +2,17 @@
 
 The **Simple Mail Transfer Protocol (SMTP)** transfers email from a sending application to a submission server and between mail servers. It is not generally the protocol a client uses to read its mailbox; IMAP or POP3 commonly serve that purpose. SMTP servers use DNS **MX** records to identify a next-hop mail exchanger, then connect to that mail server. Messages can pass through multiple relays before delivery.
 
-![Mail delivery from sender through SMTP submission and MX-selected relays](networking-diagram:smtp-flow)
+```mermaid
+sequenceDiagram
+    participant Mail as Mail client
+    participant Submit as Submission server
+    participant SenderMX as Sender or relay MX
+    participant RecipientMX as Recipient MX
+    Mail->>Submit: submit message
+    Submit->>SenderMX: relay using SMTP
+    SenderMX->>RecipientMX: deliver through MX route
+    RecipientMX-->>Mail: make message available to mailbox
+```
 
 ## A simplified message path
 
@@ -35,8 +45,4 @@ A successful TCP-port test only proves that a TCP connection could be made from 
 
 SMTP can be protected by TLS, but SMTP as a protocol name alone does not mean that a particular connection is encrypted or that a server authenticates the sender. Mail servers can relay in stages and the path is not end-to-end encrypted by default. Sensitive content may require application-level end-to-end encryption in addition to TLS on each transport hop.
 
-## References
-
-[1]: https://www.rfc-editor.org/rfc/rfc5321 "RFC 5321: Simple Mail Transfer Protocol"
-[2]: https://www.rfc-editor.org/rfc/rfc3207 "RFC 3207: SMTP Service Extension for Secure SMTP over TLS"
-[3]: https://www.rfc-editor.org/rfc/rfc8314 "RFC 8314: Cleartext Considered Obsolete: Use of TLS for Email Submission and Access"
+Further reading: [RFC 5321: Simple Mail Transfer Protocol](https://www.rfc-editor.org/rfc/rfc5321); [RFC 3207: SMTP Service Extension for Secure SMTP over TLS](https://www.rfc-editor.org/rfc/rfc3207); [RFC 8314: Cleartext Considered Obsolete: Use of TLS for Email Submission and Access](https://www.rfc-editor.org/rfc/rfc8314).

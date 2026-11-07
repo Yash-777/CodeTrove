@@ -28,7 +28,17 @@ git status -sb
 
 A feature branch only exists on your computer until you publish it. Later, `git push -u origin feature/search-filter` creates or updates the hosted branch and sets the upstream. See the [remote publishing lesson](/content/tree/git-collaboration/git/remotes/publish-branch).
 
-![Two branch names can point to different commits while sharing earlier history.](git-diagram:head-branches)
+```mermaid
+sequenceDiagram
+    participant Dev as Developer
+    participant HEAD as HEAD
+    participant Branch as Branch ref
+    participant Commit as Commit graph
+    Dev->>HEAD: checkout branch
+    HEAD->>Branch: identify current branch
+    Branch->>Commit: point to current commit
+    Commit-->>Dev: resolve history and parent commits
+```
 
 ## Switch safely when files have edits
 
@@ -42,12 +52,7 @@ git diff
 git diff --cached
 ```
 
-## References
-
-- [Git `switch`](https://git-scm.com/docs/git-switch)
-- [Git `branch`](https://git-scm.com/docs/git-branch)
-- [Git `checkout`](https://git-scm.com/docs/git-checkout)
-
+Further reading: [Git `switch`](https://git-scm.com/docs/git-switch); [Git `branch`](https://git-scm.com/docs/git-branch); [Git `checkout`](https://git-scm.com/docs/git-checkout).
 ## Questions and answers
 
 <details>

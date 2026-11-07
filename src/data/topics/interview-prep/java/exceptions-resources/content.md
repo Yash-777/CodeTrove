@@ -77,8 +77,4 @@ try {
 Clearing the flag and continuing an infinite loop is a common production bug. Ask how cancellation propagates through child tasks, network calls, and executor shutdown.
 </details>
 
-## References
-
-- [Java exceptions API](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html)
-- [try-with-resources](https://docs.oracle.com/javase/tutorial/essential/exceptions/tryResourceClose.html)
-- [Java instrumentation exceptions](https://docs.oracle.com/en/java/javase/21/docs/api/java.instrument/java/lang/instrument/package-summary.html)
+Further reading: [Java exceptions API](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Exception.html); [try-with-resources](https://docs.oracle.com/javase/tutorial/essential/exceptions/tryResourceClose.html); [Java instrumentation exceptions](https://docs.oracle.com/en/java/javase/21/docs/api/java.instrument/java/lang/instrument/package-summary.html).

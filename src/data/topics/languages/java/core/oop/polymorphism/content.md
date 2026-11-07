@@ -139,7 +139,6 @@ According to the Java Language Specification, a method signature consists of:
 2. The method's **type parameters**, if any.
 3. The formal parameter types, after the applicable generic type adaptation.
 
-
 What is NOT Part of a Method Signature?
 
 It is a common point of confusion, but the following elements are completely excluded from the method signature:
@@ -200,13 +199,11 @@ The `throws` clause is part of a method declaration, but not its signature.
 
 ---
 
-
 The Core Rule for Overriding
 
 When a subclass overrides a method declared in a superclass:
  * Allowed: The overriding method can throw the same checked exception, a subclass (sublevel) of that exception, or no exception at all.
  * Not Allowed: The overriding method cannot throw a broader checked exception or a same-level sibling checked exception that wasn't declared by the parent.
-
 
 > Case A: Parent throws IOException ➡️ Child throws FileNotFoundException (ALLOWED)
 
@@ -235,7 +232,6 @@ class Child extends Parent {
     void read() throws java.io.IOException { } // ❌ Exception IOException is not compatible...
 }
 ```
-
 
 > Case C: Same-Level / Sibling Exceptions (COMPILATION ERROR)
 
@@ -790,12 +786,4 @@ A private method is not inherited, so a same-named child method is new rather th
 For an overridden instance method, the runtime object's implementation runs. For an overloaded method, the compiler uses declared argument types. For a static method, the class or reference type controls the selection.
 </details>
 
-## References
-
-- [Java Language Specification §8.4: Method Declarations](https://docs.oracle.com/javase/specs/jls/se21/html/jls-8.html#jls-8.4)
-- [Java Language Specification §8.4.2: Method Signature](https://docs.oracle.com/javase/specs/jls/se21/html/jls-8.html#jls-8.4.2)
-- [Java Language Specification §8.4.8: Inheritance, Overriding, and Hiding](https://docs.oracle.com/javase/specs/jls/se21/html/jls-8.html#jls-8.4.8)
-- [Java Language Specification §8.4.6: Method Throws](https://docs.oracle.com/javase/specs/jls/se21/html/jls-8.html#jls-8.4.6)
-- [dev.java: Polymorphism](https://dev.java/learn/language/oop/inheritance/polymorphism/)
-- [Oracle Java Tutorial: Overriding and Hiding Methods](https://docs.oracle.com/javase/tutorial/java/IandI/override.html)
-- [Oracle Java Tutorial: Polymorphism](https://docs.oracle.com/javase/tutorial/java/IandI/polymorphism.html)
+Further reading: [Java Language Specification §8.4: Method Declarations](https://docs.oracle.com/javase/specs/jls/se21/html/jls-8.html#jls-8.4); [Java Language Specification §8.4.2: Method Signature](https://docs.oracle.com/javase/specs/jls/se21/html/jls-8.html#jls-8.4.2); [Java Language Specification §8.4.8: Inheritance, Overriding, and Hiding](https://docs.oracle.com/javase/specs/jls/se21/html/jls-8.html#jls-8.4.8); [Java Language Specification §8.4.6: Method Throws](https://docs.oracle.com/javase/specs/jls/se21/html/jls-8.html#jls-8.4.6); [dev.java: Polymorphism](https://dev.java/learn/language/oop/inheritance/polymorphism/); [Oracle Java Tutorial: Overriding and Hiding Methods](https://docs.oracle.com/javase/tutorial/java/IandI/override.html); [Oracle Java Tutorial: Polymorphism](https://docs.oracle.com/javase/tutorial/java/IandI/polymorphism.html).

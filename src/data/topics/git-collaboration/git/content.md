@@ -15,7 +15,15 @@ Git is a **distributed version-control system**. A repository stores committed s
 
 > **Rule of thumb:** `commit` saves history locally; `push` publishes commits to a remote. `fetch` downloads remote history without integrating it into your checked-out branch. `pull` fetches and then integrates by merge or, when requested/configured, rebase.
 
-![Git moves from working files to staged changes to local commits; fetch and push connect the local repository to a hosted remote.](git-diagram:overview)
+```mermaid
+sequenceDiagram
+    participant Dev as Developer
+    participant Local as Local repository
+    participant Remote as Hosted remote
+    Dev->>Local: edit and commit snapshots
+    Dev->>Remote: fetch or push when sharing
+    Remote-->>Dev: refs and collaboration updates
+```
 
 ## Expand the Git lessons
 
@@ -51,14 +59,7 @@ Every lesson includes a diagram, copyable command examples, notes on whether a c
 
 In **Build → Tools → Git**, this branch adds a link to [Learn Git Branching](https://learngitbranching.js.org/). It is an open-source browser-based Git simulator: commands change a visible commit graph and interactive lessons teach branching and remote concepts. The sandbox is simulated; it does not read or modify your local repository or publish to your GitHub, GitLab, or Bitbucket account. Use it to visualize commands, then use the terminal examples here in a real repository.
 
-## References
-
-- [Git official cheat sheet](https://git-scm.com/cheat-sheet/) — commands grouped by common tasks.
-- [GitHub Education Git cheat sheet (PDF)](https://education.github.com/git-cheat-sheet-education.pdf) — quick command reference.
-- [Atlassian Git cheat sheet](https://www.atlassian.com/git/tutorials/atlassian-git-cheatsheet) — workflow-oriented command overview.
-- [Git documentation](https://git-scm.com/docs) — official reference for individual commands.
-- [Learn Git Branching source repository](https://github.com/pcottle/learnGitBranching) — visual simulator, tutorial, and source code.
-
+Further reading: [Git official cheat sheet](https://git-scm.com/cheat-sheet/); [GitHub Education Git cheat sheet (PDF)](https://education.github.com/git-cheat-sheet-education.pdf); [Atlassian Git cheat sheet](https://www.atlassian.com/git/tutorials/atlassian-git-cheatsheet); [Git documentation](https://git-scm.com/docs); [Learn Git Branching source repository](https://github.com/pcottle/learnGitBranching).
 ## Questions and answers
 
 <details>

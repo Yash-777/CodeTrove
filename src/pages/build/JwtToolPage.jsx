@@ -1,3 +1,4 @@
+import ToolBackLink from '../../components/ToolBackLink.jsx';
 import { useEffect, useMemo, useState } from 'react';
 import { Copy, Check, X, Github, ExternalLink } from 'lucide-react';
 import './JwtToolPage.css';
@@ -99,6 +100,7 @@ export default function JwtToolPage() {
   const pretty = (value) => JSON.stringify(value, null, 2);
 
   return <div className="jwt-tool-page">
+      <ToolBackLink />
     <div className="jwt-tool-credit"><Github size={14} /> Generated with Copilot · <a href="https://jwt.io" target="_blank" rel="noreferrer">jwt.io reference <ExternalLink size={12} /></a></div>
     <div className="jwt-tool-container">
       <header className="jwt-tool-intro"><div className="jwt-tool-kicker">Build / Tools / JWT</div><h1>JSON Web Tokens</h1><p>Decode, verify, and generate JSON Web Tokens.</p></header>

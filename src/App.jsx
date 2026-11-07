@@ -21,13 +21,21 @@ import ToolsPage from './pages/build/ToolsPage.jsx';
 import JwtToolPage from './pages/build/JwtToolPage.jsx';
 import CharacterCounterPage from './pages/build/CharacterCounterPage.jsx';
 import StringUtilitiesPage from './pages/build/StringUtilitiesPage.jsx';
+import RegexMatchPage from './pages/build/RegexMatchPage.jsx';
+import TextComparePage from './pages/build/TextComparePage.jsx';
+import CompareOnlinePage from './pages/build/CompareOnlinePage.jsx';
 import CryptographyToolsPage from './pages/build/CryptographyToolsPage.jsx';
+import UrlEncodeDecodePage from './pages/build/UrlEncodeDecodePage.jsx';
 import PomFormatterPage from './pages/build/PomFormatterPage.jsx';
 import PropertiesYamlConverterPage from './pages/build/PropertiesYamlConverterPage.jsx';
 import UnixTimestampConverterPage from './pages/build/UnixTimestampConverterPage.jsx';
+import WorldClockPage from './pages/build/WorldClockPage.jsx';
 import HtmlXmlJsonToolPage from './pages/build/HtmlXmlJsonToolPage.jsx';
+import DocumentConverterPage from './pages/build/DocumentConverterPage.jsx';
+import DocumentComparePage from './pages/build/DocumentComparePage.jsx';
 import JsonCrackPage from './pages/build/JsonCrackPage.jsx';
 import MarkdownEditorPage from './pages/build/MarkdownEditorPage.jsx';
+import JavaDecompilerPage from './pages/build/JavaDecompilerPage.jsx';
 import NetworkToolsPage from './pages/build/NetworkToolsPage.jsx';
 import ProjectsPage from './pages/build/ProjectsPage.jsx';
 import ProfilePage from './pages/store/ProfilePage.jsx';
@@ -63,11 +71,19 @@ export default function App() {
           <Route path="/build/tools/jwt-tool" element={<JwtToolPage />} />
           <Route path="/build/tools/character-counter" element={<CharacterCounterPage />} />
           <Route path="/build/tools/string-utilities" element={<StringUtilitiesPage />} />
+          <Route path="/build/tools/regex-match" element={<RegexMatchPage />} />
+          <Route path="/build/tools/text-compare" element={<TextComparePage />} />
+          <Route path="/build/tools/compare-online" element={<CompareOnlinePage />} />
           <Route path="/build/tools/cryptography" element={<CryptographyToolsPage />} />
+          <Route path="/build/tools/url-encode-decode" element={<UrlEncodeDecodePage />} />
           <Route path="/build/tools/pom-formatter" element={<PomFormatterPage />} />
           <Route path="/build/tools/properties-yaml-converter" element={<PropertiesYamlConverterPage />} />
           <Route path="/build/tools/unix-timestamp-converter" element={<UnixTimestampConverterPage />} />
+          <Route path="/build/tools/world-clock" element={<WorldClockPage />} />
           <Route path="/build/tools/html-xml-json" element={<HtmlXmlJsonToolPage />} />
+          <Route path="/build/tools/document-converter" element={<DocumentConverterPage />} />
+          <Route path="/build/tools/document-compare" element={<DocumentComparePage />} />
+          <Route path="/build/tools/java-decompiler" element={<JavaDecompilerPage />} />
           <Route path="/build/tools/json-crack" element={<JsonCrackPage />} />
           <Route path="/build/tools/markdown-editor" element={<MarkdownEditorPage />} />
           <Route path="/build/tools/network" element={<NetworkToolsPage />} />

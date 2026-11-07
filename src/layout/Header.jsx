@@ -11,7 +11,7 @@
  */
 
 import { Link } from 'react-router-dom';
-import { Sun, Moon, Monitor, LogOut } from 'lucide-react';
+import { Sun, Moon, Monitor, LogOut, PanelLeft } from 'lucide-react';
 import { paths } from '../routes/routes.config.js';
 import codeTroveWordmark from '../assets/brand/codetrove-wordmark.png';
 import { useAuth } from '../context/AuthContext.jsx';
@@ -34,9 +34,9 @@ export default function Header({ sidebarOpen, onToggleSidebar }) {
         className="app-header__toggle"
         onClick={onToggleSidebar}
         aria-label={sidebarOpen ? 'Collapse sidebar' : 'Expand sidebar'}
-        title={sidebarOpen ? 'Collapse sidebar' : 'Expand sidebar'}
+        title={sidebarOpen ? 'Close sidebar' : 'Open sidebar'}
       >
-        ☰
+        <PanelLeft size={18} strokeWidth={2} aria-hidden="true" />
       </button>
 
       <Link to={paths.home()} className="app-header__brand">

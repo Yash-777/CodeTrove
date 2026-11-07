@@ -2,7 +2,18 @@
 
 Git separates edits into three local areas: the **working tree** (files you are editing), the **index** or **staging area** (the exact changes selected for the next commit), and the **commit history** (saved snapshots). Nothing in this workflow reaches a hosted repository until you push.
 
-![The normal snapshot cycle: edit files, stage selected changes, create a local commit, then push when ready.](git-diagram:lifecycle)
+```mermaid
+sequenceDiagram
+    participant Dev as Developer
+    participant Work as Working tree
+    participant Index as Staging index
+    participant Repo as Local repository
+    participant Remote as Hosted remote
+    Dev->>Work: edit files
+    Dev->>Index: git add selected changes
+    Dev->>Repo: git commit
+    Dev->>Remote: git push when ready
+```
 
 ## Inspect before you save
 
@@ -73,13 +84,7 @@ git status
 
 This stages two named files and creates one commit locally. It does not publish the commit until a later `git push`.
 
-## References
-
-- [Git `status`](https://git-scm.com/docs/git-status)
-- [Git `add`](https://git-scm.com/docs/git-add)
-- [Git `diff`](https://git-scm.com/docs/git-diff)
-- [Git `commit`](https://git-scm.com/docs/git-commit)
-
+Further reading: [Git `status`](https://git-scm.com/docs/git-status); [Git `add`](https://git-scm.com/docs/git-add); [Git `diff`](https://git-scm.com/docs/git-diff); [Git `commit`](https://git-scm.com/docs/git-commit).
 ## Questions and answers
 
 <details>

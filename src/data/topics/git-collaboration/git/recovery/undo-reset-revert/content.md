@@ -43,12 +43,7 @@ Revert creates a new commit that applies the inverse of a chosen commit. It is u
 | Move local branch while keeping content | `git reset --soft` or `--mixed` |
 | Undo a published commit without rewriting history | `git revert <commit>` |
 
-## References
-
-- [Git `restore`](https://git-scm.com/docs/git-restore)
-- [Git `reset`](https://git-scm.com/docs/git-reset)
-- [Git `revert`](https://git-scm.com/docs/git-revert)
-
+Further reading: [Git `restore`](https://git-scm.com/docs/git-restore); [Git `reset`](https://git-scm.com/docs/git-reset); [Git `revert`](https://git-scm.com/docs/git-revert).
 ## Questions and answers
 
 <details>

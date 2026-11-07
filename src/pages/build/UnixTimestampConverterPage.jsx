@@ -1,3 +1,4 @@
+import ToolBackLink from '../../components/ToolBackLink.jsx';
 import { useEffect, useMemo, useState } from 'react';
 import { Check, Copy, RefreshCw, Clock3, ArrowLeftRight, AlertCircle, XCircle, CheckCircle2 } from 'lucide-react';
 import { copyToClipboard } from '../../utils/textActions.js';
@@ -119,6 +120,7 @@ export default function UnixTimestampConverterPage() {
   const resetHuman = () => { setHuman(toLocalInput(new Date())); setEpoch(String(nowSeconds())); setResult(''); setStatus({ type: 'idle', message: 'Reset to the current date and time.' }); };
 
   return <main className="content-page ut-page">
+      <ToolBackLink />
     <div className="ut-hero">
       <div className="ut-eyebrow"><Clock3 size={16} /> DATA &amp; TIME TOOL</div>
       <h1>Unix Timestamp Converter</h1>

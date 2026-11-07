@@ -15,6 +15,7 @@ import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
 import RunnableCode from './CodeRunner/RunnableCode.jsx';
+import MermaidDiagram from './MermaidDiagram.jsx';
 import './MarkdownContent.css';
 
 function textContent(value) {
@@ -24,9 +25,45 @@ function textContent(value) {
   return '';
 }
 
+import { Children, cloneElement, isValidElement } from "react";
+
+const ALERT_RE = /^\s*\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\][ \t]*\r?\n?/i;
+
+const ALERT_LABELS = {
+  note: "Note",
+  tip: "Tip",
+  important: "Important",
+  warning: "Warning",
+  caution: "Caution",
+};
+
 function alertType(children) {
-  const match = textContent(children).match(/^\s*\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]/i);
+  const match = textContent(children).match(ALERT_RE);
   return match ? match[1].toLowerCase() : null;
+}
+
+// Removes "[!TYPE]" from the first non-empty text node, however deeply nested
+// (blockquote > p > text). `state` makes sure only the first match is stripped.
+function stripAlertMarker(children, state = { done: false }) {
+  return Children.map(children, (child) => {
+    if (state.done) return child;
+
+    if (typeof child === "string") {
+      if (!child.trim()) return child; // skip "\n" nodes before the <p>
+      state.done = true;
+      return child.replace(ALERT_RE, "");
+    }
+
+    if (isValidElement(child) && child.props.children != null) {
+      return cloneElement(
+        child,
+        undefined,
+        stripAlertMarker(child.props.children, state)
+      );
+    }
+
+    return child;
+  });
 }
 
 // js/javascript -> 'javascript', ts/typescript -> 'typescript', kt/kotlin -> 'kotlin', java -> 'java'
@@ -38,59 +75,12 @@ function normalizeRunnableLanguage(language = '') {
   return 'javascript';
 }
 
-const NETWORKING_DIAGRAMS = {
-  'request-lifecycle': 'request-lifecycle.png',
-  'dns-resolution': 'dns-resolution.png',
-  'url-anatomy': 'url-anatomy.png',
-  'tls-trust': 'tls-trust.png',
-  'proxy-comparison': 'proxy-comparison.png',
-  'forward-proxy': 'proxy-comparison.png',
-  'reverse-proxy': 'proxy-comparison.png',
-  'protocol-transfers': 'protocol-transfers.png',
-  'socket-lifecycle': 'socket-lifecycle.png',
-  'ftp-connections': 'ftp-connections.png',
-  'dns-tls-http': 'dns-tls-http.png',
-  'smtp-flow': 'smtp-flow.png',
-};
-
-const GIT_DIAGRAMS = {
-  overview: 'overview.png',
-  'local-remote': 'local-remote.png',
-  'head-branches': 'head-branches.png',
-  lifecycle: 'lifecycle.png',
-  merge: 'merge.png',
-  rebase: 'rebase.png',
-  'cherry-pick': 'cherry-pick.png',
-  'remote-flow': 'remote-flow.png',
-  'publish-branch': 'publish-branch.png',
-  'force-push': 'force-push.png',
-  stash: 'stash.png',
-  patch: 'patch.png',
-  integration: 'integration.png',
-  recovery: 'recovery.png',
-  conflict: 'conflict.png',
-};
-
-const JAVA_DIAGRAMS = {
-  'throwable-hierarchy': 'throwable-hierarchy.png',
-  'exception-propagation': 'exception-propagation.png',
-};
-
-function resolveMarkdownImage(src) {
-  if (typeof src !== 'string') return src;
-  if (src.startsWith('networking-diagram:')) {
-    const name = NETWORKING_DIAGRAMS[src.slice('networking-diagram:'.length)];
-    return name ? `${import.meta.env.BASE_URL}networking/${name}` : src;
-  }
-  if (src.startsWith('git-diagram:')) {
-    const name = GIT_DIAGRAMS[src.slice('git-diagram:'.length)];
-    return name ? `${import.meta.env.BASE_URL}git/${name}` : src;
-  }
-  if (src.startsWith('java-diagram:')) {
-    const name = JAVA_DIAGRAMS[src.slice('java-diagram:'.length)];
-    return name ? `${import.meta.env.BASE_URL}java/${name}` : src;
-  }
-  return src;
+// Keep canonical Markdown links such as `[label](https://example.com)` as
+// normal anchors, while trimming parser-provided whitespace before routing.
+function normalizeMarkdownHref(href) {
+  if (typeof href !== 'string') return undefined;
+  const normalized = href.trim();
+  return normalized || undefined;
 }
 
 function MarkdownCode({ inline, className, children, node, ...props }) {
@@ -99,6 +89,10 @@ function MarkdownCode({ inline, className, children, node, ...props }) {
   const meta = node?.data?.meta || node?.properties?.meta || '';
   const normalizedLanguage = normalizeRunnableLanguage(language);
   const isRunnable = !inline && ['js', 'javascript', 'ts', 'typescript', 'kt', 'kotlin', 'java'].includes(language.toLowerCase()) && /(?:^|\s)runnable(?:\s|$)/.test(String(meta));
+
+  if (!inline && language.toLowerCase() === 'mermaid') {
+    return <MermaidDiagram chart={String(children).replace(/\n$/, '')} />;
+  }
 
   if (isRunnable) {
     // key = language + source: navigating to another page must remount the box,
@@ -126,6 +120,11 @@ function MarkdownCode({ inline, className, children, node, ...props }) {
 function MarkdownPre({ node, children, ...props }) {
   const codeNode = node?.children?.[0];
   const codeClasses = codeNode?.properties?.className || [];
+  if (Array.isArray(codeClasses) && codeClasses.includes('language-mermaid')) {
+    const chart = (codeNode.children || []).map((child) => child.value || '').join('').replace(/\n$/, '');
+    return <MermaidDiagram chart={chart} />;
+  }
+
   if (Array.isArray(codeClasses) && codeClasses.includes('runnable')) {
     const source = (codeNode.children || []).map((child) => child.value || '').join('').replace(/\n$/, '');
     const languageClass = codeClasses.find((name) => /^language-/.test(name)) || 'language-js';
@@ -167,30 +166,36 @@ function remarkRunnableCode() {
   };
 }
 
-// Keep reference-style links such as `[SQLite query planner][1]` working
-// across all authored wiki Markdown, including content that passes through
-// raw HTML. Standard CommonMark parsing resolves these already, but this
-// compatibility pass also handles any remaining mdast linkReference nodes.
+function normalizeReferenceIdentifier(value) {
+  return String(value || '').trim().replace(/\s+/g, ' ').toLowerCase();
+}
+
+// Keep reference-style links such as `[label][1]`, `[label][]`, and `[1]`
+// working across authored wiki Markdown, including definitions with titles.
+// Standard CommonMark parsing resolves most references already; this
+// compatibility pass also handles remaining mdast reference nodes.
 function remarkReferenceLinks() {
   return (tree) => {
     const definitions = new Map();
     const collectDefinitions = (node) => {
-      if (node?.type === 'definition' && node.identifier) {
-        definitions.set(node.identifier.toLowerCase(), node);
+      if (node?.type === 'definition') {
+        definitions.set(normalizeReferenceIdentifier(node.identifier || node.label), node);
       }
       if (Array.isArray(node?.children)) node.children.forEach(collectDefinitions);
     };
     const resolveReferences = (node) => {
-      if (node?.type === 'linkReference' && node.identifier) {
-        const definition = definitions.get(node.identifier.toLowerCase());
-        if (definition) {
-          node.type = 'link';
-          node.url = definition.url;
-          node.title = definition.title;
-          delete node.identifier;
-          delete node.label;
-          delete node.referenceType;
-        }
+      if (node?.type !== 'linkReference' && node?.type !== 'imageReference') {
+        if (Array.isArray(node?.children)) node.children.forEach(resolveReferences);
+        return;
+      }
+      const definition = definitions.get(normalizeReferenceIdentifier(node.identifier || node.label));
+      if (definition) {
+        node.type = node.type === 'imageReference' ? 'image' : 'link';
+        node.url = definition.url;
+        node.title = definition.title || null;
+        delete node.identifier;
+        delete node.label;
+        delete node.referenceType;
       }
       if (Array.isArray(node?.children)) node.children.forEach(resolveReferences);
     };
@@ -218,7 +223,7 @@ export default function MarkdownContent({ children }) {
         ol: ({ node, ...props }) => <ol className="markdown-ol" {...props} />,
         li: ({ node, ordered: _ordered, ...props }) => <li className="markdown-li" {...props} />,
         img: ({ node, ...props }) => (
-          <img className="markdown-image" loading="lazy" {...props} src={resolveMarkdownImage(props.src)} />
+          <img className="markdown-image" loading="lazy" {...props} />
         ),
         table: ({ node, ...props }) => <table className="markdown-table" {...props} />,
         thead: ({ node, ...props }) => <thead className="markdown-thead" {...props} />,
@@ -227,20 +232,22 @@ export default function MarkdownContent({ children }) {
         th: ({ node, isHeader: _isHeader, ...props }) => <th className="markdown-th" {...props} />,
         td: ({ node, ...props }) => <td className="markdown-td" {...props} />,
         a: ({ node, href, children, ...props }) => {
-          const isInternalRoute = href?.startsWith('/') && !href.startsWith('//');
+          const normalizedHref = normalizeMarkdownHref(href);
+          const isInternalRoute = normalizedHref?.startsWith('/') && !normalizedHref.startsWith('//');
           return isInternalRoute
-            ? <Link className="markdown-a" to={href} {...props}>{children}</Link>
-            : <a className="markdown-a" href={href} {...props}>{children}</a>;
+            ? <Link className="markdown-a" to={normalizedHref} {...props}>{children}</Link>
+            : <a className="markdown-a" href={normalizedHref} {...props}>{children}</a>;
         },
         blockquote: ({ node, children, ...props }) => {
           const type = alertType(children);
+
           return (
             <blockquote
-              className={`markdown-blockquote${type ? ` markdown-alert markdown-alert--${type}` : ''}`}
+              className={`markdown-blockquote${type ? ` markdown-alert markdown-alert--${type}` : ""}`}
               data-alert={type || undefined}
               {...props}
             >
-              {children}
+              {type ? stripAlertMarker(children) : children}
             </blockquote>
           );
         },

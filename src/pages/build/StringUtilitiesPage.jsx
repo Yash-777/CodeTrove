@@ -1,3 +1,4 @@
+import ToolBackLink from '../../components/ToolBackLink.jsx';
 import { useMemo, useState } from 'react';
 import { copyToClipboard } from '../../utils/textActions.js';
 import './StringUtilitiesPage.css';
@@ -76,6 +77,7 @@ export default function StringUtilitiesPage() {
 
   return (
     <div className="su-page">
+      <ToolBackLink />
       <header className="su-intro">
         <div className="su-kicker">Build / Tools / Text</div>
         <h1>String Utilities</h1>

@@ -37,7 +37,7 @@ import javascriptTopics from './javascript.js';
 import typescriptTopics from './typescript.js';
 import nodejsTopics from './nodejs.js';
 import jsonTopics from './json.js';
-import jwtTopics from './jwt.js';
+// import jwtTopics from './jwt.js';
 import gitTopics from './git.js';
 import emailTopics from './email.js';
 import { getTopicContent } from './contentLoader.js';
@@ -53,12 +53,13 @@ export const CATEGORIES = [
       body: getTopicContent('java', topic.slug),
     })),
     tools: [
-      { name: 'Java Formatter', description: 'Beautify Java source using standard style rules.', internalTool: 'java-formatter', externalUrl: null },
+     // { name: 'Java Formatter', description: 'Beautify Java source using standard style rules.', internalTool: 'java-formatter', externalUrl: null },
+      { name: 'Java Decompiler', description: 'Inspect .class files and browse JAR bytecode as Java source locally, with Java-version samples and source ZIP export.', internalTool: 'java-decompiler', externalUrl: null },
       { name: 'Maven POM Formatter', description: 'Convert dependency XML to a one-line custom build format and back, and pretty-print pom.xml (2/3/4 spaces).', internalTool: 'pom-formatter', externalUrl: null },
       { name: 'Properties ⇄ YAML ⇄ JSON Converter', description: 'Validate, format, and convert application.properties, application.yml, and application.json in all six directions.', internalTool: 'properties-yaml-converter', externalUrl: null },
     ],
   },
-  {
+  /*{
     key: 'javascript',
     label: 'JavaScript',
     color: '#D9A404',
@@ -70,7 +71,7 @@ export const CATEGORIES = [
     tools: [
       { name: 'JS/JSON Validator', description: 'Catch syntax errors before you run the code.', internalTool: 'json-formatter', externalUrl: null },
     ],
-  },
+  },*/
   {
     key: 'typescript',
     label: 'TypeScript',
@@ -91,7 +92,8 @@ export const CATEGORIES = [
     codeLang: 'text',
     topics: [],
     tools: [
-      { name: 'Cryptography Tools', description: 'Encrypt and decrypt text, generate hashes, and create or verify HMAC signatures.', internalTool: 'cryptography', externalUrl: null },
+      { name: 'Cryptography Tools', description: 'Compare symmetric and asymmetric encryption, reproduce compatible AES formats, and generate hashes or HMAC signatures.', internalTool: 'cryptography', externalUrl: null },
+      { name: 'URL (Encode ⇄ Decode)', description: 'Percent-encode and decode URL text locally with RFC 3986 character mappings and selectable replacements.', internalTool: 'url-encode-decode', externalUrl: null },
     ],
   },
   {
@@ -103,12 +105,22 @@ export const CATEGORIES = [
     tools: [
       { name: 'Character Counter', description: 'Count unique characters, whitespace, symbols, numbers, letters, emojis, words, sentences, and lines locally.', internalTool: 'character-counter', externalUrl: null },
       { name: 'String Utilities', description: 'Remove extra spaces, duplicate lines, and accents from text.', internalTool: 'string-utilities', externalUrl: null },
-      { name: 'Compare — Diffchecker', description: 'Compare text or files in a new tab.', internalTool: null, externalUrl: 'https://www.diffchecker.com/' },
-      { name: 'Compare — Text-Compare', description: 'Quick online text comparison.', internalTool: null, externalUrl: 'https://text-compare.com/' },
-      { name: 'Beyond Compare', description: 'Powerful local file comparison tool (heavy files).', internalTool: null, externalUrl: 'https://www.scootersoftware.com/' },
+      { name: 'Regular Expression Match', description: 'Find, highlight, extract, and replace text with JavaScript regular expressions, locally in your browser.', internalTool: 'regex-match', externalUrl: null },
+      { name: 'Text Compare Pro', description: 'Compare pasted text or local files with aligned line numbers, red/green change highlighting, ignore options, samples, copy actions, and local diff export.', internalTool: 'text-compare', externalUrl: null },
     ],
   },
   {
+    key: 'web',
+    label: 'Web',
+    color: '#F97316',
+    codeLang: 'html',
+    topics: [],
+    tools: [
+      { name: 'HTML / XML / JSON Formatter & Validator', description: 'Beautify, minify, validate, and explore JSON/XML in a tree view.', internalTool: 'html-xml-json', externalUrl: null },
+      { name: 'Compare Online (JSON/XML/HTML)', description: 'Format, validate, and compare two JSON, XML, or HTML documents locally with side-by-side red and green differences.', internalTool: 'compare-online', externalUrl: null },
+    ],
+  },
+  /*{
     key: 'nodejs',
     label: 'Node.js',
     color: '#3FA34D',
@@ -120,7 +132,7 @@ export const CATEGORIES = [
     tools: [
       { name: 'package.json Validator', description: 'Check for common manifest mistakes.', internalTool: null, externalUrl: 'https://www.npmjs.com/package/package-json-validator' },
     ],
-  },
+  },*/
   {
     key: 'json',
     label: 'JSON',
@@ -136,7 +148,7 @@ export const CATEGORIES = [
       { name: 'JSON Key Editor', description: 'Remove or replace a value by key using regex/path match.', internalTool: 'json-key-editor', externalUrl: null },
     ],
   },
-  {
+  /* {
     key: 'jwt',
     label: 'JWT',
     color: '#8B5CF6',
@@ -149,7 +161,7 @@ export const CATEGORIES = [
       { name: 'JWT Encode/Decode', description: 'Inspect header, payload, and signature.', internalTool: 'jwt-tool', externalUrl: null },
       { name: 'jwt.io', description: 'The reference JWT debugger, for cross-checking results.', internalTool: null, externalUrl: 'https://jwt.io' },
     ],
-  },
+  },*/
   {
     key: 'git',
     label: 'Git',
@@ -165,16 +177,6 @@ export const CATEGORIES = [
     ],
   },
   {
-    key: 'web',
-    label: 'Web',
-    color: '#F97316',
-    codeLang: 'html',
-    topics: [],
-    tools: [
-      { name: 'HTML / XML / JSON Formatter & Validator', description: 'Beautify, minify, validate, and explore JSON/XML in a tree view.', internalTool: 'html-xml-json', externalUrl: null },
-    ],
-  },
-  {
     key: 'diagrams-editors',
     label: 'Diagrams / Editors tools',
     color: '#8B5CF6',
@@ -187,6 +189,17 @@ export const CATEGORIES = [
     ],
   },
   {
+    key: 'data-documents',
+    label: 'Data & Documents',
+    color: '#2563EB',
+    codeLang: 'text',
+    topics: [],
+    tools: [
+      { name: 'Document Converter', description: 'Convert CSV, JSON, and Excel workbooks in your browser, map or skip fields, add a result worksheet, and download the output without uploading files.', internalTool: 'document-converter', externalUrl: null },
+      { name: 'Document Compare (CSV / Spreadsheet)', description: 'Compare two local CSV, TSV, or Excel worksheets side by side; match rows by position or a shared key and review cell, row, and column changes.', internalTool: 'document-compare', externalUrl: null },
+    ],
+  },
+  {
     key: 'data-time',
     label: 'Data & Time',
     color: '#0D9488',
@@ -194,6 +207,7 @@ export const CATEGORIES = [
     topics: [],
     tools: [
       { name: 'Unix Timestamp ⇄ Date Time Converter', description: 'Convert epoch timestamps and human-readable dates with seconds, milliseconds, microseconds, nanoseconds, custom patterns, and local/GMT time zones.', internalTool: 'unix-timestamp-converter', externalUrl: null },
+      { name: 'World Clock & Time Zone Converter', description: 'Compare live world clocks, convert between IANA time zones, calculate time differences from local dates or timestamps, and add or remove time with daylight-saving validation.', internalTool: 'world-clock', externalUrl: null },
     ],
   },
   {

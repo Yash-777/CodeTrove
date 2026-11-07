@@ -55,8 +55,4 @@ openssl s_client -connect localhost:5173 -servername localhost -showcerts
 
 Use the port your server actually listens on. The certificate file names and paths vary; avoid placing private keys in a public web directory or source repository.
 
-## References
-
-[1]: https://github.com/FiloSottile/mkcert "mkcert project and installation instructions"
-[2]: https://letsencrypt.org/docs/certificates-for-localhost/ "Let's Encrypt: localhost certificates"
-[3]: https://developer.mozilla.org/en-US/docs/Web/Security/Transport_Layer_Security "MDN: Transport Layer Security"
+Further reading: [mkcert project and installation instructions](https://github.com/FiloSottile/mkcert); [Let's Encrypt: localhost certificates](https://letsencrypt.org/docs/certificates-for-localhost/); [MDN: Transport Layer Security](https://developer.mozilla.org/en-US/docs/Web/Security/Transport_Layer_Security).

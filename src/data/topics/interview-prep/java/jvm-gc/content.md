@@ -84,8 +84,4 @@ Reference types influence how the garbage collector treats reachable objects. A 
 A reference type is not a substitute for a bounded cache with an eviction policy. Prefer explicit ownership and observability for application-critical resources.
 </details>
 
-## References
-
-- [JVM specification](https://docs.oracle.com/javase/specs/jvms/se21/html/)
-- [Garbage collection tuning guide](https://docs.oracle.com/en/java/javase/21/gctuning/)
-- [Class loading](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/ClassLoader.html)
+Further reading: [JVM specification](https://docs.oracle.com/javase/specs/jvms/se21/html/); [Garbage collection tuning guide](https://docs.oracle.com/en/java/javase/21/gctuning/); [Class loading](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/ClassLoader.html).

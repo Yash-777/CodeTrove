@@ -1,3 +1,4 @@
+import ToolBackLink from '../../components/ToolBackLink.jsx';
 import { useMemo, useState } from 'react';
 import { Check, Copy, Sparkles, Trash2 } from 'lucide-react';
 import { copyToClipboard } from '../../utils/textActions.js';
@@ -80,6 +81,7 @@ export default function CharacterCounterPage() {
 
   return (
     <main className="cc-page">
+      <ToolBackLink />
       <header className="cc-intro">
         <div className="cc-kicker">Build / Tools / Text</div>
         <h1>Character Counter</h1>

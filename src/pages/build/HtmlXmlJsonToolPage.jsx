@@ -1,3 +1,4 @@
+import ToolBackLink from '../../components/ToolBackLink.jsx';
 import { useMemo, useState } from 'react';
 import JSON5 from 'json5';
 import CodeMirror from '@uiw/react-codemirror';
@@ -522,6 +523,7 @@ export default function HtmlXmlJsonToolPage() {
 
   return (
     <div className="content-page hxt-page">
+      <ToolBackLink />
       <div className="cp-head">
         <div>
           <h1>HTML / XML / JSON Tools</h1>

@@ -4,7 +4,16 @@ Branches provide separate lines of work. Integration commands decide how those l
 
 Start with [creating and switching branches](/content/tree/git-collaboration/git/branching/branch-switch). Then learn [merge conflicts](/content/tree/git-collaboration/git/branching/merge-conflicts), [rebase](/content/tree/git-collaboration/git/branching/rebase), and [cherry-pick](/content/tree/git-collaboration/git/branching/cherry-pick). The sidebar groups these pages beneath Git → Branching and History.
 
-![Merge preserves both branch histories, while rebase replays commits and cherry-pick transfers one chosen change.](git-diagram:integration)
+```mermaid
+sequenceDiagram
+    participant Main as Main branch
+    participant Feature as Feature branch
+    participant Git as Integration command
+    Feature->>Git: merge, rebase, or cherry-pick request
+    Main->>Git: target history
+    Git->>Main: update target history
+    Git-->>Feature: preserve or replay selected changes
+```
 
 ## Questions and answers
 

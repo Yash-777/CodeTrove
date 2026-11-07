@@ -46,7 +46,16 @@ Your computer                                  Hosted service
 └─────────────────────────────┘                └──────────────────────┘
 ```
 
-![A local repository and hosted remote are separate repository copies connected over the network.](git-diagram:local-remote)
+```mermaid
+sequenceDiagram
+    participant Dev as Developer
+    participant Local as Local repository
+    participant Remote as Hosted remote
+    Dev->>Remote: clone or fetch
+    Remote-->>Local: repository objects and refs
+    Dev->>Local: commit locally
+    Dev->>Remote: push selected commits
+```
 
 ## Configure commit identity
 
@@ -81,13 +90,7 @@ git push -u origin main
 
 Replace `main` if your local branch has another name. `-u` records the upstream relationship for later `git push` and `git pull` commands.
 
-## References
-
-- [Git `init`](https://git-scm.com/docs/git-init)
-- [Git `clone`](https://git-scm.com/docs/git-clone)
-- [Git `remote`](https://git-scm.com/docs/git-remote)
-- [Git configuration](https://git-scm.com/docs/git-config)
-
+Further reading: [Git `init`](https://git-scm.com/docs/git-init); [Git `clone`](https://git-scm.com/docs/git-clone); [Git `remote`](https://git-scm.com/docs/git-remote); [Git configuration](https://git-scm.com/docs/git-config).
 ## Questions and answers
 
 <details>

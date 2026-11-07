@@ -82,7 +82,7 @@ Grouping can benefit when rows arrive in a useful grouping order, but an index i
 
 **Cardinality** is the number of distinct values (or, in plan discussions, sometimes the estimated number of matching rows). **Selectivity** describes how narrowly a predicate reduces the input. A unique identifier is usually highly selective; a boolean or a flag with two values is often not. But a low-cardinality column can still be useful when a filtered/partial index stores only a small subset, when the table is physically large, or when it is the leading part of a useful composite access path.
 
-The optimizer compares an index traversal plus row lookups with a scan. On a two-row table, scanning both rows can be cheaper than traversing an index. On a very large table, the same predicate may justify an index. There is no universal row-count threshold: cache state, row width, clustering, selectivity, and requested columns all matter. SQLite's planner documentation likewise describes indexes as a way to narrow searches and notes that statistics help choose among alternatives [1].
+The optimizer compares an index traversal plus row lookups with a scan. On a two-row table, scanning both rows can be cheaper than traversing an index. On a very large table, the same predicate may justify an index. There is no universal row-count threshold: cache state, row width, clustering, selectivity, and requested columns all matter. SQLite's planner documentation likewise describes indexes as a way to narrow searches and notes that statistics help choose among alternatives [SQLite Query Planning](https://www.sqlite.org/queryplanner.html).
 
 Refresh or inspect statistics before drawing conclusions from a plan. Stale statistics can make a good index look unused or make a poor index look attractive.
 
@@ -104,15 +104,15 @@ Before creating `(a, b)`, check whether an existing `(a, b, c)` already supplies
 
 #### Unique indexes
 
-A unique index both enforces a data rule and supplies an access path. Use it when the model requires uniqueness, not merely because uniqueness might make a lookup fast. In MySQL and MariaDB, a primary key or unique `NOT NULL` key is central to InnoDB clustering; if no suitable key exists, InnoDB can create a hidden clustered key (`GEN_CLUST_INDEX`). Secondary entries include the primary-key value used to locate the clustered row [5].
+A unique index both enforces a data rule and supplies an access path. Use it when the model requires uniqueness, not merely because uniqueness might make a lookup fast. In MySQL and MariaDB, a primary key or unique `NOT NULL` key is central to InnoDB clustering; if no suitable key exists, InnoDB can create a hidden clustered key (`GEN_CLUST_INDEX`). Secondary entries include the primary-key value used to locate the clustered row [MySQL 8.4 Reference Manual: InnoDB Index Types](https://dev.mysql.com/doc/refman/8.4/en/innodb-index-types.html).
 
 #### Clustered and nonclustered terminology
 
 **SQL Server:** A table can have at most one clustered index; its leaf level contains the table rows. A heap has no clustered index, and a nonclustered index uses a row identifier (RID) to locate heap rows. If the table has a clustered index, nonclustered entries use the clustered key as the locator; a nonunique clustered key can require a hidden uniqueifier. Nonclustered indexes have their own leaf index pages.
 
-**MySQL/MariaDB with InnoDB:** The primary key is the clustered index. A secondary index is a separate B-tree-like structure whose entries carry the primary-key value, not SQL Server's RID terminology [5]. Do not write `CLUSTERED` or `NONCLUSTERED` in MySQL/MariaDB `CREATE INDEX` syntax.
+**MySQL/MariaDB with InnoDB:** The primary key is the clustered index. A secondary index is a separate B-tree-like structure whose entries carry the primary-key value, not SQL Server's RID terminology [MySQL 8.4 Reference Manual: InnoDB Index Types](https://dev.mysql.com/doc/refman/8.4/en/innodb-index-types.html). Do not write `CLUSTERED` or `NONCLUSTERED` in MySQL/MariaDB `CREATE INDEX` syntax.
 
-**SQLite:** Ordinary rowid tables and their indexes have SQLite-specific B-tree and rowid behavior. A SQLite index is not a SQL Server-style clustered index, and SQLite does not accept SQL Server's clustered-index syntax. SQLite's file format distinguishes table and index B-tree pages, along with overflow and freelist pages [3].
+**SQLite:** Ordinary rowid tables and their indexes have SQLite-specific B-tree and rowid behavior. A SQLite index is not a SQL Server-style clustered index, and SQLite does not accept SQL Server's clustered-index syntax. SQLite's file format distinguishes table and index B-tree pages, along with overflow and freelist pages [SQLite Database File Format](https://www.sqlite.org/fileformat2.html).
 
 #### Filtered, partial, covering, and specialized indexes
 
@@ -143,9 +143,9 @@ WHERE TABLE_SCHEMA = DATABASE()
 ORDER BY ORDINAL_POSITION;
 ```
 
-`COLUMN_KEY` values such as `PRI`, `UNI`, and `MUL` are useful clues, but an empty value does not always prove that a column is absent from every index: MySQL documents cases where a column is only a later part of a nonunique composite key [7]. Inspect the complete index metadata too.
+`COLUMN_KEY` values such as `PRI`, `UNI`, and `MUL` are useful clues, but an empty value does not always prove that a column is absent from every index: MySQL documents cases where a column is only a later part of a nonunique composite key [MySQL 8.4 Reference Manual: The INFORMATION_SCHEMA COLUMNS Table](https://dev.mysql.com/doc/refman/8.4/en/information-schema-columns-table.html). Inspect the complete index metadata too.
 
-A simple calculation such as `VARCHAR(50) × 4 bytes` for `utf8mb4` is a **maximum payload estimate**, not an exact InnoDB row size. Real storage includes record headers, null maps, length fields, page overhead, and possible off-page storage for large variable values [9]. Compare it with observed `AVG_ROW_LENGTH` and `DATA_LENGTH` rather than claiming that the arithmetic is the allocated row size.
+A simple calculation such as `VARCHAR(50) × 4 bytes` for `utf8mb4` is a **maximum payload estimate**, not an exact InnoDB row size. Real storage includes record headers, null maps, length fields, page overhead, and possible off-page storage for large variable values [MySQL 8.4 Reference Manual: InnoDB Row Formats](https://dev.mysql.com/doc/refman/8.4/en/innodb-row-format.html). Compare it with observed `AVG_ROW_LENGTH` and `DATA_LENGTH` rather than claiming that the arithmetic is the allocated row size.
 
 ### Find duplicates and redundant prefixes before adding anything
 
@@ -169,7 +169,7 @@ WHERE TABLE_SCHEMA = DATABASE()
 ORDER BY INDEX_NAME, SEQ_IN_INDEX;
 ```
 
-The statistics view exposes ordered columns, uniqueness, and estimated cardinality; those estimates can be cached until statistics are refreshed [8]. Group index rows by `(TABLE_SCHEMA, TABLE_NAME, INDEX_NAME)` to reconstruct each ordered key. A report can flag exact duplicate definitions and shorter indexes subsumed by a longer leftmost prefix, but it cannot prove that an index is safe to remove. A shorter index may be narrower, may support a different included/covering requirement, or may be used by a constraint or operational query.
+The statistics view exposes ordered columns, uniqueness, and estimated cardinality; those estimates can be cached until statistics are refreshed [MySQL 8.4 Reference Manual: The INFORMATION_SCHEMA STATISTICS Table](https://dev.mysql.com/doc/refman/8.4/en/information-schema-statistics-table.html). Group index rows by `(TABLE_SCHEMA, TABLE_NAME, INDEX_NAME)` to reconstruct each ordered key. A report can flag exact duplicate definitions and shorter indexes subsumed by a longer leftmost prefix, but it cannot prove that an index is safe to remove. A shorter index may be narrower, may support a different included/covering requirement, or may be used by a constraint or operational query.
 
 Creating two indexes with different names but identical key definitions does not create two useful access paths. It creates extra storage and extra write maintenance. A secondary index on an InnoDB primary-key column is usually redundant for the same reason: the clustered primary key already supplies that key lookup. Confirm constraints and plans before removing it.
 
@@ -189,7 +189,7 @@ CREATE UNIQUE INDEX ux_users_email
     ON users (email);
 ```
 
-InnoDB stores the primary key in secondary-index records, so a wide primary key makes every secondary index more expensive than the visible key list suggests [5]. MySQL index creation options and online behavior vary by version and table operation; check the version-specific manual before a production build.
+InnoDB stores the primary key in secondary-index records, so a wide primary key makes every secondary index more expensive than the visible key list suggests [MySQL 8.4 Reference Manual: InnoDB Index Types](https://dev.mysql.com/doc/refman/8.4/en/innodb-index-types.html). MySQL index creation options and online behavior vary by version and table operation; check the version-specific manual before a production build.
 
 ### MariaDB
 
@@ -201,7 +201,7 @@ CREATE UNIQUE INDEX ux_users_email
     ON users (email);
 ```
 
-MariaDB's index guidance starts with equality predicates, then considers range, grouping, and ordering in the context of the complete query. It specifically cautions that low-cardinality flag-only indexes are often poor choices and that every index adds update cost [4]. Treat that as a design heuristic, not an automatic rejection.
+MariaDB's index guidance starts with equality predicates, then considers range, grouping, and ordering in the context of the complete query. It specifically cautions that low-cardinality flag-only indexes are often poor choices and that every index adds update cost [MariaDB: Building the Best Index for a Given SELECT](https://mariadb.com/docs/server/ha-and-performance/optimization-and-tuning/optimization-and-indexes/building-the-best-index-for-a-given-select). Treat that as a design heuristic, not an automatic rejection.
 
 ### SQLite
 
@@ -218,7 +218,7 @@ CREATE INDEX ix_orders_open
     WHERE status = 'open';
 ```
 
-SQLite's `EXPLAIN QUERY PLAN` can report `SCAN`, `SEARCH`, covering-index use, and temporary sort structures, but its output is a high-level debugging format that may change between versions [2]. A partial index is only useful when the query predicate and SQLite's rules allow the planner to infer that the indexed subset applies.
+SQLite's `EXPLAIN QUERY PLAN` can report `SCAN`, `SEARCH`, covering-index use, and temporary sort structures, but its output is a high-level debugging format that may change between versions [SQLite EXPLAIN QUERY PLAN](https://www.sqlite.org/eqp.html). A partial index is only useful when the query predicate and SQLite's rules allow the planner to infer that the indexed subset applies.
 
 ### SQL Server
 
@@ -262,7 +262,7 @@ ORDER BY created_at DESC
 LIMIT 50;
 ```
 
-MySQL documents `EXPLAIN` as an estimate and `EXPLAIN ANALYZE` as an execution that reports iterator timing and rows; `ANALYZE TABLE` refreshes statistics that influence plan choices [6]. Run `EXPLAIN ANALYZE` only for statements whose execution is safe and acceptable in the test environment.
+MySQL documents `EXPLAIN` as an estimate and `EXPLAIN ANALYZE` as an execution that reports iterator timing and rows; `ANALYZE TABLE` refreshes statistics that influence plan choices [MySQL 8.4 Reference Manual: EXPLAIN Statement](https://dev.mysql.com/doc/refman/8.4/en/explain.html). Run `EXPLAIN ANALYZE` only for statements whose execution is safe and acceptable in the test environment.
 
 ## III. Monitoring and Maintenance (After Creation)
 
@@ -280,7 +280,7 @@ A plan that mentions an index is not automatically a win. Look for:
 
 **MariaDB:** use the MariaDB `EXPLAIN` variants and index metadata, then refresh statistics with the MariaDB-supported `ANALYZE TABLE` operation when distribution has changed. Confirm exact syntax and instrumentation for the installed release.
 
-**SQLite:** use `EXPLAIN QUERY PLAN` and inspect `PRAGMA index_list('orders')` and `PRAGMA index_info('index_name')`. `SCAN` is not inherently bad: a small table or a query returning most rows may correctly scan. Run `ANALYZE` when planner statistics need refreshing, and remember that the EQP display is intended for interactive diagnosis rather than a stable application API [2].
+**SQLite:** use `EXPLAIN QUERY PLAN` and inspect `PRAGMA index_list('orders')` and `PRAGMA index_info('index_name')`. `SCAN` is not inherently bad: a small table or a query returning most rows may correctly scan. Run `ANALYZE` when planner statistics need refreshing, and remember that the EQP display is intended for interactive diagnosis rather than a stable application API [SQLite EXPLAIN QUERY PLAN](https://www.sqlite.org/eqp.html).
 
 **SQL Server:** inspect estimated and actual execution plans. SQL Server installations commonly use DMVs such as `sys.dm_db_index_usage_stats` for seek/scan/lookup/update activity and `sys.dm_db_index_physical_stats` for physical condition. DMV counters reset or change with events such as restart and failover, so correlate them with an observation window and workload history rather than treating a zero count as permanent proof of uselessness.
 
@@ -289,7 +289,7 @@ A plan that mentions an index is not automatically a win. Look for:
 Statistics describe row counts, distributions, and index properties used by the optimizer. They can become stale after bulk loads, deletes, skew changes, or major migrations. A stale estimate may cause a scan when a lookup would be better—or an index lookup followed by millions of row fetches when a scan would be cheaper.
 
 - **MySQL/MariaDB:** `ANALYZE TABLE orders;` refreshes table/index statistics. It is not an index rebuild and should not be used as a substitute for physical maintenance.
-- **SQLite:** `ANALYZE;` collects planner statistics. Follow with representative plan checks; SQLite's planner uses its statistics to choose among alternatives [1].
+- **SQLite:** `ANALYZE;` collects planner statistics. Follow with representative plan checks; SQLite's planner uses its statistics to choose among alternatives [SQLite Query Planning](https://www.sqlite.org/queryplanner.html).
 - **SQL Server:** automatic statistics may handle normal changes, while targeted `UPDATE STATISTICS` or a documented maintenance process may be appropriate after exceptional changes. Do not disable or force statistics behavior without measuring the consequence.
 
 ### Understand fragmentation before acting
@@ -324,7 +324,7 @@ This command is intentionally shown behind a warning because it is not a harmles
 
 #### SQLite: no blanket rebuild equivalent
 
-SQLite has no SQL Server-style `ALTER INDEX ... REORGANIZE/REBUILD`. `REINDEX` rebuilds indexes associated with a collation or named index, but it is not a general fragmentation policy. `VACUUM` rewrites and compacts the database file; it is a database-file operation, not a drop-in index-maintenance command, and it needs planning for time and disk space. SQLite's page-oriented file format includes table/index B-trees, overflow pages, and freelist pages, so file size and free-page observations need to be interpreted in that context [3].
+SQLite has no SQL Server-style `ALTER INDEX ... REORGANIZE/REBUILD`. `REINDEX` rebuilds indexes associated with a collation or named index, but it is not a general fragmentation policy. `VACUUM` rewrites and compacts the database file; it is a database-file operation, not a drop-in index-maintenance command, and it needs planning for time and disk space. SQLite's page-oriented file format includes table/index B-trees, overflow pages, and freelist pages, so file size and free-page observations need to be interpreted in that context [SQLite Database File Format](https://www.sqlite.org/fileformat2.html).
 
 ```sql
 -- SQLite-specific and potentially expensive.
@@ -389,15 +389,3 @@ Keep a short index record: definition, engine/version, owning query or constrain
 [ ] Remove duplicates/unused indexes only after dependency and rollback review.
 [ ] Re-test after data and workload changes.
 ```
-
-## References
-
-[1]: https://www.sqlite.org/queryplanner.html "SQLite Query Planning"
-[2]: https://www.sqlite.org/eqp.html "SQLite EXPLAIN QUERY PLAN"
-[3]: https://www.sqlite.org/fileformat2.html "SQLite Database File Format"
-[4]: https://mariadb.com/docs/server/ha-and-performance/optimization-and-tuning/optimization-and-indexes/building-the-best-index-for-a-given-select "MariaDB: Building the Best Index for a Given SELECT"
-[5]: https://dev.mysql.com/doc/refman/8.4/en/innodb-index-types.html "MySQL 8.4 Reference Manual: InnoDB Index Types"
-[6]: https://dev.mysql.com/doc/refman/8.4/en/explain.html "MySQL 8.4 Reference Manual: EXPLAIN Statement"
-[7]: https://dev.mysql.com/doc/refman/8.4/en/information-schema-columns-table.html "MySQL 8.4 Reference Manual: The INFORMATION_SCHEMA COLUMNS Table"
-[8]: https://dev.mysql.com/doc/refman/8.4/en/information-schema-statistics-table.html "MySQL 8.4 Reference Manual: The INFORMATION_SCHEMA STATISTICS Table"
-[9]: https://dev.mysql.com/doc/refman/8.4/en/innodb-row-format.html "MySQL 8.4 Reference Manual: InnoDB Row Formats"

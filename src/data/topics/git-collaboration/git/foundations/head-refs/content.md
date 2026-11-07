@@ -4,7 +4,17 @@ A **commit** is an immutable history object containing a snapshot, parent commit
 
 A **branch** is a movable reference to a commit. When you commit on a branch, that branch reference advances. `HEAD` tells Git what you currently have checked out. Normally it points to a branch name, which then points to a commit. This is called **attached HEAD**.
 
-![HEAD points to the current branch; each branch name points to a commit, while a commit hash identifies a specific history object.](git-diagram:head-branches)
+```mermaid
+sequenceDiagram
+    participant Dev as Developer
+    participant HEAD as HEAD
+    participant Branch as Branch ref
+    participant Commit as Commit graph
+    Dev->>HEAD: checkout branch
+    HEAD->>Branch: identify current branch
+    Branch->>Commit: point to current commit
+    Commit-->>Dev: resolve history and parent commits
+```
 
 ## Inspect history and references
 
@@ -34,13 +44,7 @@ If you meant to move a branch to an earlier commit, that is a different and pote
 
 For a tracking branch, `main` is your local branch. `origin/main` is your local record of the remote branch's last fetched position. It does not update continuously while someone else pushes. Run `git fetch origin` to refresh remote-tracking refs.
 
-## References
-
-- [Git `revisions`](https://git-scm.com/docs/gitrevisions)
-- [Git `log`](https://git-scm.com/docs/git-log)
-- [Git `switch`](https://git-scm.com/docs/git-switch)
-- [Git `checkout`](https://git-scm.com/docs/git-checkout)
-
+Further reading: [Git `revisions`](https://git-scm.com/docs/gitrevisions); [Git `log`](https://git-scm.com/docs/git-log); [Git `switch`](https://git-scm.com/docs/git-switch); [Git `checkout`](https://git-scm.com/docs/git-checkout).
 ## Questions and answers
 
 <details>

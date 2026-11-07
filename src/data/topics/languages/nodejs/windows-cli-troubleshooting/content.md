@@ -32,7 +32,7 @@ npm install --save-dev @angular/cli
 npm exec -- ng version
 ```
 
-The exact Node.js version must be supported by the Angular version used by the project. Check Angular's compatibility guidance before changing Node or Angular versions. [1]
+The exact Node.js version must be supported by the Angular version used by the project. Check Angular's compatibility guidance before changing Node or Angular versions. [Angular CLI setup](https://angular.dev/tools/cli/setup-local)
 
 ## 3. If you intentionally installed a global CLI
 
@@ -44,11 +44,11 @@ where.exe ng
 Get-Command ng -ErrorAction SilentlyContinue
 ```
 
-If `ng` is not found, confirm the CLI is installed globally with `npm list --global --depth=0`. If the global prefix directory is missing from the user PATH, add the correct prefix using Windows Environment Variables, then open a new terminal. Avoid copying a path from another account or another Node installation: version managers can change the active global package location. [2]
+If `ng` is not found, confirm the CLI is installed globally with `npm list --global --depth=0`. If the global prefix directory is missing from the user PATH, add the correct prefix using Windows Environment Variables, then open a new terminal. Avoid copying a path from another account or another Node installation: version managers can change the active global package location. [npm folders](https://docs.npmjs.com/cli/v11/configuring-npm/folders)
 
 ## 4. Check PowerShell-specific errors
 
-A message that `npm.ps1` or another script cannot run because script execution is disabled is different from “command not found.” Try the same command in Command Prompt to isolate a PowerShell policy issue. If you need PowerShell script support, review Microsoft's policy guidance and choose the narrowest policy appropriate for your machine; do not set a machine-wide unrestricted policy just to work around one command. Angular documents a per-user `RemoteSigned` option for its CLI workflow. Understand the security effect before applying it. [1]
+A message that `npm.ps1` or another script cannot run because script execution is disabled is different from “command not found.” Try the same command in Command Prompt to isolate a PowerShell policy issue. If you need PowerShell script support, review Microsoft's policy guidance and choose the narrowest policy appropriate for your machine; do not set a machine-wide unrestricted policy just to work around one command. Angular documents a per-user `RemoteSigned` option for its CLI workflow. Understand the security effect before applying it. [Angular CLI setup](https://angular.dev/tools/cli/setup-local)
 
 ## Quick diagnostic flow
 
@@ -57,8 +57,3 @@ A message that `npm.ps1` or another script cannot run because script execution i
 - `node` and `npm` work but `ng` fails inside a project: run `npm install`, confirm `@angular/cli` is listed in the project, and use `npm exec -- ng ...`.
 - A global `ng` command fails: inspect `npm config get prefix`, the global package list, and PATH; then open a fresh shell.
 - A CLI starts but reports an unsupported Node version: select a Node version allowed by that project's framework compatibility matrix instead of forcing the newest runtime.
-
-## References
-
-[1]: https://angular.dev/tools/cli/setup-local "Angular CLI setup"
-[2]: https://docs.npmjs.com/cli/v11/configuring-npm/folders "npm folders"

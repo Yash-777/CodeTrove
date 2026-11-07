@@ -2,7 +2,16 @@
 
 A **reverse proxy** is the client-facing endpoint for one or more origin servers. The client connects to the public hostname; the reverse proxy selects a backend and forwards the request. Backend systems can remain on private addresses, but their protection depends on network rules and correct proxy configuration.
 
-![A reverse proxy terminates client connections and routes to backend services](networking-diagram:reverse-proxy)
+```mermaid
+sequenceDiagram
+    participant Client as Client
+    participant Proxy as Reverse proxy
+    participant Backend as Selected backend
+    Client->>Proxy: connect to public hostname
+    Proxy->>Backend: terminate, filter, and route request
+    Backend-->>Proxy: return application response
+    Proxy-->>Client: return response
+```
 
 ## Example flow
 
@@ -21,8 +30,4 @@ Never trust an incoming `X-Forwarded-For` or `Forwarded` header from arbitrary c
 
 A reverse proxy usually understands application requests (for example, HTTP paths and headers). A load balancer may select a backend based only on transport connections or may also operate at layer 7. Many products provide both roles; the names describe functions, not necessarily separate boxes.
 
-## References
-
-[1]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Proxy_servers_and_tunneling "MDN: Proxy servers and tunneling"
-[2]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Forwarded "MDN: Forwarded header"
-[3]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-For "MDN: X-Forwarded-For header"
+Further reading: [MDN: Proxy servers and tunneling](https://developer.mozilla.org/en-US/docs/Web/HTTP/Proxy_servers_and_tunneling); [MDN: Forwarded header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Forwarded); [MDN: X-Forwarded-For header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-For).

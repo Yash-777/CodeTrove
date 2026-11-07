@@ -22,10 +22,4 @@ Classic **FTP** separates a control connection from a data connection and sends 
 
 Use HTTPS for web APIs and browsers. Use SMTP for email transfer. Prefer SFTP or an HTTPS-based transfer service over plain FTP. Use TCP when an application needs a reliable ordered stream; UDP suits designs that value low overhead or implement reliability at a higher layer. Protocol selection depends on the complete application, security model, network path, and latency/loss trade-offs—not just a port number.
 
-## References
-
-[1]: https://www.rfc-editor.org/rfc/rfc9110 "RFC 9110: HTTP Semantics"
-[2]: https://www.rfc-editor.org/rfc/rfc5321 "RFC 5321: SMTP"
-[3]: https://www.rfc-editor.org/rfc/rfc959 "RFC 959: FTP"
-[4]: https://www.rfc-editor.org/rfc/rfc768 "RFC 768: UDP"
-[5]: https://www.rfc-editor.org/rfc/rfc9293 "RFC 9293: TCP"
+Further reading: [RFC 9110: HTTP Semantics](https://www.rfc-editor.org/rfc/rfc9110); [RFC 5321: SMTP](https://www.rfc-editor.org/rfc/rfc5321); [RFC 959: FTP](https://www.rfc-editor.org/rfc/rfc959); [RFC 768: UDP](https://www.rfc-editor.org/rfc/rfc768); [RFC 9293: TCP](https://www.rfc-editor.org/rfc/rfc9293).

@@ -142,9 +142,4 @@ try {
 Request-body caching can consume memory, expose secrets, and break streaming uploads. Use it only for bounded payloads and redact credentials before logging.
 </details>
 
-## References
-
-- [Jakarta Servlet specification](https://jakarta.ee/specifications/servlet/)
-- [HttpServlet API](https://jakarta.ee/specifications/servlet/6.0/apidocs/jakarta.servlet/jakarta/servlet/http/HttpServlet.html)
-- [Spring OncePerRequestFilter](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/web/filter/OncePerRequestFilter.html)
-- [Spring FilterRegistrationBean](https://docs.spring.io/spring-boot/api/java/org/springframework/boot/web/servlet/FilterRegistrationBean.html)
+Further reading: [Jakarta Servlet specification](https://jakarta.ee/specifications/servlet/); [HttpServlet API](https://jakarta.ee/specifications/servlet/6.0/apidocs/jakarta.servlet/jakarta/servlet/http/HttpServlet.html); [Spring OncePerRequestFilter](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/web/filter/OncePerRequestFilter.html); [Spring FilterRegistrationBean](https://docs.spring.io/spring-boot/api/java/org/springframework/boot/web/servlet/FilterRegistrationBean.html).

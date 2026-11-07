@@ -1,3 +1,4 @@
+import ToolBackLink from '../../components/ToolBackLink.jsx';
 /**
  * src/pages/build/PomFormatterPage.jsx
  * ------------------------------------------------------------------
@@ -344,6 +345,7 @@ export default function PomFormatterPage() {
 
   return (
     <div className="content-page cp-page">
+      <ToolBackLink />
       <div className="cp-head">
         <div>
           <h1>{active.title}</h1>

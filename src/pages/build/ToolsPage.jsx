@@ -6,7 +6,7 @@ export default function ToolsPage() {
   return (
     <div className="content-page">
       <h1>Tools</h1>
-      <p style={{ color: 'var(--color-muted)', maxWidth: '60ch' }}>
+      <p style={{ color: 'var(--color-muted)' }}>
         Formatters, validators, and encode/decode utilities, grouped by language.
         Built-in tools open inside CodeTrove; external tools open in a new tab.
       </p>
