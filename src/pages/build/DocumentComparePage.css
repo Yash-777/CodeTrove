@@ -119,3 +119,43 @@
   .sp-diff-table { min-width: 690px; }
   .sp-result-count { width: 100%; }
 }
+
+.sp-mode-tabs, .sp-view-switch { display: flex; flex-wrap: wrap; align-items: center; gap: 0.35rem; margin-bottom: 0.65rem; }
+.sp-mode-tabs { padding: 0.25rem; width: fit-content; border: 1px solid var(--color-border); border-radius: 8px; background: var(--color-sidebar-bg); }
+.sp-mode-tabs button, .sp-view-switch button { display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem; min-height: 2.2rem; padding: 0.42rem 0.75rem; border: 1px solid transparent; border-radius: 6px; color: var(--color-muted); background: transparent; font: inherit; font-size: 0.82rem; font-weight: 650; cursor: pointer; }
+.sp-mode-tabs button.is-active, .sp-view-switch button.is-active { border-color: var(--color-border); color: var(--color-text); background: var(--color-paper); box-shadow: 0 1px 2px rgb(20 30 50 / 6%); }
+.sp-mode-tabs button:focus-visible, .sp-view-switch button:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+.sp-view-switch { gap: 0.25rem; padding: 0.15rem 0; }
+.sp-view-switch > span { margin-right: 0.35rem; color: var(--color-muted); font-size: 0.78rem; font-weight: 650; }
+.sp-view-switch button { min-height: 1.9rem; padding: 0.3rem 0.55rem; font-size: 0.76rem; }
+.sp-source-view { min-width: 0; margin-top: 0.7rem; border: 1px solid var(--color-border); border-radius: 7px; overflow: hidden; background: var(--color-paper); }
+.sp-source-view__heading { display: flex; justify-content: space-between; gap: 0.6rem; padding: 0.45rem 0.55rem; border-bottom: 1px solid var(--color-border); color: var(--color-text); font-size: 0.73rem; }
+.sp-source-view__heading span, .sp-preview-count { color: var(--color-muted); font-size: 0.68rem; }
+.sp-csv-textarea { display: block; box-sizing: border-box; width: 100%; min-height: 12rem; max-height: 32rem; resize: vertical; padding: 0.65rem; border: 0; color: var(--color-text); background: var(--color-paper); font: 0.76rem/1.5 var(--font-mono); tab-size: 2; white-space: pre; }
+.sp-csv-textarea:focus-visible { outline: 2px solid var(--color-accent); outline-offset: -2px; }
+.sp-source-table-wrap { max-width: 100%; max-height: 19rem; overflow: auto; }
+.sp-source-table { width: max-content; min-width: 100%; border-collapse: separate; border-spacing: 0; font-size: 0.72rem; }
+.sp-source-table th, .sp-source-table td { max-width: 20rem; padding: 0.4rem 0.55rem; border-right: 1px solid var(--color-border); border-bottom: 1px solid var(--color-border); color: var(--color-text); text-align: left; vertical-align: top; overflow-wrap: anywhere; }
+.sp-source-table thead th { position: sticky; z-index: 1; top: 0; background: var(--color-sidebar-bg); font-weight: 700; }
+.sp-source-table tbody th { color: var(--color-muted); background: var(--color-bg); font: 0.68rem var(--font-mono); }
+.sp-preview-count { display: block; padding: 0.35rem 0.55rem; }
+.sp-ignore-columns { min-width: 0; margin: 0; padding: 0.6rem 0.9rem 0.75rem; border: 0; border-top: 1px solid var(--color-border); background: var(--color-sidebar-bg); }
+.sp-ignore-columns legend { padding: 0; color: var(--color-text); font-size: 0.78rem; font-weight: 700; }
+.sp-ignore-columns__help { display: block; margin: 0.15rem 0 0.45rem; color: var(--color-muted); font-size: 0.7rem; }
+.sp-ignore-columns > div { display: flex; flex-wrap: wrap; gap: 0.45rem 0.9rem; }
+.sp-ignore-columns .sp-check { padding: 0.18rem 0; }
+.sp-button--validate { border-color: var(--color-accent); color: var(--color-accent); }
+.sp-export-format { display: inline-flex; align-items: center; gap: 0.45rem; color: var(--color-muted); font-size: 0.76rem; }
+.sp-export-format select { min-height: 2rem; padding: 0.3rem 0.45rem; border: 1px solid var(--color-border); border-radius: 5px; color: var(--color-text); background: var(--color-paper); font: inherit; }
+.sp-export-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 0.45rem; padding: 0.65rem 0.9rem; border-bottom: 1px solid var(--color-border); }
+.sp-record-ids { min-width: 5rem; font: 0.7rem/1.5 var(--font-mono); }
+.sp-record-ids span { display: block; }
+.sp-record-ids span:first-child { color: #a53535; }
+.sp-record-ids span:last-child { color: #167343; }
+@media (max-width: 580px) {
+  .sp-mode-tabs { width: 100%; }
+  .sp-mode-tabs button { flex: 1; }
+  .sp-source-view__heading { flex-direction: column; gap: 0.12rem; }
+  .sp-csv-textarea { min-height: 10rem; }
+  .sp-export-actions > .sp-button { width: 100%; }
+}

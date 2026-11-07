@@ -5,12 +5,18 @@ export const MAX_COMPARE_ROWS = 50000;
 export const MAX_COMPARE_COLUMNS = 1000;
 export const MAX_COMPARE_CELLS = 500000;
 
+function sampleEmployee(id) {
+  return `${id},Employee ${id.slice(2)},Operations,90000,Remote,Active`;
+}
+
 export const SAMPLE_BEFORE_CSV = [
-  'Employee ID,Name,Department,Salary,Office',
-  'E-101,Ada Lovelace,Engineering,145000,London',
-  'E-102,Grace Hopper,Engineering,138000,New York',
-  'E-103,Linus Torvalds,Platform,132000,Oslo',
-  'E-104,Katherine Johnson,Research,121000,New York',
+  'Employee ID,Name,Department,Salary,Office,Status',
+  'E-101,Ada Lovelace,Engineering,145000,London,Active',
+  'E-102,Grace Hopper,Engineering,138000,New York,Active',
+  'E-103,Linus Torvalds,Platform,132000,Oslo,Inactive',
+  'E-104,Katherine Johnson,Research,121000,New York,Active',
+  ...Array.from({ length: 16 }, (_, index) => sampleEmployee(`E-${String(201 + index).padStart(3, '0')}`)),
+  'E-121,Row-order demo,Operations,90000,Remote,Active',
 ].join('\n');
 
 export const SAMPLE_AFTER_CSV = [
@@ -19,6 +25,9 @@ export const SAMPLE_AFTER_CSV = [
   'E-102,Grace Hopper,Engineering,138000,New York,Active',
   'E-104,Katherine Johnson,Research,121000,Boston,Active',
   'E-105,Dorothy Vaughan,Data,128000,London,New',
+  ...Array.from({ length: 4 }, (_, index) => sampleEmployee(`E-${String(201 + index).padStart(3, '0')}`)),
+  'E-121,Row-order demo,Operations,90000,Remote,Active',
+  ...Array.from({ length: 12 }, (_, index) => sampleEmployee(`E-${String(205 + index).padStart(3, '0')}`)),
 ].join('\n');
 
 function headerInfo(header, index) {
@@ -113,6 +122,8 @@ function createRecord(leftRow, rightRow, leftIndex, rightIndex, columns, options
     type,
     leftRowNumber: leftRow ? leftIndex + 2 : null,
     rightRowNumber: rightRow ? rightIndex + 2 : null,
+    leftRecordId: leftRow ? `L-${String(leftIndex + 1).padStart(2, '0')}` : '',
+    rightRecordId: rightRow ? `R-${String(rightIndex + 1).padStart(2, '0')}` : '',
     rowKey: keyValue || (leftRow && rightRow ? `Row ${leftIndex + 2} ↔ ${rightIndex + 2}` : `Row ${leftIndex != null ? leftIndex + 2 : rightIndex + 2}`),
     cells,
     changedCellCount: cells.filter((cell) => cell.changed).length,
@@ -125,6 +136,8 @@ export function compareSpreadsheetTables(leftTable, rightTable, options = {}) {
   }
   const matchBy = options.matchBy || 'position';
   const { columns, leftHeaders, rightHeaders } = getColumns(leftTable, rightTable);
+  const ignored = new Set(options.ignoredColumns || []);
+  const comparedColumns = columns.filter((column) => !ignored.has(column.key));
   const records = [];
   if (matchBy === 'key') {
     const key = String(options.key || '');
@@ -148,20 +161,20 @@ export function compareSpreadsheetTables(leftTable, rightTable, options = {}) {
       const nextIndex = value ? nextRightMatch.get(value) || 0 : 0;
       const match = bucket?.[nextIndex] || null;
       if (!match) {
-        records.push(createRecord(leftRow, null, leftIndex, null, columns, options, leftKeyIndex));
+        records.push(createRecord(leftRow, null, leftIndex, null, comparedColumns, options, leftKeyIndex));
         return;
       }
       nextRightMatch.set(value, nextIndex + 1);
       usedRightRows.add(match.index);
-      records.push(createRecord(leftRow, match.row, leftIndex, match.index, columns, options, leftKeyIndex));
+      records.push(createRecord(leftRow, match.row, leftIndex, match.index, comparedColumns, options, leftKeyIndex));
     });
     rightTable.rows.forEach((rightRow, rightIndex) => {
-      if (!usedRightRows.has(rightIndex)) records.push(createRecord(null, rightRow, null, rightIndex, columns, options, rightKeyIndex));
+      if (!usedRightRows.has(rightIndex)) records.push(createRecord(null, rightRow, null, rightIndex, comparedColumns, options, rightKeyIndex));
     });
   } else {
     const rowCount = Math.max(leftTable.rows.length, rightTable.rows.length);
     for (let index = 0; index < rowCount; index += 1) {
-      records.push(createRecord(leftTable.rows[index] || null, rightTable.rows[index] || null, index, index, columns, options));
+      records.push(createRecord(leftTable.rows[index] || null, rightTable.rows[index] || null, index, index, comparedColumns, options));
     }
   }
 
@@ -176,28 +189,35 @@ export function compareSpreadsheetTables(leftTable, rightTable, options = {}) {
   const leftKeys = new Set(leftHeaders.map((header) => header.key));
   const rightKeys = new Set(rightHeaders.map((header) => header.key));
   return {
-    columns,
+    columns: comparedColumns,
     records,
     summary,
-    addedColumns: rightHeaders.filter((header) => !leftKeys.has(header.key)).map(({ label }) => label),
-    removedColumns: leftHeaders.filter((header) => !rightKeys.has(header.key)).map(({ label }) => label),
+    addedColumns: rightHeaders.filter((header) => !leftKeys.has(header.key) && !ignored.has(header.key)).map(({ label }) => label),
+    removedColumns: leftHeaders.filter((header) => !rightKeys.has(header.key) && !ignored.has(header.key)).map(({ label }) => label),
+    ignoredColumns: [...ignored],
+    leftHeaders,
+    rightHeaders,
+    leftRows: leftTable.rows,
+    rightRows: rightTable.rows,
     matchBy,
     key: options.key || '',
   };
 }
 
 export function createSpreadsheetDiffCsv(result) {
-  const fields = ['Change', 'Row key', 'Original row', 'Updated row', 'Column', 'Original value', 'Updated value'];
+  const fields = ['Change', 'L-ID', 'R-ID', 'Row key', 'Original row', 'Updated row', 'Column', 'Original value', 'Updated value'];
   const rows = [];
   for (const record of result?.records || []) {
     if (record.type === 'unchanged') continue;
     const changedCells = record.type === 'changed' ? record.cells.filter((cell) => cell.changed) : record.cells;
     if (!changedCells.length) {
-      rows.push([record.type, record.rowKey, record.leftRowNumber ?? '', record.rightRowNumber ?? '', '', '', '']);
+      rows.push([record.type, record.leftRecordId, record.rightRecordId, record.rowKey, record.leftRowNumber ?? '', record.rightRowNumber ?? '', '', '', '']);
       continue;
     }
     changedCells.forEach((cell) => rows.push([
       record.type,
+      record.leftRecordId,
+      record.rightRecordId,
       record.rowKey,
       record.leftRowNumber ?? '',
       record.rightRowNumber ?? '',
@@ -207,4 +227,29 @@ export function createSpreadsheetDiffCsv(result) {
     ]));
   }
   return serializeCsv({ headers: fields, rows });
+}
+
+export function createRecordExportTable(result, category) {
+  const records = (result?.records || []).filter((record) => category === 'identical'
+    ? record.type === 'unchanged'
+    : record.type !== 'unchanged');
+  const leftHeaders = result?.leftHeaders || [];
+  const rightHeaders = result?.rightHeaders || [];
+  const headers = [
+    'Record status', 'L-ID', 'R-ID',
+    ...leftHeaders.map((header) => `Original: ${header.label}`),
+    ...rightHeaders.map((header) => `Updated: ${header.label}`),
+  ];
+  const rows = records.map((record) => {
+    const leftRow = record.leftRowNumber ? result.leftRows[record.leftRowNumber - 2] : null;
+    const rightRow = record.rightRowNumber ? result.rightRows[record.rightRowNumber - 2] : null;
+    return [
+      record.type,
+      record.leftRecordId,
+      record.rightRecordId,
+      ...leftHeaders.map((header) => leftRow?.[header.index] ?? ''),
+      ...rightHeaders.map((header) => rightRow?.[header.index] ?? ''),
+    ];
+  });
+  return { headers, rows, recordCount: records.length };
 }
