@@ -89,10 +89,6 @@ const tree = [
         } },
       ]},
       { key: 'typescript', label: 'TypeScript', pages: {'types-generics': 'Types Generics', 'interfaces': 'Interfaces', 'utility-types': 'Utility Types', 'tsconfig': 'Tsconfig', 'typescript-basics': 'TypeScript Basics'} },
-      { key: 'web', label: 'Web', children: [
-        { key: 'html', label: 'HTML', pages: {'semantic-html': 'Semantic Html', 'forms': 'Forms', 'accessibility': 'Accessibility'} },
-        { key: 'css', label: 'CSS', pages: {'layout': 'Layout', 'flexbox': 'Flexbox', 'grid': 'Grid', 'responsive-design': 'Responsive Design'} },
-      ]},
       { key: 'nodejs', label: 'Node.js', contentKey: 'languages/nodejs', pages: {
         'installation-and-versions': 'Installation and Version Management',
         'npm-and-package-json': 'npm and package.json',
@@ -102,7 +98,14 @@ const tree = [
         'express': 'Express HTTP Services',
         'security': 'Security Basics',
         'windows-cli-troubleshooting': 'Windows PATH and CLI Troubleshooting',
-      } },
+      }},
+    ],
+  },
+  {
+    key: 'web-languages', label: 'Web Languages', children: [
+      { key: 'html', label: 'HTML', pages: {'semantic-html': 'Semantic HTML', 'forms': 'Forms', 'accessibility': 'Accessibility'} },
+      { key: 'css', label: 'CSS', pages: {'layout': 'Layout', 'flexbox': 'Flexbox', 'grid': 'Grid', 'responsive-design': 'Responsive Design'} },
+      { key: 'markdown', label: 'Markdown', contentKey: 'web-languages/markdown' },
     ],
   },
   {
