@@ -87,6 +87,10 @@ export default function Sidebar({ open }) {
     }
   }
 
+  function isNavigationPartition(node) {
+    return node.key === 'core' || node.key === 'advanced';
+  }
+
   function renderPage(page) {
     return (
       <li key={page.path} className="sidebar__tree-item">
@@ -107,6 +111,28 @@ export default function Sidebar({ open }) {
     const hasChildren = nodeHasChildren(node);
     const active = isNodeActive(node);
     const isOpen = expanded[node.path] ?? active;
+
+    if (isNavigationPartition(node)) {
+      return (
+        <li key={node.path} className={`sidebar__partition${active ? ' sidebar__partition--active' : ''}`}>
+          <div className="sidebar__partition-heading">
+            {hasContent ? (
+              <NavLink to={`/content/tree/${node.path}`} className="sidebar__partition-title">
+                {node.label}
+              </NavLink>
+            ) : (
+              <span className="sidebar__partition-title">{node.label}</span>
+            )}
+          </div>
+          {hasChildren && (
+            <ul className="sidebar__tree-list sidebar__tree-list--partition">
+              {(node.children || []).map((child) => renderNode(child, depth + 1))}
+              {(node.pages || []).map(renderPage)}
+            </ul>
+          )}
+        </li>
+      );
+    }
 
     return (
       <li key={node.path} className="sidebar__tree-item">
