@@ -232,6 +232,7 @@ export const CATEGORIES = [
     topics: [],
     tools: [
       { name: 'Network', description: 'Explore public connection details, DNS records, TCP setup, and TLS certificates with local command guides.', internalTool: 'network', externalUrl: null },
+      { name: 'Protocol Explorer', description: 'Learn HTTP, HTTPS, DNS, TCP, UDP, TLS, WebSocket, and ICMP through interactive packet and sequence traces.', internalTool: 'protocol-explorer', externalUrl: 'https://a2aprotocol.ai/tools/protocol-explorer' },
     ],
   },
 ];

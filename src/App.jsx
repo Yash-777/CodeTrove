@@ -37,6 +37,7 @@ import JsonCrackPage from './pages/build/JsonCrackPage.jsx';
 import MarkdownEditorPage from './pages/build/MarkdownEditorPage.jsx';
 import JavaDecompilerPage from './pages/build/JavaDecompilerPage.jsx';
 import NetworkToolsPage from './pages/build/NetworkToolsPage.jsx';
+import ProtocolExplorerPage from './pages/build/ProtocolExplorerPage.jsx';
 import ProjectsPage from './pages/build/ProjectsPage.jsx';
 import ProfilePage from './pages/store/ProfilePage.jsx';
 import ResumePage from './pages/store/ResumePage.jsx';
@@ -87,6 +88,7 @@ export default function App() {
           <Route path="/build/tools/json-crack" element={<JsonCrackPage />} />
           <Route path="/build/tools/markdown-editor" element={<MarkdownEditorPage />} />
           <Route path="/build/tools/network" element={<NetworkToolsPage />} />
+          <Route path="/build/tools/protocol-explorer" element={<ProtocolExplorerPage />} />
           <Route path="/build/projects" element={<RequireRole allow={ANY_LOGGED_IN}><ProjectsPage /></RequireRole>} />
 
           <Route path="/store/profile" element={<RequireRole allow={ANY_LOGGED_IN}><ProfilePage /></RequireRole>} />
