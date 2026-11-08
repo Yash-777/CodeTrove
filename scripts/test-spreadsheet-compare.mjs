@@ -9,7 +9,12 @@ import {
   SHEET_COLUMN_LABEL_ROW_ID,
   SHEET_DATA_ROW_PREFIX,
   SHEET_FIELD_HEADER_ROW_ID,
+  SHEET_MIN_COLUMN_WIDTH,
+  SHEET_MIN_ROW_HEIGHT,
+  SHEET_ROW_NUMBER_COLUMN_WIDTH,
   SHEET_ROW_NUMBER_COLUMN_ID,
+  resizeSpreadsheetColumnWidths,
+  resizeSpreadsheetRowHeights,
   spreadsheetColumnLabel,
 } from '../src/utils/spreadsheetGrid.js';
 import {
@@ -85,6 +90,14 @@ assert.equal(createRecordExportTable(sampleDiff, 'mismatched').recordCount, 4);
 assert.deepEqual(createRecordExportTable(sampleDiff, 'identical').rows[0].slice(0, 3), ['unchanged', 'L-02', 'R-02']);
 
 assert.deepEqual([0, 25, 26, 27, 51, 52].map(spreadsheetColumnLabel), ['A', 'Z', 'AA', 'AB', 'AZ', 'BA']);
+assert.equal(SHEET_ROW_NUMBER_COLUMN_WIDTH, 42, 'row number column should stay compact like a spreadsheet row header');
+assert.deepEqual(resizeSpreadsheetColumnWidths({}, `${SHEET_COLUMN_ID_PREFIX}1`, 214), { [`${SHEET_COLUMN_ID_PREFIX}1`]: 214 }, 'column resizing should persist the requested width');
+assert.deepEqual(resizeSpreadsheetColumnWidths({}, `${SHEET_COLUMN_ID_PREFIX}1`, 214, [`${SHEET_COLUMN_ID_PREFIX}1`, `${SHEET_COLUMN_ID_PREFIX}2`]), { [`${SHEET_COLUMN_ID_PREFIX}1`]: 214, [`${SHEET_COLUMN_ID_PREFIX}2`]: 214 }, 'selected columns should retain the resized width');
+assert.deepEqual(resizeSpreadsheetColumnWidths({}, SHEET_ROW_NUMBER_COLUMN_ID, 200), {}, 'the row-number gutter should remain non-resizable');
+assert.deepEqual(resizeSpreadsheetColumnWidths({}, `${SHEET_COLUMN_ID_PREFIX}0`, 20), { [`${SHEET_COLUMN_ID_PREFIX}0`]: SHEET_MIN_COLUMN_WIDTH }, 'columns should respect the minimum width');
+assert.equal(SHEET_MIN_ROW_HEIGHT, 22);
+assert.deepEqual(resizeSpreadsheetRowHeights({}, 'sheet-data-0', 42, ['sheet-data-0', 'sheet-data-1']), { 'sheet-data-0': 42, 'sheet-data-1': 42 }, 'selected rows should retain the resized height');
+assert.deepEqual(resizeSpreadsheetRowHeights({}, 'sheet-data-0', 10), { 'sheet-data-0': SHEET_MIN_ROW_HEIGHT }, 'rows should respect a readable minimum height');
 const editableGridTable = tableFromRows([['id', 'name'], ['1', 'Ada'], ['2', 'Grace']]);
 const editedGridTable = applySpreadsheetGridChanges(editableGridTable, [
   { rowId: SHEET_FIELD_HEADER_ROW_ID, columnId: `${SHEET_COLUMN_ID_PREFIX}1`, newCell: { type: 'text', text: 'fullName' } },
@@ -149,6 +162,7 @@ const app = await readFile(new URL('../src/App.jsx', import.meta.url), 'utf8');
 const registry = await readFile(new URL('../src/data/topics/index.js', import.meta.url), 'utf8');
 const page = await readFile(new URL('../src/pages/build/DocumentComparePage.jsx', import.meta.url), 'utf8');
 const spreadsheetGrid = await readFile(new URL('../src/components/SpreadsheetGrid.jsx', import.meta.url), 'utf8');
+const spreadsheetGridCss = await readFile(new URL('../src/components/SpreadsheetGrid.css', import.meta.url), 'utf8');
 assert.match(app, /\/build\/tools\/document-compare/);
 assert.match(registry, /internalTool: 'document-compare'/);
 assert.match(page, /Files stay in this browser/);
@@ -162,9 +176,15 @@ assert.match(page, /Original Excel row/);
 assert.match(page, /first shared column is selected as the match key/);
 assert.match(spreadsheetGrid, /enableRowSelection/);
 assert.match(spreadsheetGrid, /enableColumnSelection/);
+assert.match(spreadsheetGrid, /onColumnResized=\{handleColumnResized\}/);
+assert.match(spreadsheetGrid, /onRowResized=\{handleRowResized\}/);
+assert.match(spreadsheetGrid, /Maximize2/);
+assert.match(spreadsheetGrid, /Restore spreadsheet panel/);
 assert.match(spreadsheetGrid, /stickyTopRows/);
 assert.match(spreadsheetGrid, /Copy selection/);
 assert.match(spreadsheetGrid, /Delete selection/);
+assert.match(spreadsheetGridCss, /\.ct-sheet__grid\s*\{[^}]*overflow:\s*auto/s);
+assert.match(spreadsheetGridCss, /\.ct-sheet--maximized/);
 assert.doesNotMatch(page, /textcompare\.org|diffchecker\.com|xlcompare\.com|draftable\.com/);
 
 console.log('Document Compare tests passed: CSV/Excel modes, editable grid coordinates, cell and row/column selection actions, local parsing, validation, ignored columns, source IDs, exports, matching, XLSX sheets, and route registration.');

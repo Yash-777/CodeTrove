@@ -3,6 +3,30 @@ export const SHEET_COLUMN_LABEL_ROW_ID = 'sheet-column-labels';
 export const SHEET_FIELD_HEADER_ROW_ID = 'sheet-field-headers';
 export const SHEET_DATA_ROW_PREFIX = 'sheet-data-';
 export const SHEET_COLUMN_ID_PREFIX = 'sheet-column-';
+export const SHEET_ROW_NUMBER_COLUMN_WIDTH = 42;
+export const SHEET_DEFAULT_COLUMN_WIDTH = 168;
+export const SHEET_MIN_COLUMN_WIDTH = 96;
+export const SHEET_DEFAULT_ROW_HEIGHT = 29;
+export const SHEET_MIN_ROW_HEIGHT = 22;
+
+function updateDimensionMap(current, primaryId, value, selectedIds, minimum) {
+  const ids = Array.isArray(selectedIds) && selectedIds.length ? selectedIds : [primaryId];
+  const size = Math.max(minimum, Math.round(Number(value) || minimum));
+  const next = { ...current };
+  ids.forEach((id) => { if (id) next[id] = size; });
+  return next;
+}
+
+export function resizeSpreadsheetColumnWidths(current, columnId, width, selectedColumnIds = []) {
+  const ids = (Array.isArray(selectedColumnIds) && selectedColumnIds.length ? selectedColumnIds : [columnId])
+    .filter((id) => id && id !== SHEET_ROW_NUMBER_COLUMN_ID);
+  if (!ids.length) return current;
+  return updateDimensionMap(current, columnId, width, ids, SHEET_MIN_COLUMN_WIDTH);
+}
+
+export function resizeSpreadsheetRowHeights(current, rowId, height, selectedRowIds = []) {
+  return updateDimensionMap(current, rowId, height, selectedRowIds, SHEET_MIN_ROW_HEIGHT);
+}
 
 export function spreadsheetColumnLabel(index) {
   if (!Number.isInteger(index) || index < 0) return '';

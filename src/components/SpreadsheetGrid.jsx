@@ -1,5 +1,5 @@
-import { useMemo, useState } from 'react';
-import { Copy, Pin, PinOff, Trash2 } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { Copy, Maximize2, Minimize2, Pin, PinOff, Trash2 } from 'lucide-react';
 import { ReactGrid } from '@silevis/reactgrid';
 import '@silevis/reactgrid/styles.css';
 import {
@@ -10,15 +10,24 @@ import {
   SHEET_COLUMN_LABEL_ROW_ID,
   SHEET_DATA_ROW_PREFIX,
   SHEET_FIELD_HEADER_ROW_ID,
+  SHEET_DEFAULT_COLUMN_WIDTH,
+  SHEET_DEFAULT_ROW_HEIGHT,
+  SHEET_MIN_COLUMN_WIDTH,
+  SHEET_MIN_ROW_HEIGHT,
+  SHEET_ROW_NUMBER_COLUMN_WIDTH,
   SHEET_ROW_NUMBER_COLUMN_ID,
+  resizeSpreadsheetColumnWidths,
+  resizeSpreadsheetRowHeights,
   spreadsheetColumnLabel,
 } from '../utils/spreadsheetGrid.js';
 import './SpreadsheetGrid.css';
 
-function buildGridRows(table) {
+function buildGridRows(table, rowHeights) {
   return [
     {
       rowId: SHEET_COLUMN_LABEL_ROW_ID,
+      height: rowHeights[SHEET_COLUMN_LABEL_ROW_ID] ?? SHEET_DEFAULT_ROW_HEIGHT,
+      resizable: true,
       cells: [
         { type: 'header', text: '' },
         ...table.headers.map((_, index) => ({ type: 'header', text: spreadsheetColumnLabel(index) })),
@@ -26,6 +35,8 @@ function buildGridRows(table) {
     },
     {
       rowId: SHEET_FIELD_HEADER_ROW_ID,
+      height: rowHeights[SHEET_FIELD_HEADER_ROW_ID] ?? SHEET_DEFAULT_ROW_HEIGHT,
+      resizable: true,
       cells: [
         { type: 'header', text: '1' },
         ...table.headers.map((header) => ({ type: 'text', text: String(header.label ?? '') })),
@@ -33,6 +44,8 @@ function buildGridRows(table) {
     },
     ...table.rows.map((row, rowIndex) => ({
       rowId: `${SHEET_DATA_ROW_PREFIX}${rowIndex}`,
+      height: rowHeights[`${SHEET_DATA_ROW_PREFIX}${rowIndex}`] ?? SHEET_DEFAULT_ROW_HEIGHT,
+      resizable: true,
       cells: [
         { type: 'header', text: String(rowIndex + 2) },
         ...table.headers.map((_, columnIndex) => ({ type: 'text', text: String(row[columnIndex] ?? '') })),
@@ -62,11 +75,26 @@ export default function SpreadsheetGrid({ table, label, onChange }) {
   const [selectedRanges, setSelectedRanges] = useState([]);
   const [freezeHeader, setFreezeHeader] = useState(true);
   const [message, setMessage] = useState('');
+  const [columnWidths, setColumnWidths] = useState({});
+  const [rowHeights, setRowHeights] = useState({});
+  const [isMaximized, setIsMaximized] = useState(false);
   const columns = useMemo(() => [
-    { columnId: SHEET_ROW_NUMBER_COLUMN_ID, width: 58, resizable: false },
-    ...table.headers.map((_, index) => ({ columnId: `${SHEET_COLUMN_ID_PREFIX}${index}`, width: 168, resizable: true })),
-  ], [table.headers]);
-  const rows = useMemo(() => buildGridRows(table), [table]);
+    { columnId: SHEET_ROW_NUMBER_COLUMN_ID, width: SHEET_ROW_NUMBER_COLUMN_WIDTH, resizable: false },
+    ...table.headers.map((_, index) => {
+      const columnId = `${SHEET_COLUMN_ID_PREFIX}${index}`;
+      return { columnId, width: columnWidths[columnId] ?? SHEET_DEFAULT_COLUMN_WIDTH, resizable: true };
+    }),
+  ], [table.headers, columnWidths]);
+  const rows = useMemo(() => buildGridRows(table, rowHeights), [table, rowHeights]);
+
+  useEffect(() => {
+    if (!isMaximized) return undefined;
+    function restoreOnEscape(event) {
+      if (event.key === 'Escape') setIsMaximized(false);
+    }
+    window.addEventListener('keydown', restoreOnEscape);
+    return () => window.removeEventListener('keydown', restoreOnEscape);
+  }, [isMaximized]);
 
   function handleChanges(changes) {
     const nextTable = applySpreadsheetGridChanges(table, changes);
@@ -99,8 +127,16 @@ export default function SpreadsheetGrid({ table, label, onChange }) {
     }
   }
 
+  function handleColumnResized(columnId, width, selectedColumnIds) {
+    setColumnWidths((current) => resizeSpreadsheetColumnWidths(current, columnId, width, selectedColumnIds));
+  }
+
+  function handleRowResized(rowId, height, selectedRowIds) {
+    setRowHeights((current) => resizeSpreadsheetRowHeights(current, rowId, height, selectedRowIds));
+  }
+
   return (
-    <section className="ct-sheet" aria-label={`${label} editable spreadsheet`}>
+    <section className={`ct-sheet${isMaximized ? ' ct-sheet--maximized' : ''}`} aria-label={`${label} editable spreadsheet`}>
       <div className="ct-sheet__toolbar" role="toolbar" aria-label={`${label} spreadsheet actions`}>
         <label className="ct-sheet__freeze">
           <input type="checkbox" checked={freezeHeader} onChange={(event) => setFreezeHeader(event.target.checked)} />
@@ -113,6 +149,9 @@ export default function SpreadsheetGrid({ table, label, onChange }) {
         <button type="button" className="ct-sheet__action ct-sheet__action--danger" onClick={handleDeleteSelection} disabled={!selectedRanges.length} title="Delete selected rows or columns, or clear selected cells">
           <Trash2 size={14} /> Delete selection
         </button>
+        <button type="button" className="ct-sheet__action ct-sheet__maximize" onClick={() => setIsMaximized((value) => !value)} aria-label={isMaximized ? 'Restore spreadsheet panel' : 'Maximize spreadsheet panel'} aria-pressed={isMaximized} title={isMaximized ? 'Restore panel' : 'Maximize panel'}>
+          {isMaximized ? <Minimize2 size={15} /> : <Maximize2 size={15} />}
+        </button>
       </div>
       <p className="ct-sheet__hint">Edit cells directly. Click a row number or A/B/C heading to select a full row or column; Ctrl/Cmd+C and Ctrl/Cmd+V work on selected ranges.</p>
       <div className="ct-sheet__grid" role="region" aria-label={`${label} Excel-style grid`}>
@@ -120,14 +159,16 @@ export default function SpreadsheetGrid({ table, label, onChange }) {
           rows={rows}
           columns={columns}
           onCellsChanged={handleChanges}
+          onColumnResized={handleColumnResized}
+          onRowResized={handleRowResized}
           onSelectionChanged={setSelectedRanges}
           enableRangeSelection
           enableRowSelection
           enableColumnSelection
           stickyTopRows={freezeHeader ? 2 : 0}
           stickyLeftColumns={1}
-          minColumnWidth={96}
-          minRowHeight={29}
+          minRowHeight={SHEET_MIN_ROW_HEIGHT}
+          minColumnWidth={SHEET_MIN_COLUMN_WIDTH}
         />
       </div>
       <p className="ct-sheet__message" role="status" aria-live="polite">{message || `${table.rows.length.toLocaleString()} data rows · ${table.headers.length} columns · source stays in this browser.`}</p>
