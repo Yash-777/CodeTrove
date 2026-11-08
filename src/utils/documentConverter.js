@@ -167,12 +167,12 @@ export function applyColumnMapping(table, rulesText) {
   };
 }
 
-export function serializeCsv(table, delimiter = ',') {
+export function serializeCsv(table, delimiter = ',', options = {}) {
   return Papa.unparse({ fields: table.headers, data: table.rows }, {
     delimiter: delimiter || ',',
     newline: '\r\n',
     header: true,
-    escapeFormulae: true,
+    escapeFormulae: options.escapeFormulae ?? true,
   });
 }
 

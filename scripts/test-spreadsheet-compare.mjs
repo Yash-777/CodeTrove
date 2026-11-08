@@ -1,6 +1,17 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { parseCsvTable, tableFromRows } from '../src/utils/documentConverter.js';
+import { parseCsvTable, serializeCsv, tableFromRows } from '../src/utils/documentConverter.js';
+import {
+  applySpreadsheetGridChanges,
+  copySpreadsheetSelectionAsTsv,
+  deleteSpreadsheetSelection,
+  SHEET_COLUMN_ID_PREFIX,
+  SHEET_COLUMN_LABEL_ROW_ID,
+  SHEET_DATA_ROW_PREFIX,
+  SHEET_FIELD_HEADER_ROW_ID,
+  SHEET_ROW_NUMBER_COLUMN_ID,
+  spreadsheetColumnLabel,
+} from '../src/utils/spreadsheetGrid.js';
 import {
   compareSpreadsheetTables,
   createRecordExportTable,
@@ -73,6 +84,30 @@ assert.equal(createRecordExportTable(sampleDiff, 'identical').recordCount, 18);
 assert.equal(createRecordExportTable(sampleDiff, 'mismatched').recordCount, 4);
 assert.deepEqual(createRecordExportTable(sampleDiff, 'identical').rows[0].slice(0, 3), ['unchanged', 'L-02', 'R-02']);
 
+assert.deepEqual([0, 25, 26, 27, 51, 52].map(spreadsheetColumnLabel), ['A', 'Z', 'AA', 'AB', 'AZ', 'BA']);
+const editableGridTable = tableFromRows([['id', 'name'], ['1', 'Ada'], ['2', 'Grace']]);
+const editedGridTable = applySpreadsheetGridChanges(editableGridTable, [
+  { rowId: SHEET_FIELD_HEADER_ROW_ID, columnId: `${SHEET_COLUMN_ID_PREFIX}1`, newCell: { type: 'text', text: 'fullName' } },
+  { rowId: `${SHEET_DATA_ROW_PREFIX}0`, columnId: `${SHEET_COLUMN_ID_PREFIX}1`, newCell: { type: 'text', text: 'Ada Lovelace' } },
+]);
+assert.equal(editedGridTable.headers[1].key, 'fullName');
+assert.equal(editedGridTable.rows[0][1], 'Ada Lovelace');
+const allGridColumns = [SHEET_ROW_NUMBER_COLUMN_ID, `${SHEET_COLUMN_ID_PREFIX}0`, `${SHEET_COLUMN_ID_PREFIX}1`].map((columnId) => ({ columnId }));
+const allGridRows = [SHEET_COLUMN_LABEL_ROW_ID, SHEET_FIELD_HEADER_ROW_ID, `${SHEET_DATA_ROW_PREFIX}0`, `${SHEET_DATA_ROW_PREFIX}1`].map((rowId) => ({ rowId }));
+assert.equal(copySpreadsheetSelectionAsTsv(editedGridTable, [{ rows: [{ rowId: `${SHEET_DATA_ROW_PREFIX}0` }], columns: allGridColumns }]), '1\tAda Lovelace');
+assert.equal(copySpreadsheetSelectionAsTsv(editableGridTable, [{ rows: allGridRows, columns: [{ columnId: `${SHEET_COLUMN_ID_PREFIX}0` }] }]), 'id\n1\n2');
+const removedGridRow = deleteSpreadsheetSelection(editableGridTable, [{ rows: [{ rowId: `${SHEET_DATA_ROW_PREFIX}0` }], columns: allGridColumns }]);
+assert.equal(removedGridRow.kind, 'rows');
+assert.deepEqual(removedGridRow.table.rows, [['2', 'Grace']]);
+const removedGridColumn = deleteSpreadsheetSelection(editableGridTable, [{ rows: allGridRows, columns: [{ columnId: `${SHEET_COLUMN_ID_PREFIX}1` }] }]);
+assert.equal(removedGridColumn.kind, 'columns');
+assert.deepEqual(removedGridColumn.table.headers.map(({ label }) => label), ['id']);
+const clearedGridCell = deleteSpreadsheetSelection(editableGridTable, [{ rows: [{ rowId: `${SHEET_DATA_ROW_PREFIX}0` }], columns: [{ columnId: `${SHEET_COLUMN_ID_PREFIX}1` }] }]);
+assert.equal(clearedGridCell.kind, 'cells');
+assert.deepEqual(clearedGridCell.table.rows[0], ['1', '']);
+assert.match(serializeCsv({ headers: ['value'], rows: [['=2+2']] }), /'=2\+2/);
+assert.match(serializeCsv({ headers: ['value'], rows: [['=2+2']] }, ',', { escapeFormulae: false }), /=2\+2/);
+
 const csvTable = parseCsvTable('code,value\n1,"comma, and quote"" inside"\n2,plain');
 assert.equal(csvTable.rows[0][1], 'comma, and quote" inside');
 assert.throws(() => parseComparisonCsv(''), /empty/);
@@ -113,6 +148,7 @@ assert.throws(() => worksheetToComparisonTable(wideSheet), /more than 1,000 colu
 const app = await readFile(new URL('../src/App.jsx', import.meta.url), 'utf8');
 const registry = await readFile(new URL('../src/data/topics/index.js', import.meta.url), 'utf8');
 const page = await readFile(new URL('../src/pages/build/DocumentComparePage.jsx', import.meta.url), 'utf8');
+const spreadsheetGrid = await readFile(new URL('../src/components/SpreadsheetGrid.jsx', import.meta.url), 'utf8');
 assert.match(app, /\/build\/tools\/document-compare/);
 assert.match(registry, /internalTool: 'document-compare'/);
 assert.match(page, /Files stay in this browser/);
@@ -122,6 +158,13 @@ assert.match(page, /Plain text/);
 assert.match(page, /Rows &amp; columns/);
 assert.match(page, /Download identical/);
 assert.match(page, /Download mismatches/);
+assert.match(page, /Original Excel row/);
+assert.match(page, /first shared column is selected as the match key/);
+assert.match(spreadsheetGrid, /enableRowSelection/);
+assert.match(spreadsheetGrid, /enableColumnSelection/);
+assert.match(spreadsheetGrid, /stickyTopRows/);
+assert.match(spreadsheetGrid, /Copy selection/);
+assert.match(spreadsheetGrid, /Delete selection/);
 assert.doesNotMatch(page, /textcompare\.org|diffchecker\.com|xlcompare\.com|draftable\.com/);
 
-console.log('Document Compare tests passed: CSV/Excel modes, local parsing, validation, ignored columns, source IDs, record exports, key/position matching, XLSX sheets, and route registration.');
+console.log('Document Compare tests passed: CSV/Excel modes, editable grid coordinates, cell and row/column selection actions, local parsing, validation, ignored columns, source IDs, exports, matching, XLSX sheets, and route registration.');
