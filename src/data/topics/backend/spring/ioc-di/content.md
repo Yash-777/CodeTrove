@@ -61,6 +61,11 @@ Now the service does not decide how the gateway is created or found. Spring (or 
 Spring needs configuration to know which classes to manage. This can come from annotations, Java configuration, or XML. Spring turns it into bean definitions and uses them to build the object graph.
 
 ```mermaid
+---
+config:
+  flowchart:
+    wrappingWidth: 400
+---
 flowchart TD
     A[Application configuration] --> B[Component scan and config parsing]
     B --> C[Bean definitions registered]

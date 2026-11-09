@@ -705,37 +705,7 @@ sequenceDiagram
 ```
 
 </td></tr>
-  <tr> <td>
-  
-````md
-```mermaid
-sequenceDiagram
-    participant A as Author
-    participant E as Editor
-    participant P as Markdown processor
-    participant O as HTML/PDF/site
-    A->>E: Write .md or .markdown text
-    E->>P: Preview or build
-    P->>O: Convert Markdown to output
-    O-->>A: Read, publish, print, or share
-```
-````
 
-</td><td>
-
-```mermaid
-sequenceDiagram
-    participant A as Author
-    participant E as Editor
-    participant P as Markdown processor
-    participant O as HTML/PDF/site
-    A->>E: Write .md or .markdown text
-    E->>P: Preview or build
-    P->>O: Convert Markdown to output
-    O-->>A: Read, publish, print, or share
-```
-
-</td> </tr>
 <tr> <td>
 
 ````md
@@ -756,6 +726,84 @@ flowchart LR
 </table>
 
 Use diagrams for a process or relationship that is difficult to explain in prose. Keep labels short, check that the diagram remains readable on a narrow screen, and verify that the target platform enables Mermaid. GitHub's [diagram-creation documentation](https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/creating-diagrams) lists supported diagram types and syntax.
+
+## Keeping flowchart labels on one line
+
+Mermaid wraps flowchart labels that are wider than `wrappingWidth` (default 200px), so a short label like "Application configuration" can split across two lines in a top-down flowchart. You can raise the limit for one diagram or for every diagram:
+
+<table>
+  <tr>
+    <th>Per-diagram, via frontmatter</th>
+    <th>Raise <code>wrappingWidth</code> globally (recommended)</th>
+  </tr>
+
+<tr><td>
+
+````md
+```mermaid
+---
+config:
+  flowchart:
+    wrappingWidth: 400
+---
+flowchart TD
+    A[Application configuration] --> B[Component scan and config parsing]
+    B --> C[Bean definitions registered]
+```
+````
+
+</td><td>
+
+````js
+mermaid.initialize({
+  startOnLoad: false,
+  securityLevel: 'strict',
+  theme: 'default',
+  htmlLabels: false,
+  flowchart: {
+    // keeps labels like "Application configuration" on one line
+    wrappingWidth: 400,
+  },
+});
+````
+
+</td></tr>
+
+<tr><td>
+
+````mermaid
+---
+config:
+  flowchart:
+    wrappingWidth: 400
+---
+flowchart TD
+    A[Application configuration] --> B[Component scan and config parsing]
+    B --> C[Bean definitions registered]
+````
+
+</td><td>
+
+````mermaid
+flowchart TD
+    A[Application configuration] --> B[Component scan and config parsing]
+    B --> C[Bean definitions registered]
+````
+
+</td></tr>
+
+<tr><td>
+
+**Why choose it:** The setting travels with the diagram, so it also works on GitHub and other tools that render Mermaid without CodeTrove's config. It only affects that one diagram, so every diagram that needs it has to repeat the block. It also needs a Mermaid version that supports frontmatter config.
+
+</td><td>
+
+**Why choose it:** You set it once in `MermaidDiagram.jsx` and every diagram benefits, with no extra lines in the Markdown. It applies only inside CodeTrove, so the same file may still wrap labels on other platforms. Hard-refresh after changing it, because the `mermaidInitialized` flag stops `initialize` from running again on hot reload.
+
+</td></tr>
+</table>
+
+Use the global setting for CodeTrove's own rendering, and add frontmatter only to diagrams that must look the same on other platforms. If labels still wrap, increase `wrappingWidth`, since a larger font size needs a larger limit.
 
 ## Tables with HTML and code comparisons
 

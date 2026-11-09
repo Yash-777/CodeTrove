@@ -22,6 +22,9 @@ export default function MermaidDiagram({ chart, title = 'Mermaid diagram' }) {
             securityLevel: 'strict',
             theme: 'default',
             htmlLabels: false,
+            flowchart: {
+              wrappingWidth: 400, // keeps labels like "Application configuration" on one line
+            },
           });
           mermaidInitialized = true;
         }
