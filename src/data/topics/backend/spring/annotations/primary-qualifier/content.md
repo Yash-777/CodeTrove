@@ -211,10 +211,77 @@ Spring resolves this by looking for the `@Qualifier` annotation on the target cl
 
 **Two traps this surfaces — both are real interview material:**
 
-1. **Qualifier values are case-sensitive strings.** The wiki example declares `@Qualifier("Quick")` on `QuickSort` but injects `@Qualifier("quick")`. Those do not match. Because the fallback is the bean name, `@Qualifier("quickSort")` (the bean name) *does* work — which is why the bug can look intermittent depending on which form you copy.
-2. **A qualifier is not an alias for the bean name.** `@Qualifier("diesel")` does not rename `dieselEngine` to `diesel`; delete the bean and the qualifier disappears with it. If you want stable names, rename the bean itself (`@Component("diesel")`).
+1. **Trap 1**: Qualifier values are case-sensitive
 
-Prefer this form when the qualifier expresses domain vocabulary (`"diesel"`, `"electric"`, `"stripe"`) rather than a class name.
+   ```java
+   @Component
+   @Qualifier("Diesel")
+   public class DieselEngine implements Engine { }
+   
+   @Service
+   public class Car {
+       public Car(@Qualifier("diesel") Engine engine) { } // does not match
+   }
+   ```
+   
+   `"Diesel"` and `"diesel"` are different strings, so this injection fails.
+   
+   Spring also falls back to the **bean name** when matching a qualifier. The default bean name of `DieselEngine` is `dieselEngine`, so `@Qualifier("dieselEngine")` works. This is why the bug can look inconsistent: it depends on which form you copied.
+   
+   **Fix:** copy the exact string, or use one constant for both places.
+
+2. **Trap 2**: A qualifier is a label, not the bean name
+
+   ```java
+   @Component
+   @Qualifier("diesel")
+   public class DieselEngine implements Engine { }
+   ```
+   
+   - The bean name is still `dieselEngine`. The qualifier does **not** rename it to `diesel`.
+   - A qualifier is extra metadata used only for matching at injection points.
+   - Several beans can share one qualifier, but bean names must be unique.
+   
+   If you want a stable **bean name**, rename the bean itself:
+   
+   ```java
+   @Component("diesel")
+   public class DieselEngine implements Engine { }
+   ```
+   
+   Now `@Qualifier("diesel")` also matches through the bean-name fallback.
+   
+   > Use domain words for qualifiers
+   
+   Prefer names that describe the role (`"diesel"`, `"electric"`, `"stripe"`) over class names. Then a class can be renamed without breaking injection points.
+   
+   ```java
+   @Component
+   @Qualifier("diesel")
+   public class DieselEngine implements Engine { }
+   
+   @Component
+   @Qualifier("petrol")
+   public class PetrolEngine implements Engine { }
+   
+   @Service
+   public class Car {
+       private final Engine engine;
+   
+       public Car(@Qualifier("diesel") Engine engine) {
+           this.engine = engine;
+       }
+   }
+   ```
+
+Quick check:
+
+| Question | Answer |
+| --- | --- |
+| Are qualifier values case-sensitive? | Yes. |
+| Does `@Qualifier` change the bean name? | No. Use `@Component("name")` for that. |
+| Does the bean name work as a qualifier? | Yes, as a fallback. |
+| Can two beans share a qualifier? | Yes. Bean names must be unique. |
 
 ### Custom qualifier annotations (the production-grade version)
 
@@ -277,25 +344,24 @@ This is the **strategy pattern**: the map key can come from configuration (`gara
 
 One caution: an injected `Map<String, Engine>` with no `@Qualifier` includes *all* `Engine` beans — including test doubles and third-party ones. Give the beans a marker qualifier if the collection must stay closed.
 
-## 6. The order Spring actually applies
+## 6. The order Spring applies
 
-`DefaultListableBeanFactory.doResolveDependency` does this, in order:
+Spring first collects and filters candidates, then picks one:
 
 | Step | Action | Annotation |
 |---|---|---|
 | 1 | Collect candidates by **type** | — |
-| 2 | Drop candidates that do not match the requested **qualifier** (including bean-name fallback) | `@Qualifier`, custom qualifiers |
+| 2 | Drop candidates that do not match the **qualifier** | `@Qualifier`, custom qualifiers |
 | 3 | If one candidate remains, use it | — |
-| 4 | Otherwise pick the single **primary** candidate | `@Primary` |
-| 5 | Otherwise pick the highest **priority/order** | `@Priority`, `@Order` |
-| 6 | Otherwise match the dependency **name** (field/parameter) to a bean name | — |
+| 4 | Otherwise pick the **primary** candidate | `@Primary` |
+| 5 | Otherwise pick the highest **priority** | `@Priority` (not `@Order`) |
+| 6 | Otherwise match the field/parameter **name** to a bean name | — |
 | 7 | Still ambiguous → `NoUniqueBeanDefinitionException` | — |
 
-Consequences worth stating out loud in an interview:
+Points worth knowing:
 
-- **`@Qualifier` beats `@Primary`.** Qualifier filtering happens while candidates are collected, i.e. *before* the primary check, so a qualified injection point can always override the default.
-- **A field or parameter name can resolve ambiguity without any annotation.** With beans `petrolEngine` and `dieselEngine`, a field named `dieselEngine` in a single-candidate context injects diesel. This is fragile and should never be the plan — but it explains "why does it work on my machine".
-- **Order is not a tie-breaker for injection by type in the same way as `@Primary`**; `@Order`/`@Priority` are consulted after `@Primary`, and `@Order` is mainly for collections, advisors and interceptors.
+- **`@Qualifier` beats `@Primary`.** Qualifier filtering happens before the primary check, so an injection point can override the default.
+- **A parameter name can resolve ambiguity.** With beans `petrolEngine` and `dieselEngine`, a parameter named `dieselEngine` selects diesel when several candidates exist. This needs the `-parameters` compiler flag and is fragile, so never design around it. It only explains "why does it work on my machine".
 
 ## 7. `@Primary` and `@Qualifier` together
 
@@ -318,51 +384,79 @@ A practical rule for a real codebase:
 - `@Qualifier` (preferably a custom annotation) for **every consumer where the choice is semantically important** — payment provider, storage backend, notification channel.
 - Never rely on field/parameter-name matching as the design.
 
-## 8. Same pattern elsewhere in the project
+## 8. The same pattern in other domains
 
-The wiki's sorting example is the same shape with a weaker domain:
+The shape is always the same: one interface, several implementations, and one injection point that must choose.
+
+### Sorting strategies
 
 ```java
-public interface SortAlgorithem { int[] sort(int[] numbers); }
+public interface SortAlgorithm {
+    int[] sort(int[] numbers);
+}
 
-@Component @Qualifier("bubble")
-public class BubbleSort implements SortAlgorithem { ... }
+@Component
+@Qualifier("bubble")
+public class BubbleSort implements SortAlgorithm { }
 
-@Component @Qualifier("quick")
-public class QuickSort implements SortAlgorithem { ... }
+@Component
+@Qualifier("quick")
+public class QuickSort implements SortAlgorithm { }
 
 @Service
 public class BinarySearchImpl {
-    private final SortAlgorithem sorter;
-    public BinarySearchImpl(@Qualifier("quick") SortAlgorithem sorter) { this.sorter = sorter; }
+    private final SortAlgorithm sorter;
+
+    public BinarySearchImpl(@Qualifier("quick") SortAlgorithm sorter) {
+        this.sorter = sorter;
+    }
 }
 ```
 
-And the payment section of this app behaves the same way:
+### Payment gateways
 
 ```java
-public interface PaymentGateway { PaymentResult pay(PaymentRequest request); }
-
-@Service @Primary
-public class StripeGateway implements PaymentGateway { ... }   // default provider
-
-@Service
-public class BilldeskGateway implements PaymentGateway { ... }
+public interface PaymentGateway {
+    PaymentResult pay(PaymentRequest request);
+}
 
 @Service
-public class RazorGateway implements PaymentGateway { ... }
+@Primary
+public class StripeGateway implements PaymentGateway { }   // default provider
 
 @Service
-public class BoxpayGateway implements PaymentGateway { ... }
+public class BilldeskGateway implements PaymentGateway { }
+
+@Service
+public class RazorGateway implements PaymentGateway { }
+
+@Service
+public class BoxpayGateway implements PaymentGateway { }
 
 @Service
 public class CheckoutService {
     private final PaymentGateway gateway;
-    public CheckoutService(@Qualifier("billdeskGateway") PaymentGateway gateway) { ... }
+
+    // These gateways have no @Qualifier of their own, so the bean name matches.
+    public CheckoutService(@Qualifier("billdeskGateway") PaymentGateway gateway) {
+        this.gateway = gateway;
+    }
 }
 ```
 
-Same decision, same failure text — only the vocabulary changes. That is why the error message mentions all three fixes: they are three legitimate designs, not three workarounds.
+`@Primary` makes Stripe the default. `CheckoutService` overrides it for this one injection point.
+
+> For payments, a domain-word qualifier or a custom annotation (such as `@Billdesk`) is safer than a bean name. Renaming the class would otherwise break the injection silently at startup.
+
+### One decision, three designs
+
+Both examples solve the same problem, and only the vocabulary changes. When several beans match, Spring Boot's startup error suggests three fixes:
+
+- Mark one bean as `@Primary`.
+- Use `@Qualifier` to name the bean you want.
+- Accept all candidates (`List` or `Map`) and choose at runtime.
+
+These are three legitimate designs, not three workarounds. Choose by who should decide: the bean (`@Primary`), the consumer (`@Qualifier`), or runtime logic (collection injection).
 
 ## 9. Verify the wiring
 
