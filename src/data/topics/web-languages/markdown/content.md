@@ -180,8 +180,16 @@ Use `-`, `*`, or `+` for an unordered list. Use numbers followed by a period for
 3. Verify the result.
 ```
 
-Nested lists need indentation:
+[Nested lists](https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax#nested-lists) need indentation:
 
+<table>
+  <tr>
+    <th>Write Markdown</th>
+    <th>Render preview</th>
+  </tr>
+
+  <tr> <td>
+  
 ```markdown
 1. Prepare the project.
    - Install dependencies.
@@ -190,6 +198,33 @@ Nested lists need indentation:
    1. Start the API.
    2. Start the frontend.
 ```
+
+</td><td>
+
+1. Prepare the project.
+   - Install dependencies.
+   - Create the environment file.
+2. Run the application.
+   1. Start the API.
+   2. Start the frontend.
+
+</td> </tr>
+<tr> <td>
+  
+```html
+1. First list item
+   - First nested list item
+     - Second nested list item
+```
+
+</td><td>
+
+1. First list item
+   - First nested list item
+     - Second nested list item
+	 
+</td> </tr>
+</table>
 
 A list item can contain multiple paragraphs. Indent the continuation content so the processor keeps it inside the item.
 
@@ -323,11 +358,28 @@ Use backslash escapes for characters such as `\`, `` ` ``, `*`, `_`, `{}`, `[]`,
 
 Many processors allow selected HTML. This is useful for elements Markdown does not express directly, but it reduces portability because another processor may sanitize or ignore it.
 
+<table>
+  <tr>
+    <th>Write Markdown</th>
+    <th>Render preview</th>
+  </tr>
+
+  <tr> <td>
+  
 ```html
 <p>This paragraph uses HTML.</p>
 <br>
 <kbd>Ctrl</kbd> + <kbd>S</kbd>
 ```
+
+</td><td>
+
+<p>This paragraph uses HTML.</p>
+<br>
+<kbd>Ctrl</kbd> + <kbd>S</kbd>
+
+</td> </tr>
+</table>
 
 Prefer Markdown for normal content. Use HTML only when the target renderer supports it and the semantic HTML improves the document.
 
@@ -339,6 +391,14 @@ GitHub Flavored Markdown extends the portable core. The [GFM specification](http
 
 Use a header row, a separator row with at least three hyphens per column, and pipe-separated cells:
 
+<table>
+  <tr>
+    <th>Write Markdown</th>
+    <th>Render preview</th>
+  </tr>
+
+  <tr> <td>
+  
 ```markdown
 | Syntax | Purpose |
 | --- | --- |
@@ -347,21 +407,49 @@ Use a header row, a separator row with at least three hyphens per column, and pi
 | `[text](url)` | Creates a link |
 ```
 
-Alignment is controlled by colons:
+</td><td>
 
+| Syntax | Purpose |
+| --- | --- |
+| `# Title` | Creates a heading |
+| `**word**` | Makes text bold |
+| `[text](url)` | Creates a link |
+
+</td> </tr>
+<tr><td colspan="2">Alignment is controlled by colons</td></tr>
+  <tr> <td>
+  
 ```markdown
 | Left | Center | Right |
 | :--- | :----: | ---: |
 | A | B | C |
 ```
 
-Tables support inline code, links, emphasis, and images in many processors. They generally do not support full block elements such as headings, nested lists, or fenced code blocks inside a cell. Escape a literal pipe so it does not split the cell:
+</td><td>
 
+| Left | Center | Right |
+| :--- | :----: | ---: |
+| A | B | C |
+
+</td> </tr>
+<tr><td colspan="2">Tables support inline code, links, emphasis, and images in many processors. They generally do not support full block elements such as headings, nested lists, or fenced code blocks inside a cell. Escape a literal pipe so it does not split the cell</td></tr>
+  <tr> <td>
+  
 ```markdown
 | Expression | Meaning |
 | --- | --- |
 | `a \| b` | A literal pipe in code |
 ```
+
+</td><td>
+
+| Expression | Meaning |
+| --- | --- |
+| `a \| b` | A literal pipe in code |
+
+</td> </tr>
+
+</table>
 
 For large or complex comparisons, use separate code blocks instead of forcing code into a table. The GitHub guide explains [organizing information with tables](https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/organizing-information-with-tables).
 
@@ -369,6 +457,14 @@ For large or complex comparisons, use separate code blocks instead of forcing co
 
 Fenced blocks are part of many extended Markdown implementations. Put the language immediately after the opening fence:
 
+<table>
+  <tr>
+    <th>Write Markdown</th>
+    <th>Render preview</th>
+  </tr>
+
+  <tr> <td>
+  
 ````markdown
 ```json
 {
@@ -377,6 +473,18 @@ Fenced blocks are part of many extended Markdown implementations. Put the langua
 }
 ```
 ````
+
+</td><td>
+
+```json
+{
+  "name": "CodeTrove",
+  "private": true
+}
+```
+
+</td> </tr>
+</table>
 
 Syntax highlighting is presentation only; it does not validate or execute the code. Choose the identifier that matches the language and keep the sample correct so readers can copy it safely.
 
@@ -413,9 +521,39 @@ GitHub renders the brackets as checkboxes. The [GitHub task-list documentation](
 
 Wrap text in two tildes:
 
-```markdown
+<table>
+  <tr>
+    <th>Write Markdown</th>
+    <th>Render preview</th>
+  </tr>
+
+<tr><td>
+
+````md
 ~~This approach is obsolete.~~ Use the supported approach instead.
-```
+````
+
+</td><td>
+
+~~This approach is obsolete.~~ Use the supported approach instead.
+
+</td></tr>
+<tr><td>
+
+````md
+- ~~Add icons to Markdown alerts~~
+- ~~Support ==highlight==, H~2~O and X^2^~~
+- Publish the Markdown syntax guide
+````
+
+</td><td>
+
+- ~~Add icons to Markdown alerts~~
+- ~~Support ==highlight==, H~2~O and X^2^~~
+- Publish the Markdown syntax guide
+
+</td></tr>
+</table>
 
 Strikethrough is useful for showing a correction or completed change, but do not use it to hide important information from screen readers.
 
@@ -826,9 +964,24 @@ Use `<code>` for inline code and `<pre><code>` for preserved indentation. Avoid 
 
 Keyboard keys can be shown with `<kbd>` when the renderer supports it:
 
+<table>
+  <tr>
+    <th>Write Markdown</th>
+    <th>Render preview</th>
+  </tr>
+
+  <tr> <td>
+  
 ```html
 <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>P</kbd>
 ```
+
+</td><td>
+
+<kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>P</kbd>
+
+</td> </tr>
+</table>
 
 Common key labels include `Tab`, `Shift`, `Alt`, `Space`, `Delete`, `Enter`, `Command`, and `Option`. Use the platform-appropriate label and do not rely on the key styling alone to explain an action.
 

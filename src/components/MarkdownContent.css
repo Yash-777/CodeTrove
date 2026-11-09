@@ -139,3 +139,24 @@
   .markdown-alert--warning   { --alert-color: #d29922; --alert-bg: rgba(210, 153, 34, 0.14); }
   .markdown-alert--caution   { --alert-color: #f85149; --alert-bg: rgba(248, 81, 73, 0.12); }
 }
+
+.markdown-mark {
+  padding: 0 0.2em;
+  border-radius: 3px;
+  background: rgba(255, 213, 0, 0.35);
+  color: inherit;
+}
+
+.markdown-kbd {
+  display: inline-block;
+  padding: 0.15em 0.5em;
+  border: 1px solid var(--color-border);
+  border-bottom-width: 2px;
+  border-radius: 5px;
+  background: var(--color-bg-secondary, rgba(128, 128, 128, 0.12));
+  color: inherit;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.85em;
+  line-height: 1.2;
+  white-space: nowrap;
+}

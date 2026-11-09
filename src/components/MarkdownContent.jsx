@@ -17,6 +17,7 @@ import rehypeRaw from 'rehype-raw';
 import RunnableCode from './CodeRunner/RunnableCode.jsx';
 import MermaidDiagram from './MermaidDiagram.jsx';
 import './MarkdownContent.css';
+import remarkInlineMarks from './remarkInlineMarks';
 
 import { Children, cloneElement, isValidElement } from "react";
 
@@ -234,7 +235,13 @@ function remarkReferenceLinks() {
 export default function MarkdownContent({ children }) {
   return (
     <ReactMarkdown
-      remarkPlugins={[remarkGfm, remarkReferenceLinks, remarkRunnableCode]}
+      //remarkPlugins={[remarkGfm, remarkReferenceLinks, remarkRunnableCode]}
+      remarkPlugins={[
+        [remarkGfm, { singleTilde: false }], // was: remarkGfm
+        remarkInlineMarks,                   // new
+        remarkReferenceLinks,
+        remarkRunnableCode,
+      ]}
       rehypePlugins={[rehypeRaw]}
       components={{
         code: MarkdownCode,
@@ -265,6 +272,12 @@ export default function MarkdownContent({ children }) {
             ? <Link className="markdown-a" to={normalizedHref} {...props}>{children}</Link>
             : <a className="markdown-a" href={normalizedHref} {...props}>{children}</a>;
         },
+        mark: ({ node, ...props }) => <mark className="markdown-mark" {...props} />,
+        sub: ({ node, ...props }) => <sub className="markdown-sub" {...props} />,
+        sup: ({ node, ...props }) => <sup className="markdown-sup" {...props} />,
+        
+        kbd: ({ node, ...props }) => <kbd className="markdown-kbd" {...props} />,
+        
         blockquote: ({ node, children, ...props }) => {
           const type = alertType(children);
 
