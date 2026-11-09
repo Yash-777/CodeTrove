@@ -60,8 +60,15 @@ const tree = [
           { key: 'modern-java', label: 'Modern Java', pages: {'functional-programming': 'Functional Programming', 'virtual-threads': 'Virtual Threads', 'pattern-matching': 'Pattern Matching', 'sealed-classes': 'Sealed Classes'} },
         ]},
       ]},
-      { key: 'javascript', label: 'JavaScript', children: [
-        { key: 'language', label: 'Language', pages: {'types': 'Types', 'scope-closures': 'Scope Closures', 'prototypes': 'Prototypes', 'modules': 'Modules', 'promises': 'Promises', 'event-loop': 'Event Loop', 'variables-hoisting': { label: 'Variables & Hoisting (var, let, const)', contentKey: 'javascript/variables-hoisting' }} },
+      { key: 'javascript', label: 'JavaScript', pages: {
+        'types': 'Types',
+        'scope-closures': 'Scope Closures',
+        'prototypes': 'Prototypes',
+        'modules': 'Modules',
+        'promises': 'Promises',
+        'event-loop': 'Event Loop',
+        'variables-hoisting': { label: 'Variables & Hoisting (var, let, const)', contentKey: 'javascript/variables-hoisting' },
+      }, children: [
         { key: 'advanced', label: 'Advanced', pages: {'async-programming': 'Async Programming', 'memory-management': 'Memory Management', 'performance': 'Performance', 'web-workers': 'Web Workers'} },
       ]},
       { key: 'kotlin', label: 'Kotlin', children: [
