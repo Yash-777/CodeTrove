@@ -123,6 +123,7 @@ const tree = [
       'overview': { label: 'Interview Guide Overview', contentKey: 'interview-prep' },
     }, children: [
       { key: 'java', label: 'Java', children: [
+        { key: 'programs', label: 'Programs', contentKey: 'interview-prep/java/programs' },
         { key: 'fundamentals', label: 'Java SE Fundamentals', contentKey: 'interview-prep/java/fundamentals' },
         { key: 'oop-contracts', label: 'OOP & Object Contracts', contentKey: 'interview-prep/java/oop-contracts' },
         { key: 'collections', label: 'Collections & Comparators', contentKey: 'interview-prep/java/collections' },
