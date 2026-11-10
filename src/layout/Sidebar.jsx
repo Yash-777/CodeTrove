@@ -88,7 +88,8 @@ export default function Sidebar({ open }) {
   }
 
   function isNavigationPartition(node) {
-    return node.key === 'core' || node.key === 'advanced';
+    //return node.key === 'core' || node.key === 'advanced';
+    return node.path === 'languages/java/core' || node.path === 'languages/java/advanced';
   }
 
   function renderPage(page) {

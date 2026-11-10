@@ -440,6 +440,22 @@ The server could not identify the caller. The fix is to send valid credentials, 
 
 </details>
 
+<details>
+<summary>Scastie API: 502 Bad Gateway (Cloudflare)</summary>
+
+| Hop | Client sends | Server/cache answers | Network work | Next |
+|---:|---|---|---|---|
+| 1 | `GET https://scastie.scala-lang.org/api/progress-sse/m13DCH7sTIONTs3uA77aTg` | `502 Bad Gateway` from Cloudflare | DNS for `scastie.scala-lang.org`, TCP to `:443`, TLS handshake, HTTP exchange through Cloudflare | Cloudflare attempts to contact the Scastie origin server |
+| 2 | Cloudflare forwards the request to the Scastie origin | No valid upstream response received (exact response unknown) | Cloudflare-to-origin connection or upstream request fails, or the origin returns an invalid response | Cloudflare returns `502 Bad Gateway` to the client |
+
+A `502 Bad Gateway` indicates that Cloudflare, acting as a reverse proxy, could not obtain a valid response from the upstream Scastie server. Possible causes include an unavailable origin server, connection failures, upstream timeouts, or an invalid origin response.
+
+Unlike a `301` redirect, this response does not provide a `Location` header or a new target URL. The request fails at the gateway/proxy layer, so the client cannot proceed to another URL based on this response.
+
+The exact failure point between Cloudflare and the Scastie origin cannot be determined from the `502` status alone. Additional Cloudflare error details or origin-server logs would be needed.
+
+</details>
+
 ## 7. Status-code classes 
 
 HTTP response status codes are issued by a server in response to a client's request. The first digit of the three-digit code defines its class.

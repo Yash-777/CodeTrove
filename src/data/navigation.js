@@ -25,7 +25,7 @@ const tree = [
         { key: 'local-testing', label: 'Local Certificates for Testing', contentKey: 'networking/tls-ssl/local-testing' },
       ] },
       { key: 'protocols', label: 'Types of Protocols', contentKey: 'networking/protocols', children: [
-        { key: 'http-https', label: 'HTTP/HTTPS & Redirects', contentKey: 'networking/protocols/http-https' },
+        { key: 'http-https', label: 'HTTP/HTTPS & Status Codes', contentKey: 'networking/protocols/http-https' },
         { key: 'smtp', label: 'SMTP & Mail Delivery', contentKey: 'networking/protocols/smtp' },
         { key: 'ftp', label: 'FTP, FTPS & SFTP', contentKey: 'networking/protocols/ftp' },
         { key: 'tcp-udp', label: 'TCP vs UDP', contentKey: 'networking/protocols/tcp-udp' },
@@ -113,7 +113,9 @@ const tree = [
     key: 'web-languages', label: 'Web Languages', children: [
       { key: 'html', label: 'HTML', pages: {'semantic-html': 'Semantic HTML', 'forms': 'Forms', 'accessibility': 'Accessibility'} },
       { key: 'css', label: 'CSS', pages: {'layout': 'Layout', 'flexbox': 'Flexbox', 'grid': 'Grid', 'responsive-design': 'Responsive Design'} },
-      { key: 'markdown', label: 'Markdown', contentKey: 'web-languages/markdown' },
+      { key: 'markdown', label: 'Markdown', contentKey: 'web-languages/markdown', 
+        pages: {/*'markdown-syntax': 'Markdown Syntax', 'markdown-extensions': 'Markdown Extensions', */'mermaid-diagrams': 'Mermaid Diagrams'}
+      },
     ],
   },
   {
@@ -252,7 +254,9 @@ const tree = [
     key: 'api-integration', label: 'API & Integration', children: [
       { key: 'api-gateway', label: 'API Gateway', pages: {'gateway-pattern': 'Gateway Pattern', 'routing': 'Routing', 'authentication-at-gateway': 'Authentication At Gateway', 'gateway-rate-limiting': 'Gateway Rate Limiting'} },
       { key: 'load-balancing', label: 'Load Balancing', pages: {'load-balancer-basics': 'Load Balancer Basics', 'client-side-load-balancing': 'Client Side Load Balancing', 'health-checks': 'Health Checks'} },
-      { key: 'rest', label: 'REST APIs', pages: {'rest-principles': 'Rest Principles', 'http-methods': 'Http Methods', 'status-codes': 'Status Codes', 'pagination': 'Pagination', 'versioning': 'Versioning'} },
+      { key: 'rest', label: 'REST APIs', pages: {'rest-principles': 'Rest Principles', 
+        'http-methods': {label: 'Http Methods & Status Codes', contentKey: 'networking/protocols/http-https'},
+        'pagination': 'Pagination', 'versioning': 'Versioning'} },
       { key: 'resilience', label: 'Resilience', pages: {'timeouts-retries': 'Timeouts Retries', 'idempotency': 'Idempotency', 'rate-limiting': 'Rate Limiting', 'dos-protection': 'Dos Protection', 'bulkheads': 'Bulkheads'} },
       { key: 'documentation', label: 'API Documentation', pages: {'openapi-swagger': 'Openapi Swagger', 'postman': 'Postman'} },
     ],
