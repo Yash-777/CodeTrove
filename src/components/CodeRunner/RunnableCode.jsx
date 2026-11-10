@@ -41,6 +41,7 @@ import { python } from '@codemirror/legacy-modes/mode/python';
 import { linter, lintGutter, setDiagnostics } from '@codemirror/lint';
 import { compileTypeScript, formatDiagnostic, preloadTypeScript } from '../../utils/tsCompiler.js';
 import { DEFAULT_KOTLIN_TARGET, getKotlinVersions, highlightKotlin, runKotlin } from '../../utils/kotlinApi.js';
+import { DEFAULT_SCALA_VERSION, runScala } from '../../utils/scalaApi.js';
 import { DEFAULT_JAVA_API, JAVA_APIS, getJavaRuntimes, pickDefaultRuntime, runJava } from '../../utils/javaApi.js';
 import { getNativeRuntimes, isNativeLanguage, pickNativeRuntime, runNative } from '../../utils/judge0Api.js';
 import { formatSource, getSampleFormatRules } from '../../utils/codeFormatter.js';
@@ -48,9 +49,9 @@ import { getLocalSyntaxDiagnostics } from '../../utils/localSyntaxDiagnostics.js
 import './RunnableCode.css';
 
 /** File name shown in the header, used by Save and in error messages. */
-export const FILE_NAMES = { javascript: 'index.js', typescript: 'index.ts', kotlin: 'Main.kt', java: 'Main.java', c: 'main.c', cpp: 'main.cpp', python: 'main.py' };
-const LANGUAGE_LABELS = { javascript: 'JavaScript', typescript: 'TypeScript', kotlin: 'Kotlin', java: 'Java', c: 'C', cpp: 'C++', python: 'Python' };
-const LANGUAGE_BADGES = { javascript: 'JS', typescript: 'TS', kotlin: 'KT', java: 'JV', c: 'C', cpp: 'C++', python: 'PY' };
+export const FILE_NAMES = { javascript: 'index.js', typescript: 'index.ts', kotlin: 'Main.kt', scala: 'Main.scala', java: 'Main.java', c: 'main.c', cpp: 'main.cpp', python: 'main.py' };
+const LANGUAGE_LABELS = { javascript: 'JavaScript', typescript: 'TypeScript', kotlin: 'Kotlin', scala: 'Scala', java: 'Java', c: 'C', cpp: 'C++', python: 'Python' };
+const LANGUAGE_BADGES = { javascript: 'JS', typescript: 'TS', kotlin: 'KT', scala: 'SC', java: 'JV', c: 'C', cpp: 'C++', python: 'PY' };
 
 const TIMEOUT_MS = 10000;
 const JAVA_TIMEOUT_MS = 30000;
@@ -202,6 +203,7 @@ function buildRunnerDocument(code, runId, stdin = '') {
 
 let runCounter = 0;
 const KOTLIN_TIMEOUT_MS = 30000;
+const SCALA_TIMEOUT_MS = 30000;
 
 /* ---- small inline icons (no icon dependency) ---- */
 const iconProps = { width: 16, height: 16, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round', 'aria-hidden': true };
@@ -280,6 +282,7 @@ export default function RunnableCode({
 }) {
   const isTs = language === 'typescript';
   const isKotlin = language === 'kotlin';
+  const isScala = language === 'scala';
   const isJava = language === 'java';
   const isNative = isNativeLanguage(language);
   const label = LANGUAGE_LABELS[language] || 'JavaScript';
@@ -292,6 +295,7 @@ export default function RunnableCode({
   const [tsTarget, setTsTarget] = useState('ES2020');
   const [kotlinVersions, setKotlinVersions] = useState([]);
   const [kotlinVersion, setKotlinVersion] = useState('');
+  const [scalaVersion, setScalaVersion] = useState(DEFAULT_SCALA_VERSION);
   const [indentWidth, setIndentWidth] = useState(2);
   const [formatRules, setFormatRules] = useState(getSampleFormatRules);
   const [formatMessage, setFormatMessage] = useState('');
@@ -441,6 +445,36 @@ export default function RunnableCode({
       return;
     }
 
+    if (isScala) {
+      // Compile + run remotely through Scastie's public Scala CLI endpoint.
+      const controller = new AbortController();
+      abortRef.current = controller;
+      timeoutRef.current = setTimeout(() => controller.abort('timeout'), SCALA_TIMEOUT_MS);
+      try {
+        const { lines, diagnostics } = await runScala(code, controller.signal, { version: scalaVersion });
+        if (activeRunRef.current !== myRun) return;
+        clearTimeout(timeoutRef.current);
+        const view = editorViewRef.current;
+        if (view) {
+          const docLength = view.state.doc.length;
+          view.dispatch(setDiagnostics(view.state, diagnostics.map((d) => ({
+            from: Math.min(d.from, docLength),
+            to: Math.min(Math.max(d.to, d.from + 1), docLength),
+            severity: d.severity,
+            message: d.message,
+            source: 'Scala',
+          }))));
+        }
+        finishWithoutRun(lines);
+      } catch (error) {
+        if (activeRunRef.current !== myRun || error?.name === 'AbortError') return;
+        clearTimeout(timeoutRef.current);
+        const timedOut = controller.signal.aborted;
+        finishWithoutRun([{ type: 'error', text: timedOut ? `Timed out after ${SCALA_TIMEOUT_MS / 1000}s waiting for the Scala compiler service.` : `Could not reach the Scala compiler service (Scastie). Check your internet connection and try again. (${error.message})` }]);
+        if (timedOut) setStatus('timeout');
+      }
+      return;
+    }
     if (isKotlin) {
       // Compile + run remotely (JetBrains' compiler service).
       const controller = new AbortController();
@@ -503,7 +537,7 @@ export default function RunnableCode({
       setStats({ time: performance.now() - startedAtRef.current, memory: null });
       stopCode('timeout');
     }, TIMEOUT_MS);
-  }, [code, isTs, isKotlin, isJava, isNative, language, label, displayName, stopCode, confType, runtimeId, javaApi, tsTarget, kotlinVersion]);
+  }, [code, isTs, isKotlin, isScala, isJava, isNative, language, label, displayName, stopCode, confType, runtimeId, javaApi, tsTarget, kotlinVersion, scalaVersion]);
 
   const resetCode = () => {
     stopCode('idle');
@@ -553,7 +587,7 @@ export default function RunnableCode({
 
   const extensions = useMemo(() => {
     const list = [
-      isJava ? StreamLanguage.define(java)
+      isJava || isScala ? StreamLanguage.define(java)
         : language === 'c' ? StreamLanguage.define(c)
         : language === 'cpp' ? StreamLanguage.define(cpp)
         : language === 'python' ? StreamLanguage.define(python)
@@ -652,7 +686,7 @@ export default function RunnableCode({
       );
     }
     return list;
-  }, [isActive, isTs, isKotlin, isJava, isNative, initial, language, jsVersion, tsTarget, kotlinVersion]);
+  }, [isActive, isTs, isKotlin, isScala, isJava, isNative, initial, language, jsVersion, tsTarget, kotlinVersion]);
 
   // Java/C/C++/Python: load runtime versions offered by the selected provider.
   useEffect(() => {
@@ -708,7 +742,7 @@ export default function RunnableCode({
   const inputTitle = isKotlin ? 'Arguments' : 'STDIN';
   const inputHelp = isKotlin
     ? 'Optional program arguments passed to main(args) - separated by spaces.'
-    : isJava || isNative
+    : isJava || isNative || isScala
     ? 'Optional input fed to the program through standard input.'
     : 'Optional input fed to the program - one value per line, read with readLine() or prompt().';
 
@@ -774,6 +808,15 @@ export default function RunnableCode({
               <span>Target</span>
               <select value={confType} onChange={(event) => changeTarget(event.target.value)} disabled={status === 'running'} aria-label="Kotlin compile target (confType)">
                 {targets.map((t) => <option key={t.confType} value={t.confType}>{t.label}</option>)}
+              </select>
+            </label>
+          )}
+          {isPlayground && isScala && (
+            <label className="runnable-code__target" title="Scala compiler version used by Scastie.">
+              <span>Version</span>
+              <select value={scalaVersion} onChange={(event) => setScalaVersion(event.target.value)} disabled={isRunning} aria-label="Scala compiler version">
+                <option value="3.7.3">Scala 3.7.3</option>
+                <option value="3.7.4">Scala 3.7.4</option>
               </select>
             </label>
           )}
@@ -915,6 +958,7 @@ export default function RunnableCode({
             ))}
           </div>
           {isKotlin && <div className="runnable-code__footer">Compiled by JetBrains · api.kotlinlang.org</div>}
+          {isScala && <div className="runnable-code__footer">Compiled and run by Scastie · scastie.scala-lang.org</div>}
           {isJava && <div className="runnable-code__footer">Compiled and run by {JAVA_APIS[javaApi].label} · {JAVA_APIS[javaApi].description}</div>}
         </div>
       </div>

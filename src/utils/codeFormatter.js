@@ -151,6 +151,6 @@ export async function formatSource(language, source, { indentWidth = 2, rulesTex
     });
   }
 
-  if (language === 'kotlin') return formatKotlinIndentation(source, width);
+  if (language === 'kotlin' || language === 'scala') return formatKotlinIndentation(source, width);
   throw new Error(`No browser formatter is configured for ${language}.`);
 }

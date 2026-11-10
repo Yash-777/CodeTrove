@@ -45,6 +45,13 @@ class SampleTest {
 // Dropdown entries come from KOTLIN_TARGETS (utils/kotlinApi.js); each gets its sample code here.
 const KOTLIN_SAMPLES = { java: KOTLIN_MAIN_SAMPLE, junit: KOTLIN_JUNIT_SAMPLE };
 const KOTLIN_TARGET_OPTIONS = KOTLIN_TARGETS.map((target) => ({ ...target, code: KOTLIN_SAMPLES[target.confType] || KOTLIN_MAIN_SAMPLE }));
+const SCALA_MAIN_SAMPLE = `val fruits = List("apple", "banana", "avocado", "papaya")
+
+val countsToFruits = fruits.groupBy(fruit => fruit.count(_ == 'a'))
+
+for (count, fruits) <- countsToFruits do
+  println(s"with 'a' × $count = $fruits")
+`;
 
 const JAVASCRIPT_SAMPLES = {
   es5: `// ES5 style: constructor function and prototype
@@ -119,6 +126,15 @@ console.log(\`In 5 years you will be \${person.age + 5}.\`);
     input: 'Kotlin 2026',
     code: KOTLIN_MAIN_SAMPLE,
     targets: KOTLIN_TARGET_OPTIONS,
+  },
+  {
+    key: 'scala',
+    param: 'scala',
+    label: 'Scala',
+    learnTo: '/content/tree/languages/scala',
+    docsUrl: 'https://scala-lang.org/',
+    input: '',
+    code: SCALA_MAIN_SAMPLE,
   },
   {
     key: 'c',
@@ -265,6 +281,35 @@ function KotlinAbout() {
         <li>Each Kotlin box says <em>Compiled by JetBrains · api.kotlinlang.org</em> because your snippet text is
           sent to that service.</li>
         <li>An internet connection is required; when offline the output shows a clear message.</li>
+      </ul>
+    </section>
+  );
+}
+
+function ScalaAbout() {
+  return (
+    <section className="cp-about" aria-labelledby="cp-about-scala">
+      <h2 id="cp-about-scala">About the Scala playground</h2>
+      <p>
+        <a href="https://scala-lang.org/" target="_blank" rel="noreferrer">Scala</a> is a statically typed language
+        that combines object-oriented and functional programming. This playground sends a Scala 3 worksheet to{' '}
+        <a href="https://scastie.scala-lang.org/" target="_blank" rel="noreferrer">Scastie</a>, the public Scala
+        environment maintained by the Scala community.
+      </p>
+      <h3>How Run works</h3>
+      <p>
+        Run submits the editor contents to Scastie as an SBT worksheet. Scastie compiles and executes the code in
+        an isolated JVM, then streams compiler diagnostics, standard output, and runtime failures back to the browser.
+        The Scala version selector changes the version sent with the request.
+      </p>
+      <pre className="cp-about__code">{`POST https://scastie.scala-lang.org/api/run
+{"SbtInputs":{"isWorksheetMode":true,"code":"println(\"Hello, Scala!\")","target":{"Scala3":{"scalaVersion":"3.7.3"}},"libraries":[],"librariesFromList":[],"sbtConfigExtra":"scalacOptions ++= Seq(...)\n","sbtConfigSaved":"scalaVersion := \\\"3.7.3\\\"","sbtPluginsConfigExtra":"","sbtPluginsConfigSaved":"addSbtPlugin(\\\"org.scastie\\\" % \\\"sbt-scastie\\\" % \\\"1.0.0-SNAPSHOT\\\")","isShowingInUserProfile":false,"forked":null}}
+GET https://scastie.scala-lang.org/api/progress-sse/<snippet-id>`}</pre>
+      <h3>Errors, output and privacy</h3>
+      <ul>
+        <li>Compiler diagnostics are shown in the output panel and underlined in the editor when Scastie reports positions.</li>
+        <li>Standard output and runtime errors are streamed back after compilation.</li>
+        <li>Your Scala code is sent to Scastie, so an internet connection is required and public service limits may apply.</li>
       </ul>
     </section>
   );
@@ -480,6 +525,7 @@ export default function CompilerPage() {
       ))}
 
       {active.key === 'kotlin' && <KotlinAbout />}
+      {active.key === 'scala' && <ScalaAbout />}
       {active.key === 'java' && <JavaAbout />}
       {NATIVE_ABOUT[active.key] && <NativeAbout language={active.key} />}
       {active.key === 'sql' && <SqlAbout />}
@@ -488,8 +534,8 @@ export default function CompilerPage() {
         JavaScript and TypeScript run in an isolated browser worker (10&nbsp;s limit, no DOM). JavaScript, TypeScript,
         Java, C, C++ and Python syntax checks run locally in the browser; formatting also runs locally with Prettier,
         clang-format WASM or Ruff WASM. Kotlin diagnostics and execution use JetBrains&apos; public service, and Run
-        sends Java to Wandbox/Judge0 and C, C++ or Python to Judge0. Kotlin&apos;s built-in Format action currently
-        normalizes indentation only; use a full Kotlin editor/formatter for project-wide ktfmt formatting.
+        sends Scala to Scastie, Java to Wandbox/Judge0 and C, C++ or Python to Judge0. Kotlin&apos;s and Scala&apos;s built-in
+        Format actions currently normalize indentation only; use a full language formatter for project-wide formatting.
       </p>}
 
       {active.key !== 'sql' && <section className="cp-about cp-editor-references" aria-labelledby="cp-editor-references-title">

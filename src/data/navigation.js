@@ -95,6 +95,7 @@ const tree = [
           'delegation': 'Delegation',
         } },
       ]},
+      { key: 'scala', label: 'Scala', contentKey: 'languages/scala' },
       { key: 'typescript', label: 'TypeScript', pages: {'types-generics': 'Types Generics', 'interfaces': 'Interfaces', 'utility-types': 'Utility Types', 'tsconfig': 'Tsconfig', 'typescript-basics': 'TypeScript Basics'} },
       { key: 'nodejs', label: 'Node.js', contentKey: 'languages/nodejs', pages: {
         'installation-and-versions': 'Installation and Version Management',

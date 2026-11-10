@@ -34,6 +34,7 @@
 
 import javaTopics from './java.js';
 import javascriptTopics from './javascript.js';
+import scalaTopics from './scala.js';
 import typescriptTopics from './typescript.js';
 import nodejsTopics from './nodejs.js';
 import jsonTopics from './json.js';
@@ -83,6 +84,19 @@ export const CATEGORIES = [
     })),
     tools: [
       { name: 'TypeScript Playground', description: 'Experiment with TypeScript examples in the browser.', internalTool: null, externalUrl: 'https://www.typescriptlang.org/play' },
+    ],
+  },
+  {
+    key: 'scala',
+    label: 'Scala',
+    color: '#DC322F',
+    codeLang: 'scala',
+    topics: scalaTopics.map((topic) => ({
+      ...topic,
+      body: getTopicContent('scala', topic.slug),
+    })),
+    tools: [
+      { name: 'Scala Playground', description: 'Compile and run Scala 3 worksheet examples with Scastie.', internalTool: null, externalUrl: 'https://scastie.scala-lang.org/' },
     ],
   },
   {
