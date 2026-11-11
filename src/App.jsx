@@ -33,6 +33,7 @@ import WorldClockPage from './pages/build/WorldClockPage.jsx';
 import HtmlXmlJsonToolPage from './pages/build/HtmlXmlJsonToolPage.jsx';
 import DocumentConverterPage from './pages/build/DocumentConverterPage.jsx';
 import DocumentComparePage from './pages/build/DocumentComparePage.jsx';
+import CompressionToolPage from './pages/build/CompressionToolPage.jsx';
 import JsonCrackPage from './pages/build/JsonCrackPage.jsx';
 import MarkdownEditorPage from './pages/build/MarkdownEditorPage.jsx';
 import JavaDecompilerPage from './pages/build/JavaDecompilerPage.jsx';
@@ -84,6 +85,7 @@ export default function App() {
           <Route path="/build/tools/html-xml-json" element={<HtmlXmlJsonToolPage />} />
           <Route path="/build/tools/document-converter" element={<DocumentConverterPage />} />
           <Route path="/build/tools/document-compare" element={<DocumentComparePage />} />
+          <Route path="/build/tools/compression" element={<CompressionToolPage />} />
           <Route path="/build/tools/java-decompiler" element={<JavaDecompilerPage />} />
           <Route path="/build/tools/json-crack" element={<JsonCrackPage />} />
           <Route path="/build/tools/markdown-editor" element={<MarkdownEditorPage />} />

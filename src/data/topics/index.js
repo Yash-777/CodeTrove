@@ -211,6 +211,7 @@ export const CATEGORIES = [
     tools: [
       { name: 'Document Converter', description: 'Convert CSV, JSON, and Excel workbooks in your browser, map or skip fields, add a result worksheet, and download the output without uploading files.', internalTool: 'document-converter', externalUrl: null },
       { name: 'Document Compare (CSV / Spreadsheet)', description: 'Compare two local CSV, TSV, or Excel worksheets side by side; match rows by position or a shared key and review cell, row, and column changes.', internalTool: 'document-compare', externalUrl: null },
+      { name: 'Compression Tool', description: 'Compress and decompress text or local files with GZIP, Deflate, ZIP, and educational Huffman modes, with levels, metrics, samples, copy, and download actions.', internalTool: 'compression', externalUrl: null },
     ],
   },
   {
