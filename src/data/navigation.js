@@ -97,6 +97,7 @@ const tree = [
       ]},
       { key: 'scala', label: 'Scala', contentKey: 'languages/scala' },
       { key: 'typescript', label: 'TypeScript', pages: {'types-generics': 'Types Generics', 'interfaces': 'Interfaces', 'utility-types': 'Utility Types', 'tsconfig': 'Tsconfig', 'typescript-basics': 'TypeScript Basics'} },
+      { key: 'python', label: 'Python', contentKey: 'languages/python' },
       { key: 'nodejs', label: 'Node.js', contentKey: 'languages/nodejs', pages: {
         'installation-and-versions': 'Installation and Version Management',
         'npm-and-package-json': 'npm and package.json',
@@ -161,7 +162,7 @@ const tree = [
       ]},
       { key: 'javascript', label: 'JavaScript', pages: {'javascript-interview-questions': 'Javascript Interview Questions', 'frontend-architecture-interview': 'Frontend Architecture Interview'} },
       { key: 'system-design', label: 'System Design', pages: {'system-design-fundamentals': 'System Design Fundamentals', 'scalability': 'Scalability', 'availability-reliability': 'Availability Reliability', 'caching-strategies': 'Caching Strategies', 'rate-limiting': 'Rate Limiting'} },
-      { key: 'behavioral', label: 'Senior Engineer', pages: {'pr-impact-beyond-jira': 'Pr Impact Beyond Jira', 'code-review': 'Code Review', 'refactoring': 'Refactoring', 'technical-leadership': 'Technical Leadership'} },
+      { key: 'behavioral', label: 'Senior Engineer', pages: {'pr-impact-beyond-jira': 'Pr Impact Beyond Jira', 'code-review': 'Code Review', 'technical-leadership': 'Technical Leadership'} },
     ],
   },
   {
@@ -237,6 +238,9 @@ const tree = [
   },
   {
     key: 'backend', label: 'Backend & Spring', children: [
+      { key: 'mapstruct', label: 'MapStruct' },
+      { key: 'connection-pool', label: 'Connection Pool' },
+      { key: 'refactoring', label: 'Refactoring' },
       { key: 'spring', label: 'Spring Framework', pages: {'ioc-di': 'Ioc Di', 'bean-lifecycle': 'Bean Lifecycle', 'application-context': 'Application Context', 'aop': 'Aop', 'interceptors': 'Interceptors', 'filters': 'Filters'}, children: [
         { key: 'annotations', label: 'Annotations', contentKey: 'backend/spring/annotations', children: [
           { key: 'annotation-catalogue', label: 'Annotations Catalogue', contentKey: 'backend/spring/annotations/annotation-catalogue' },
@@ -270,8 +274,8 @@ const tree = [
       { key: 'system-design', label: 'System Design', pages: {'capacity-planning': 'Capacity Planning', 'consistency': 'Consistency', 'partitioning': 'Partitioning', 'sharding': 'Sharding', 'disaster-recovery': 'Disaster Recovery'} },
     ],
   },
-    {
-    key: 'messaging', label: 'Messaging & Streaming', children: [
+  {
+    key: 'messaging', label: 'Messaging & Streaming', pages: {'akka-actor': 'Akka Actor', 'mail-api': 'Mail API'}, children: [
       { key: 'kafka', label: 'Apache Kafka', pages: {'architecture': 'Architecture', 'producers-consumers': 'Producers Consumers', 'partitions-offsets': 'Partitions Offsets', 'consumer-groups': 'Consumer Groups', 'delivery-semantics': 'Delivery Semantics', 'transactions': 'Transactions', 'interview': 'Interview Questions'} },
       { key: 'rabbitmq', label: 'RabbitMQ', pages: {'exchanges-queues': 'Exchanges Queues', 'acknowledgements': 'Acknowledgements', 'routing': 'Routing'} },
       { key: 'patterns', label: 'Messaging Patterns', pages: {'outbox-pattern': 'Outbox Pattern', 'saga-pattern': 'Saga Pattern', 'dead-letter-queues': 'Dead Letter Queues', 'exactly-once-processing': 'Exactly Once Processing'} },
@@ -331,6 +335,7 @@ const tree = [
       { key: 'api-testing', label: 'API Testing', pages: {'postman-testing': 'Postman Testing', 'swagger-testing': 'Swagger Testing'} },
       { key: 'quality', label: 'Code Quality', pages: {'sonarqube': 'Sonarqube', 'linting': 'Linting', 'static-analysis': 'Static Analysis', 'quality-gates': 'Quality Gates'} },
       { key: 'performance', label: 'Performance Testing', pages: {'load-testing': 'Load Testing', 'stress-testing': 'Stress Testing', 'profiling': 'Profiling'} },
+      { key: 'selenium-xpaths', label: 'Selenium XPaths', contentKey: 'testing-quality/selenium-xpaths' },
     ],
   },
   {
@@ -340,7 +345,7 @@ const tree = [
       { key: 'containers', label: 'Containers', pages: {'docker': 'Docker', 'docker-compose': 'Docker Compose', 'container-images': 'Container Images'} },
       { key: 'orchestration', label: 'Kubernetes', pages: {'pods': 'Pods', 'deployments': 'Deployments', 'services': 'Services', 'configmaps-secrets': 'Configmaps Secrets', 'ingress': 'Ingress', 'autoscaling': 'Autoscaling'} },
       { key: 'ci-cd', label: 'CI/CD', pages: {'pipeline-basics': 'Pipeline Basics', 'github-actions': 'Github Actions', 'deployment-strategies': 'Deployment Strategies'} },
-      { key: 'cloud', label: 'Cloud', pages: {'aws-basics': 'Aws Basics', 'compute': 'Compute', 'managed-databases': 'Managed Databases', 'object-storage': 'Object Storage'} },
+      { key: 'cloud', label: 'Cloud', pages: {'aws-basics': 'AWS Foundations', 'compute': 'Compute', 'managed-databases': 'Managed Databases', 'object-storage': 'Object Storage'} },
     ],
   },
   {
@@ -395,11 +400,11 @@ const tree = [
   },
 ];
 
-tree.push({
-  key: 'ai',
-  label: 'AI & Machine Learning',
-  contentKey: 'ai',
-});
+tree.push(
+  {
+  key: 'ai', label: 'AI & Machine Learning', contentKey: 'ai', 
+  }
+);
 
 const legacyPlatform = ['text', 'nodejs', 'json', /*'jwt',*/ 'email'].map((categoryKey) => {
   const category = CATEGORIES.find((item) => item.key === categoryKey);
@@ -416,14 +421,21 @@ const legacyPlatform = ['text', 'nodejs', 'json', /*'jwt',*/ 'email'].map((categ
 
 tree.push(
     {
-    key: 'tools', label: 'Developer Tools', children: [
+    key: 'tools', label: 'Developer Tools', pages: {'chromium-docs': 'Chromium Docs', 'bat-files': 'BAT Files', 'windows-command-line': 'Windows Command Line', 'freemarker-ftl': 'FreeMarker Template Language (FTL)'}, children: [
       { key: 'Notepad++', label: 'Notepad++', data: 'content.md', /*pages: {'text-editors': 'Text Editors', 'regex': 'Regex', 'file-compare': 'File Compare'}*/ },
       { key: 'api-tools', label: 'API Tools', pages: {'postman': 'Postman', 'swagger-ui': 'Swagger Ui', 'curl': 'Curl'} },
       { key: 'database-tools', label: 'Database Tools', pages: {'database-clients': 'Database Clients', 'query-analyzers': 'Query Analyzers'} },
       { key: 'developer-tools', label: 'Developer Workflow', pages: {'ide-debugging': 'Ide Debugging', 'terminal-tools': 'Terminal Tools', 'http-debugging': 'Http Debugging'} },
     ],
   },
-  { key: 'platform', label: 'Platform', children: legacyPlatform }
+  { key: 'platform', label: 'Platform', children: legacyPlatform },
+  {
+    key: 'others', label: 'Other ...', pages: {
+      'mapstruct': 'MapStruct', 'connection-pool': 'Connection Pool', 'refactoring': 'Refactoring',
+      /*'regex': 'Regex', 'unicode': 'Unicode', 'ascii': 'Ascii', 'base64': 'Base64', 'url-encoding': 'Url Encoding', 'html-entities': 'Html Entities'*/
+    }
+        //{'ioc-di': 'Ioc Di', 'bean-lifecycle': 'Bean Lifecycle', 'application-context': 'Application Context', 'aop': 'Aop', 'interceptors': 'Interceptors', 'filters': 'Filters'} },
+  }
 );
 
 function normalizeNode(node, parentPath = []) {
