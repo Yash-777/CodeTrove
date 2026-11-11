@@ -288,7 +288,7 @@ const tree = [
   },
   {
     key: 'security', label: 'Security', children: [
-      { key: 'cryptography', label: 'Cryptography', data: 'content.md', pages: {'symmetric-encryption': 'Symmetric Encryption', 'asymmetric-encryption': 'Asymmetric Encryption', 'hashing': 'Hashing', 'digital-signatures': 'Digital Signatures'} },
+      { key: 'cryptography', label: 'Cryptography', data: 'content.md', pages: {'hashing-encryption': 'Hashing vs Encryption'/*'symmetric-encryption': 'Symmetric Encryption', 'asymmetric-encryption': 'Asymmetric Encryption', 'hashing': 'Hashing', 'digital-signatures': 'Digital Signatures'*/} },
       { key: 'application-security', label: 'Application Security', pages: {'owasp-top-10': 'Owasp Top 10', 'input-validation': 'Input Validation', 'csrf': 'Csrf', 'cors': 'Cors', 'secure-headers': 'Secure Headers'} },
       { key: 'identity', label: 'Identity & Access', pages: {'oauth2': 'Oauth2', 'openid-connect': 'Openid Connect', 'jwt': 'Jwt', 'rbac': 'Rbac', 'secrets': 'Secrets'} },
       { key: 'api-security', label: 'API Security', pages: {'api-authentication': 'Api Authentication', 'api-authorization': 'Api Authorization', 'token-validation': 'Token Validation', 'dos-mitigation': 'Dos Mitigation'} },
