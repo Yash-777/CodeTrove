@@ -555,7 +555,7 @@ The summary tables are followed by one expandable section for every code covered
 | [`407`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/407) | Proxy Authentication Required | The client must authenticate with the proxy. The response includes `Proxy-Authenticate`. |
 | [`408`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/408) | Request Timeout | The server did not receive a complete request in time. |
 | [`409`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/409) | Conflict | The request conflicts with the current state of the resource, such as an edit conflict or a duplicate. |
-| [`410`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/410) | Gone | The resource is intentionally and permanently unavailable. |
+| [`410`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/410) | Gone <sup>[410: GONE, Code: DEPLOYMENT_DISABLED](https://jsperf.com/yashfunctions)</sup> | The resource is intentionally and permanently unavailable. |
 | [`411`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/411) | Length Required | The server requires a `Content-Length` header. |
 | [`412`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/412) | Precondition Failed | A conditional header such as `If-Match` evaluated to false. |
 | [`413`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/413) | Content Too Large | The request body exceeds a server limit (formerly "Payload Too Large"). |
