@@ -431,7 +431,7 @@ tree.push(
   { key: 'platform', label: 'Platform', children: legacyPlatform },
   {
     key: 'others', label: 'Other ...', pages: {
-      'mapstruct': 'MapStruct', 'connection-pool': 'Connection Pool', 'refactoring': 'Refactoring',
+      'mapstruct': 'MapStruct', 'connection-pool': 'Connection Pool', 'refactoring': 'Refactoring', 'github-repo-ai': 'GitHub Repo with AI Tools',
       /*'regex': 'Regex', 'unicode': 'Unicode', 'ascii': 'Ascii', 'base64': 'Base64', 'url-encoding': 'Url Encoding', 'html-entities': 'Html Entities'*/
     }
         //{'ioc-di': 'Ioc Di', 'bean-lifecycle': 'Bean Lifecycle', 'application-context': 'Application Context', 'aop': 'Aop', 'interceptors': 'Interceptors', 'filters': 'Filters'} },
