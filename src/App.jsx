@@ -38,6 +38,7 @@ import CompressionToolPage from './pages/build/CompressionToolPage.jsx';
 import JsonCrackPage from './pages/build/JsonCrackPage.jsx';
 import MarkdownEditorPage from './pages/build/MarkdownEditorPage.jsx';
 import JavaDecompilerPage from './pages/build/JavaDecompilerPage.jsx';
+import JavaJsonConverterPage from './pages/build/JavaJsonConverterPage.jsx';
 import NetworkToolsPage from './pages/build/NetworkToolsPage.jsx';
 import ProtocolExplorerPage from './pages/build/ProtocolExplorerPage.jsx';
 import ProjectsPage from './pages/build/ProjectsPage.jsx';
@@ -89,6 +90,7 @@ export default function App() {
           <Route path="/build/tools/document-compare" element={<DocumentComparePage />} />
           <Route path="/build/tools/compression" element={<CompressionToolPage />} />
           <Route path="/build/tools/java-decompiler" element={<JavaDecompilerPage />} />
+          <Route path="/build/tools/java-json-converter" element={<JavaJsonConverterPage />} />
           <Route path="/build/tools/json-crack" element={<JsonCrackPage />} />
           <Route path="/build/tools/markdown-editor" element={<MarkdownEditorPage />} />
           <Route path="/build/tools/network" element={<NetworkToolsPage />} />
