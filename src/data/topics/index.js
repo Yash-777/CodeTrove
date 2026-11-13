@@ -132,6 +132,7 @@ export const CATEGORIES = [
     topics: [],
     tools: [
       { name: 'HTML / XML / JSON Formatter & Validator', description: 'Beautify, minify, validate, and explore JSON/XML in a tree view.', internalTool: 'html-xml-json', externalUrl: null },
+      { name: 'HTTP Status Codes', description: 'Browse 1XX–5XX HTTP status code samples and convert a validated dataset to formatted JSON or JSONL.', internalTool: 'http-status-codes', externalUrl: null },
       { name: 'Compare Online (JSON/XML/HTML)', description: 'Format, validate, and compare two JSON, XML, or HTML documents locally with side-by-side red and green differences.', internalTool: 'compare-online', externalUrl: null },
       { name: 'JSON to GraphQL Schema Converter', description: 'Generate GraphQL type definitions and example queries from JSON data with configurable root names and nullability.', internalTool: 'json-to-graphql', externalUrl: null },
     ],

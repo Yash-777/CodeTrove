@@ -238,9 +238,6 @@ const tree = [
   },
   {
     key: 'backend', label: 'Backend & Spring', children: [
-      { key: 'mapstruct', label: 'MapStruct' },
-      { key: 'connection-pool', label: 'Connection Pool' },
-      { key: 'refactoring', label: 'Refactoring' },
       { key: 'spring', label: 'Spring Framework', pages: {'ioc-di': 'Ioc Di', 'bean-lifecycle': 'Bean Lifecycle', 'application-context': 'Application Context', 'aop': 'Aop', 'interceptors': 'Interceptors', 'filters': 'Filters'}, children: [
         { key: 'annotations', label: 'Annotations', contentKey: 'backend/spring/annotations', children: [
           { key: 'annotation-catalogue', label: 'Annotations Catalogue', contentKey: 'backend/spring/annotations/annotation-catalogue' },
