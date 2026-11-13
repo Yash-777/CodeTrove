@@ -1,6 +1,7 @@
 import ToolBackLink from '../../components/ToolBackLink.jsx';
 import { useMemo, useState } from 'react';
 import JSON5 from 'json5';
+import { getRepairChanges, repairJsonLines, repairJsonSource } from '../../utils/jsonRepair.js';
 import CodeMirror from '@uiw/react-codemirror';
 import { oneDark } from '@codemirror/theme-one-dark';
 import { StreamLanguage } from '@codemirror/language';
@@ -25,6 +26,7 @@ const JSONC_SAMPLE = `{// JSONC: comments and trailing commas, but quoted keys/s
   /* Disable only in local development. */
   "secure": true,
 }`;
+const JSONL_SAMPLE = `{"id": 1, "name": "Ada", "roles": ["admin", "author"]}\n{"id": 2, "name": "Linus", "roles": ["maintainer"]}\n{"id": 3, "name": "Grace", "roles": ["compiler", "research"]}`;
 const JSON5_SAMPLE = `// Postman / microservice payload sample\n{\n  // Enable this feature\n  active: true,\n  /* API metadata */\n  metadata: { version: 1, },\n  name: 'CodeTrove',\n  tools: ['HTML', 'XML', 'JSON'],\n}`;
 const TOOL_DESCRIPTIONS = {
   html: 'Format and inspect HTML markup. Use Trim Text Nodes to remove leading and trailing whitespace from text values.',
@@ -105,6 +107,7 @@ function jsonCommentsError(source) {
 }
 
 function parseJsonByMode(source, mode) {
+  if (mode === 'jsonl') return source.split(/\r?\n/).filter((line) => line.trim()).map((line, index) => { try { return JSON.parse(line); } catch (error) { throw new Error(`Invalid JSONL at line ${index + 1}: ${error.message}`); } });
   if (mode === 'json') return JSON.parse(source);
   if (mode === 'json5') return JSON5.parse(source);
   // JSONC accepts comments and trailing commas, but still requires quoted keys and double-quoted strings.
@@ -207,6 +210,12 @@ function quoteJson5SourceKeys(source, quoteKeys) {
   return result;
 }
 
+function sortJsonKeys(value) {
+  if (Array.isArray(value)) return value.map(sortJsonKeys);
+  if (value && typeof value === 'object') return Object.keys(value).sort((a, b) => a.localeCompare(b)).reduce((result, key) => { result[key] = sortJsonKeys(value[key]); return result; }, {});
+  return value;
+}
+
 function validateSource(kind, source, jsonMode = 'json') {
   if (!source.trim()) return 'Enter some code before validating or converting.';
   if (kind === 'json') {
@@ -214,7 +223,11 @@ function validateSource(kind, source, jsonMode = 'json') {
       return 'Comments detected in JSON. Standard JSON does not support comments. Remove all // and /* */ comments.';
     }
     try { parseJsonByMode(source, jsonMode); return ''; }
-    catch (error) { return `Invalid ${jsonMode === 'json' ? 'JSON' : jsonMode === 'jsonc' ? 'JSONC' : 'JSON5'}: ${error.message}`; }
+    catch (error) {
+      const repairChanges = (jsonMode === 'json' || jsonMode === 'jsonl') ? getRepairChanges(source, jsonMode) : [];
+      const repairHint = repairChanges.length ? ` Auto-Fix available: ${repairChanges.join(' ')}` : '';
+      return `Invalid ${jsonMode === 'json' ? 'JSON' : jsonMode === 'jsonl' ? 'JSONL' : jsonMode === 'jsonc' ? 'JSONC' : 'JSON5'}: ${error.message}${repairHint}`;
+    }
   }
   if (kind === 'xml') {
     const doc = new DOMParser().parseFromString(source, 'application/xml');
@@ -435,6 +448,7 @@ export default function HtmlXmlJsonToolPage() {
   const [useTabs, setUseTabs] = useState(false);
   const [keepComments, setKeepComments] = useState(true);
   const [quoteJson5Keys, setQuoteJson5Keys] = useState(false);
+  const [sortKeys, setSortKeys] = useState(false);
   const [minifyCss, setMinifyCss] = useState(false);
   const [trimTextNodes, setTrimTextNodes] = useState(false);
   const [error, setError] = useState('');
@@ -442,7 +456,7 @@ export default function HtmlXmlJsonToolPage() {
   const [tree, setTree] = useState(null);
   const [treeExpanded, setTreeExpanded] = useState(true);
   const [copied, setCopied] = useState(false);
-  const config = FORMATS[kind];
+  const config = kind === 'json' && jsonMode === 'jsonl' ? { ...FORMATS.json, label: 'JSONL', file: 'data.jsonl' } : FORMATS[kind];
   const language = kind === 'json' ? JSON_LANGUAGE : XML_LANGUAGE;
   const indentSize = useTabs ? 2 : Number(indent);
   const options = { indent: indentSize, indentText: useTabs ? '\t' : ' '.repeat(Number(indent)), minify: operation === 'minify', keepComments, minifyCss: kind === 'html' && minifyCss, trimTextNodes: (kind === 'xml' || kind === 'html') && trimTextNodes, kind };
@@ -478,10 +492,11 @@ export default function HtmlXmlJsonToolPage() {
       if (kind === 'json') {
         const comments = scanJsonComments(input);
         const value = parseJsonByMode(input, jsonMode);
-        let formatted = (jsonMode === 'json' ? JSON : JSON5).stringify(value, null, isMinify ? undefined : useTabs ? '\t' : Number(indent));
-        if (jsonMode === 'jsonc') formatted = JSON.stringify(value, null, isMinify ? undefined : useTabs ? '\t' : Number(indent));
+        const sortedValue = sortKeys ? sortJsonKeys(value) : value;
+        let formatted = jsonMode === 'jsonl' ? sortedValue.map((entry) => JSON.stringify(entry)).join('\n') : (jsonMode === 'json' ? JSON : JSON5).stringify(sortedValue, null, isMinify ? undefined : useTabs ? '\t' : Number(indent));
+        if (jsonMode === 'jsonc') formatted = JSON.stringify(sortedValue, null, isMinify ? undefined : useTabs ? '\t' : Number(indent));
         else if (jsonMode === 'json5') formatted = quoteJson5SourceKeys(formatted, quoteJson5Keys);
-        result = !isMinify && keepComments && jsonMode !== 'json' && comments.length ? preserveJson5Comments(input, formatted) : formatted;
+        result = !isMinify && keepComments && jsonMode !== 'json' && jsonMode !== 'jsonl' && comments.length ? preserveJson5Comments(input, formatted) : formatted;
       }
       else result = formatMarkup(input, { ...options, minify: isMinify });
       setOutput(result);
@@ -517,9 +532,22 @@ export default function HtmlXmlJsonToolPage() {
     } catch { setError('Clipboard access was blocked by the browser. Select and copy the output manually.'); }
   };
   const onKindChange = (next) => { setKind(next); setInput(''); setOutput(''); setTree(null); setCopied(false); setError(''); setStatus(''); };
-  const onJsonModeChange = (next) => { setJsonMode(next); setQuoteJson5Keys(false); setInput(next === 'json' ? FORMATS.json.sample : next === 'jsonc' ? JSONC_SAMPLE : JSON5_SAMPLE); setOutput(''); setTree(null); setCopied(false); setError(''); setStatus(''); };
-  const sample = kind === 'json' && jsonMode === 'json5' ? JSON5_SAMPLE : kind === 'json' && jsonMode === 'jsonc' ? JSONC_SAMPLE : FORMATS[kind].sample;
-  const autoFixComments = () => { setInput(stripJsonComments(input)); setError(''); setStatus('Comments removed. Validate or format the corrected JSON.'); setTree(null); };
+  const onJsonModeChange = (next) => { setJsonMode(next); setQuoteJson5Keys(false); setSortKeys(false); setInput(next === 'json' ? FORMATS.json.sample : next === 'jsonc' ? JSONC_SAMPLE : next === 'jsonl' ? JSONL_SAMPLE : JSON5_SAMPLE); setOutput(''); setTree(null); setCopied(false); setError(''); setStatus(''); };
+  const sample = kind === 'json' && jsonMode === 'json5' ? JSON5_SAMPLE : kind === 'json' && jsonMode === 'jsonc' ? JSONC_SAMPLE : kind === 'json' && jsonMode === 'jsonl' ? JSONL_SAMPLE : FORMATS[kind].sample;
+  const autoFixJson = () => {
+    const repaired = jsonMode === 'jsonl' ? repairJsonLines(input) : repairJsonSource(input);
+    setInput(repaired.source); setTree(null); setOutput(''); setCopied(false);
+    if (!repaired.changes.length) { setError('No automatic repair was detected. Review the syntax manually.'); setStatus(''); return; }
+    try { parseJsonByMode(repaired.source, jsonMode); setError(''); setStatus(`Auto-Fix complete: ${repaired.changes.join(' ')} Validate or format the corrected ${jsonMode.toUpperCase()}.`); }
+    catch (problem) { setError(`Auto-Fix attempted: ${repaired.changes.join(' ')} Still invalid ${jsonMode.toUpperCase()}: ${problem.message}`); setStatus(''); }
+  };
+  const repairActionLabel = () => {
+    const changes = getRepairChanges(input, jsonMode);
+    if (changes.some((change) => change.includes('comments'))) return 'Auto-Fix: Remove Comments';
+    if (changes.some((change) => change.includes('trailing commas'))) return 'Auto-Fix: Remove trailing commas';
+    return 'Auto-Fix: Repair JSON';
+  };
+  const autoFixComments = autoFixJson;
 
   return (
     <div className="content-page hxt-page">
@@ -557,7 +585,8 @@ export default function HtmlXmlJsonToolPage() {
             {kind !== 'json' && <label className="hxt-check"><input type="checkbox" checked={keepComments} onChange={(event) => setKeepComments(event.target.checked)} /> Keep comments</label>}
             {kind === 'json' && jsonMode !== 'json' && <label className="hxt-check"><input type="checkbox" checked={keepComments} onChange={(event) => setKeepComments(event.target.checked)} /> Keep comments</label>}
             {kind === 'json' && jsonMode === 'json5' && <label className="hxt-check"><input type="checkbox" checked={quoteJson5Keys} onChange={(event) => { const checked = event.target.checked; setQuoteJson5Keys(checked); setInput((current) => quoteJson5SourceKeys(current, checked)); setOutput(''); setTree(null); setError(''); setStatus('JSON5 source keys updated.'); }} /> Quote keys</label>}
-            {kind === 'json' && <label className="runnable-code__target"><span>Syntax</span><select value={jsonMode} onChange={(event) => onJsonModeChange(event.target.value)} aria-label="JSON syntax"><option value="json">JSON</option><option value="jsonc">JSONC</option><option value="json5">JSON5</option></select></label>}
+            {kind === 'json' && (jsonMode === 'json' || jsonMode === 'jsonl') && <label className="hxt-check"><input type="checkbox" checked={sortKeys} onChange={(event) => { setSortKeys(event.target.checked); setOutput(''); setTree(null); setError(''); setStatus(event.target.checked ? 'Sort keys enabled for the next format operation.' : 'Sort keys disabled.'); }} /><span className="switch-label">Sort keys</span></label>}
+            {kind === 'json' && <label className="runnable-code__target"><span>Syntax</span><select value={jsonMode} onChange={(event) => onJsonModeChange(event.target.value)} aria-label="JSON syntax"><option value="json">JSON</option><option value="jsonl">JSONL</option><option value="jsonc">JSONC</option><option value="json5">JSON5</option></select></label>}
             {(kind === 'xml' || kind === 'html') && <label className="hxt-check" title="Removes leading and trailing whitespace from text nodes"><input type="checkbox" checked={trimTextNodes} onChange={(event) => setTrimTextNodes(event.target.checked)} /> Trim Text Nodes</label>}
             {kind === 'html' && <label className="hxt-check"><input type="checkbox" checked={minifyCss} onChange={(event) => setMinifyCss(event.target.checked)} /> Minify inline CSS</label>}
           </div>
@@ -571,7 +600,7 @@ export default function HtmlXmlJsonToolPage() {
           </div>
         </div>
 
-        {(error || status) && <div className={`hxt-message${error ? ' hxt-message--error' : ' hxt-message--success'}`} role={error ? 'alert' : 'status'}>{error || status}{error && kind === 'json' && jsonMode === 'json' && jsonCommentsError(input) && <button type="button" className="hxt-autofix" onClick={autoFixComments}><WandSparkles size={14} /> Auto-Fix: Remove Comments</button>}</div>}
+        {(error || status) && <div className={`hxt-message${error ? ' hxt-message--error' : ' hxt-message--success'}`} role={error ? 'alert' : 'status'}>{error || status}{error && kind === 'json' && (jsonMode === 'json' || jsonMode === 'jsonl') && getRepairChanges(input, jsonMode).length > 0 && <button type="button" className="hxt-autofix" onClick={autoFixJson}><WandSparkles size={14} /> {repairActionLabel()}</button>}</div>}
 
         <div className="hxt-panes">
           <div className="hxt-pane">

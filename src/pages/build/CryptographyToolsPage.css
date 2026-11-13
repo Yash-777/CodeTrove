@@ -5,3 +5,20 @@
 .crypto-explainer p{margin:.8rem 0;line-height:1.65}
 .crypto-explainer code{overflow-wrap:anywhere}
 .crypto-security-options input[type="number"]{width:100%;min-width:0}
+.crypto-file-picker { cursor: pointer; }
+.crypto-file-picker input[type="file"] { min-height: 34px; padding: 7px; cursor: pointer; }
+.crypto-inline-button { border: 0; padding: 0; color: var(--color-accent); background: transparent; cursor: pointer; font: inherit; text-decoration: underline; }
+.crypto-hash-reference { max-width: 1240px; margin: 30px auto 0; }
+.crypto-hash-reference h2 { margin: 5px 0; font-size: 1.45rem; }
+.crypto-hash-reference > p { color: var(--color-muted); line-height: 1.6; }
+.crypto-hash-details { display: grid; gap: 9px; margin-top: 16px; }
+.crypto-hash-details details { overflow: hidden; border: 1px solid var(--color-border); border-radius: 10px; background: var(--color-paper); }
+.crypto-hash-details summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px; cursor: pointer; list-style: none; }
+.crypto-hash-details summary::-webkit-details-marker { display: none; }
+.crypto-hash-details summary strong { color: var(--color-text); }
+.crypto-hash-details summary span { color: var(--color-muted); font-size: .8rem; text-align: right; }
+.crypto-hash-details details > div { padding: 2px 14px 10px; border-top: 1px solid var(--color-border); background: var(--color-bg); }
+.crypto-hash-details p { margin: 10px 0; color: var(--color-muted); font-size: .84rem; line-height: 1.6; }
+.crypto-hash-details p strong { color: var(--color-text); }
+.crypto-hash-details code { font-family: var(--font-mono); }
+@media(max-width:800px) { .crypto-hash-details summary { align-items: flex-start; flex-direction: column; } .crypto-hash-details summary span { text-align: left; } }

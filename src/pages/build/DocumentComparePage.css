@@ -116,7 +116,7 @@
   .sp-button--swap, .sp-button--primary { width: 100%; margin-left: 0; }
   .sp-results__heading { align-items: flex-start; flex-direction: column; }
   .sp-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .sp-diff-table { min-width: 690px; }
+  .sp-diff-table { min-width: 980px; }
   .sp-result-count { width: 100%; }
 }
 
@@ -152,6 +152,12 @@
 .sp-record-ids span { display: block; }
 .sp-record-ids span:first-child { color: #a53535; }
 .sp-record-ids span:last-child { color: #167343; }
+.sp-id-chip { display: inline-flex; min-width: 3.2rem; justify-content: center; padding: 0.14rem 0.35rem; border-radius: 4px; font: 0.69rem/1.35 var(--font-mono); white-space: nowrap; }
+.sp-id-chip--left { color: #a53535; background: color-mix(in srgb, #c43b3b 10%, var(--color-paper)); }
+.sp-id-chip--right { color: #167343; background: color-mix(in srgb, #279650 10%, var(--color-paper)); }
+.sp-source-position { min-width: 4.5rem; color: var(--color-muted); font: 0.72rem var(--font-mono); text-align: center !important; white-space: nowrap; }
+.sp-open-source-note { margin: 0.65rem 0 0; color: var(--color-muted); font-size: 0.72rem; }
+.sp-open-source-note a { color: var(--color-accent); text-underline-offset: 2px; }
 @media (max-width: 580px) {
   .sp-mode-tabs { width: 100%; }
   .sp-mode-tabs button { flex: 1; }

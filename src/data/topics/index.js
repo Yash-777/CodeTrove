@@ -34,6 +34,7 @@
 
 import javaTopics from './java.js';
 import javascriptTopics from './javascript.js';
+import scalaTopics from './scala.js';
 import typescriptTopics from './typescript.js';
 import nodejsTopics from './nodejs.js';
 import jsonTopics from './json.js';
@@ -55,6 +56,7 @@ export const CATEGORIES = [
     tools: [
      // { name: 'Java Formatter', description: 'Beautify Java source using standard style rules.', internalTool: 'java-formatter', externalUrl: null },
       { name: 'Java Decompiler', description: 'Inspect .class files and browse JAR bytecode as Java source locally, with Java-version samples and source ZIP export.', internalTool: 'java-decompiler', externalUrl: null },
+      { name: 'JSON ⇄ Java POJO / Record Converter', description: 'Convert JSON or JSON5 to Java POJOs and Records with optional Lombok annotations, or create representative JSON from Java declarations.', internalTool: 'java-json-converter', externalUrl: null },
       { name: 'Maven POM Formatter', description: 'Convert dependency XML to a one-line custom build format and back, and pretty-print pom.xml (2/3/4 spaces).', internalTool: 'pom-formatter', externalUrl: null },
       { name: 'Properties ⇄ YAML ⇄ JSON Converter', description: 'Validate, format, and convert application.properties, application.yml, and application.json in all six directions.', internalTool: 'properties-yaml-converter', externalUrl: null },
     ],
@@ -83,6 +85,19 @@ export const CATEGORIES = [
     })),
     tools: [
       { name: 'TypeScript Playground', description: 'Experiment with TypeScript examples in the browser.', internalTool: null, externalUrl: 'https://www.typescriptlang.org/play' },
+    ],
+  },
+  {
+    key: 'scala',
+    label: 'Scala',
+    color: '#DC322F',
+    codeLang: 'scala',
+    topics: scalaTopics.map((topic) => ({
+      ...topic,
+      body: getTopicContent('scala', topic.slug),
+    })),
+    tools: [
+      { name: 'Scala Playground', description: 'Compile and run Scala 3 worksheet examples with Scastie.', internalTool: null, externalUrl: 'https://scastie.scala-lang.org/' },
     ],
   },
   {
@@ -117,7 +132,9 @@ export const CATEGORIES = [
     topics: [],
     tools: [
       { name: 'HTML / XML / JSON Formatter & Validator', description: 'Beautify, minify, validate, and explore JSON/XML in a tree view.', internalTool: 'html-xml-json', externalUrl: null },
+      { name: 'HTTP Status Codes', description: 'Browse 1XX–5XX HTTP status code samples and convert a validated dataset to formatted JSON or JSONL.', internalTool: 'http-status-codes', externalUrl: null },
       { name: 'Compare Online (JSON/XML/HTML)', description: 'Format, validate, and compare two JSON, XML, or HTML documents locally with side-by-side red and green differences.', internalTool: 'compare-online', externalUrl: null },
+      { name: 'JSON to GraphQL Schema Converter', description: 'Generate GraphQL type definitions and example queries from JSON data with configurable root names and nullability.', internalTool: 'json-to-graphql', externalUrl: null },
     ],
   },
   /*{
@@ -197,6 +214,7 @@ export const CATEGORIES = [
     tools: [
       { name: 'Document Converter', description: 'Convert CSV, JSON, and Excel workbooks in your browser, map or skip fields, add a result worksheet, and download the output without uploading files.', internalTool: 'document-converter', externalUrl: null },
       { name: 'Document Compare (CSV / Spreadsheet)', description: 'Compare two local CSV, TSV, or Excel worksheets side by side; match rows by position or a shared key and review cell, row, and column changes.', internalTool: 'document-compare', externalUrl: null },
+      { name: 'Compression Tool', description: 'Compress and decompress text or local files with GZIP, Deflate, ZIP, and educational Huffman modes, with levels, metrics, samples, copy, and download actions.', internalTool: 'compression', externalUrl: null },
     ],
   },
   {
@@ -232,6 +250,7 @@ export const CATEGORIES = [
     topics: [],
     tools: [
       { name: 'Network', description: 'Explore public connection details, DNS records, TCP setup, and TLS certificates with local command guides.', internalTool: 'network', externalUrl: null },
+      { name: 'Protocol Explorer', description: 'Learn HTTP, HTTPS, DNS, TCP, UDP, TLS, WebSocket, and ICMP through interactive packet and sequence traces.', internalTool: 'protocol-explorer', externalUrl: 'https://a2aprotocol.ai/tools/protocol-explorer' },
     ],
   },
 ];

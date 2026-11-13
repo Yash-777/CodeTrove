@@ -31,12 +31,17 @@ import PropertiesYamlConverterPage from './pages/build/PropertiesYamlConverterPa
 import UnixTimestampConverterPage from './pages/build/UnixTimestampConverterPage.jsx';
 import WorldClockPage from './pages/build/WorldClockPage.jsx';
 import HtmlXmlJsonToolPage from './pages/build/HtmlXmlJsonToolPage.jsx';
+import HttpStatusCodesPage from './pages/build/HttpStatusCodesPage.jsx';
+import JsonToGraphqlPage from './pages/build/JsonToGraphqlPage.jsx';
 import DocumentConverterPage from './pages/build/DocumentConverterPage.jsx';
 import DocumentComparePage from './pages/build/DocumentComparePage.jsx';
+import CompressionToolPage from './pages/build/CompressionToolPage.jsx';
 import JsonCrackPage from './pages/build/JsonCrackPage.jsx';
 import MarkdownEditorPage from './pages/build/MarkdownEditorPage.jsx';
 import JavaDecompilerPage from './pages/build/JavaDecompilerPage.jsx';
+import JavaJsonConverterPage from './pages/build/JavaJsonConverterPage.jsx';
 import NetworkToolsPage from './pages/build/NetworkToolsPage.jsx';
+import ProtocolExplorerPage from './pages/build/ProtocolExplorerPage.jsx';
 import ProjectsPage from './pages/build/ProjectsPage.jsx';
 import ProfilePage from './pages/store/ProfilePage.jsx';
 import ResumePage from './pages/store/ResumePage.jsx';
@@ -81,12 +86,17 @@ export default function App() {
           <Route path="/build/tools/unix-timestamp-converter" element={<UnixTimestampConverterPage />} />
           <Route path="/build/tools/world-clock" element={<WorldClockPage />} />
           <Route path="/build/tools/html-xml-json" element={<HtmlXmlJsonToolPage />} />
+          <Route path="/build/tools/http-status-codes" element={<HttpStatusCodesPage />} />
+          <Route path="/build/tools/json-to-graphql" element={<JsonToGraphqlPage />} />
           <Route path="/build/tools/document-converter" element={<DocumentConverterPage />} />
           <Route path="/build/tools/document-compare" element={<DocumentComparePage />} />
+          <Route path="/build/tools/compression" element={<CompressionToolPage />} />
           <Route path="/build/tools/java-decompiler" element={<JavaDecompilerPage />} />
+          <Route path="/build/tools/java-json-converter" element={<JavaJsonConverterPage />} />
           <Route path="/build/tools/json-crack" element={<JsonCrackPage />} />
           <Route path="/build/tools/markdown-editor" element={<MarkdownEditorPage />} />
           <Route path="/build/tools/network" element={<NetworkToolsPage />} />
+          <Route path="/build/tools/protocol-explorer" element={<ProtocolExplorerPage />} />
           <Route path="/build/projects" element={<RequireRole allow={ANY_LOGGED_IN}><ProjectsPage /></RequireRole>} />
 
           <Route path="/store/profile" element={<RequireRole allow={ANY_LOGGED_IN}><ProfilePage /></RequireRole>} />

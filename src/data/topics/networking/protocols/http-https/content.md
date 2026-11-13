@@ -440,6 +440,22 @@ The server could not identify the caller. The fix is to send valid credentials, 
 
 </details>
 
+<details>
+<summary>Scastie API: 502 Bad Gateway (Cloudflare)</summary>
+
+| Hop | Client sends | Server/cache answers | Network work | Next |
+|---:|---|---|---|---|
+| 1 | `GET https://scastie.scala-lang.org/api/progress-sse/m13DCH7sTIONTs3uA77aTg` | `502 Bad Gateway` from Cloudflare | DNS for `scastie.scala-lang.org`, TCP to `:443`, TLS handshake, HTTP exchange through Cloudflare | Cloudflare attempts to contact the Scastie origin server |
+| 2 | Cloudflare forwards the request to the Scastie origin | No valid upstream response received (exact response unknown) | Cloudflare-to-origin connection or upstream request fails, or the origin returns an invalid response | Cloudflare returns `502 Bad Gateway` to the client |
+
+A `502 Bad Gateway` indicates that Cloudflare, acting as a reverse proxy, could not obtain a valid response from the upstream Scastie server. Possible causes include an unavailable origin server, connection failures, upstream timeouts, or an invalid origin response.
+
+Unlike a `301` redirect, this response does not provide a `Location` header or a new target URL. The request fails at the gateway/proxy layer, so the client cannot proceed to another URL based on this response.
+
+The exact failure point between Cloudflare and the Scastie origin cannot be determined from the `502` status alone. Additional Cloudflare error details or origin-server logs would be needed.
+
+</details>
+
 ## 7. Status-code classes 
 
 HTTP response status codes are issued by a server in response to a client's request. The first digit of the three-digit code defines its class.
@@ -539,7 +555,7 @@ The summary tables are followed by one expandable section for every code covered
 | [`407`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/407) | Proxy Authentication Required | The client must authenticate with the proxy. The response includes `Proxy-Authenticate`. |
 | [`408`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/408) | Request Timeout | The server did not receive a complete request in time. |
 | [`409`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/409) | Conflict | The request conflicts with the current state of the resource, such as an edit conflict or a duplicate. |
-| [`410`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/410) | Gone | The resource is intentionally and permanently unavailable. |
+| [`410`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/410) | Gone <sup>[410: GONE, Code: DEPLOYMENT_DISABLED](https://jsperf.com/yashfunctions)</sup> | The resource is intentionally and permanently unavailable. |
 | [`411`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/411) | Length Required | The server requires a `Content-Length` header. |
 | [`412`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/412) | Precondition Failed | A conditional header such as `If-Match` evaluated to false. |
 | [`413`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/413) | Content Too Large | The request body exceeds a server limit (formerly "Payload Too Large"). |

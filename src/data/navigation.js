@@ -25,7 +25,7 @@ const tree = [
         { key: 'local-testing', label: 'Local Certificates for Testing', contentKey: 'networking/tls-ssl/local-testing' },
       ] },
       { key: 'protocols', label: 'Types of Protocols', contentKey: 'networking/protocols', children: [
-        { key: 'http-https', label: 'HTTP/HTTPS & Redirects', contentKey: 'networking/protocols/http-https' },
+        { key: 'http-https', label: 'HTTP/HTTPS & Status Codes', contentKey: 'networking/protocols/http-https' },
         { key: 'smtp', label: 'SMTP & Mail Delivery', contentKey: 'networking/protocols/smtp' },
         { key: 'ftp', label: 'FTP, FTPS & SFTP', contentKey: 'networking/protocols/ftp' },
         { key: 'tcp-udp', label: 'TCP vs UDP', contentKey: 'networking/protocols/tcp-udp' },
@@ -60,8 +60,15 @@ const tree = [
           { key: 'modern-java', label: 'Modern Java', pages: {'functional-programming': 'Functional Programming', 'virtual-threads': 'Virtual Threads', 'pattern-matching': 'Pattern Matching', 'sealed-classes': 'Sealed Classes'} },
         ]},
       ]},
-      { key: 'javascript', label: 'JavaScript', children: [
-        { key: 'language', label: 'Language', pages: {'types': 'Types', 'scope-closures': 'Scope Closures', 'prototypes': 'Prototypes', 'modules': 'Modules', 'promises': 'Promises', 'event-loop': 'Event Loop', 'variables-hoisting': { label: 'Variables & Hoisting (var, let, const)', contentKey: 'javascript/variables-hoisting' }} },
+      { key: 'javascript', label: 'JavaScript', pages: {
+        'types': 'Types',
+        'scope-closures': 'Scope Closures',
+        'prototypes': 'Prototypes',
+        'modules': 'Modules',
+        'promises': 'Promises',
+        'event-loop': 'Event Loop',
+        'variables-hoisting': { label: 'Variables & Hoisting (var, let, const)', contentKey: 'javascript/variables-hoisting' },
+      }, children: [
         { key: 'advanced', label: 'Advanced', pages: {'async-programming': 'Async Programming', 'memory-management': 'Memory Management', 'performance': 'Performance', 'web-workers': 'Web Workers'} },
       ]},
       { key: 'kotlin', label: 'Kotlin', children: [
@@ -88,11 +95,9 @@ const tree = [
           'delegation': 'Delegation',
         } },
       ]},
+      { key: 'scala', label: 'Scala', contentKey: 'languages/scala' },
       { key: 'typescript', label: 'TypeScript', pages: {'types-generics': 'Types Generics', 'interfaces': 'Interfaces', 'utility-types': 'Utility Types', 'tsconfig': 'Tsconfig', 'typescript-basics': 'TypeScript Basics'} },
-      { key: 'web', label: 'Web', children: [
-        { key: 'html', label: 'HTML', pages: {'semantic-html': 'Semantic Html', 'forms': 'Forms', 'accessibility': 'Accessibility'} },
-        { key: 'css', label: 'CSS', pages: {'layout': 'Layout', 'flexbox': 'Flexbox', 'grid': 'Grid', 'responsive-design': 'Responsive Design'} },
-      ]},
+      { key: 'python', label: 'Python', contentKey: 'languages/python' },
       { key: 'nodejs', label: 'Node.js', contentKey: 'languages/nodejs', pages: {
         'installation-and-versions': 'Installation and Version Management',
         'npm-and-package-json': 'npm and package.json',
@@ -102,7 +107,16 @@ const tree = [
         'express': 'Express HTTP Services',
         'security': 'Security Basics',
         'windows-cli-troubleshooting': 'Windows PATH and CLI Troubleshooting',
-      } },
+      }},
+    ],
+  },
+  {
+    key: 'web-languages', label: 'Web Languages', children: [
+      { key: 'html', label: 'HTML', pages: {'semantic-html': 'Semantic HTML', 'forms': 'Forms', 'accessibility': 'Accessibility'} },
+      { key: 'css', label: 'CSS', pages: {'layout': 'Layout', 'flexbox': 'Flexbox', 'grid': 'Grid', 'responsive-design': 'Responsive Design'} },
+      { key: 'markdown', label: 'Markdown', contentKey: 'web-languages/markdown', 
+        pages: {/*'markdown-syntax': 'Markdown Syntax', 'markdown-extensions': 'Markdown Extensions', */'mermaid-diagrams': 'Mermaid Diagrams'}
+      },
     ],
   },
   {
@@ -110,6 +124,7 @@ const tree = [
       'overview': { label: 'Interview Guide Overview', contentKey: 'interview-prep' },
     }, children: [
       { key: 'java', label: 'Java', children: [
+        { key: 'programs', label: 'Programs', contentKey: 'interview-prep/java/programs' },
         { key: 'fundamentals', label: 'Java SE Fundamentals', contentKey: 'interview-prep/java/fundamentals' },
         { key: 'oop-contracts', label: 'OOP & Object Contracts', contentKey: 'interview-prep/java/oop-contracts' },
         { key: 'collections', label: 'Collections & Comparators', contentKey: 'interview-prep/java/collections' },
@@ -147,7 +162,7 @@ const tree = [
       ]},
       { key: 'javascript', label: 'JavaScript', pages: {'javascript-interview-questions': 'Javascript Interview Questions', 'frontend-architecture-interview': 'Frontend Architecture Interview'} },
       { key: 'system-design', label: 'System Design', pages: {'system-design-fundamentals': 'System Design Fundamentals', 'scalability': 'Scalability', 'availability-reliability': 'Availability Reliability', 'caching-strategies': 'Caching Strategies', 'rate-limiting': 'Rate Limiting'} },
-      { key: 'behavioral', label: 'Senior Engineer', pages: {'pr-impact-beyond-jira': 'Pr Impact Beyond Jira', 'code-review': 'Code Review', 'refactoring': 'Refactoring', 'technical-leadership': 'Technical Leadership'} },
+      { key: 'behavioral', label: 'Senior Engineer', pages: {'pr-impact-beyond-jira': 'Pr Impact Beyond Jira', 'code-review': 'Code Review', 'technical-leadership': 'Technical Leadership'} },
     ],
   },
   {
@@ -223,7 +238,13 @@ const tree = [
   },
   {
     key: 'backend', label: 'Backend & Spring', children: [
-      { key: 'spring', label: 'Spring Framework', pages: {'ioc-di': 'Ioc Di', 'bean-lifecycle': 'Bean Lifecycle', 'application-context': 'Application Context', 'aop': 'Aop', 'interceptors': 'Interceptors', 'filters': 'Filters'} },
+      { key: 'spring', label: 'Spring Framework', pages: {'ioc-di': 'Ioc Di', 'bean-lifecycle': 'Bean Lifecycle', 'application-context': 'Application Context', 'aop': 'Aop', 'interceptors': 'Interceptors', 'filters': 'Filters'}, children: [
+        { key: 'annotations', label: 'Annotations', contentKey: 'backend/spring/annotations', children: [
+          { key: 'annotation-catalogue', label: 'Annotations Catalogue', contentKey: 'backend/spring/annotations/annotation-catalogue' },
+          { key: 'primary-qualifier', label: '@Primary vs @Qualifier', contentKey: 'backend/spring/annotations/primary-qualifier' },
+          { key: 'annotation-interview-questions', label: 'Annotation Interview Questions', contentKey: 'backend/spring/annotations/annotation-interview-questions' },
+        ] },
+      ] },
       { key: 'spring-boot', label: 'Spring Boot', pages: {'auto-configuration': 'Auto Configuration', 'configuration-properties': 'Configuration Properties', 'actuator': 'Actuator', 'profiles': 'Profiles', 'starters': 'Starters', 'exception-handling': {label: 'Exception Handling', contentKey: 'backend/spring-boot/exception-handling'}} },
       { key: 'spring-web', label: 'Spring Web', pages: {'dispatcher-servlet': 'Dispatcher Servlet', 'rest-controllers': 'Rest Controllers', 'validation': 'Validation', 'global-exception-handling': 'Global Exception Handling'} },
       { key: 'spring-security', label: 'Spring Security', pages: {'security-filters': 'Security Filters', 'authentication': 'Authentication', 'authorization': 'Authorization', 'preauthorize': 'Preauthorize', 'oauth2-jwt': 'Oauth2 Jwt'} },
@@ -235,7 +256,9 @@ const tree = [
     key: 'api-integration', label: 'API & Integration', children: [
       { key: 'api-gateway', label: 'API Gateway', pages: {'gateway-pattern': 'Gateway Pattern', 'routing': 'Routing', 'authentication-at-gateway': 'Authentication At Gateway', 'gateway-rate-limiting': 'Gateway Rate Limiting'} },
       { key: 'load-balancing', label: 'Load Balancing', pages: {'load-balancer-basics': 'Load Balancer Basics', 'client-side-load-balancing': 'Client Side Load Balancing', 'health-checks': 'Health Checks'} },
-      { key: 'rest', label: 'REST APIs', pages: {'rest-principles': 'Rest Principles', 'http-methods': 'Http Methods', 'status-codes': 'Status Codes', 'pagination': 'Pagination', 'versioning': 'Versioning'} },
+      { key: 'rest', label: 'REST APIs', pages: {'rest-principles': 'Rest Principles', 
+        'http-methods': {label: 'Http Methods & Status Codes', contentKey: 'networking/protocols/http-https'},
+        'pagination': 'Pagination', 'versioning': 'Versioning'} },
       { key: 'resilience', label: 'Resilience', pages: {'timeouts-retries': 'Timeouts Retries', 'idempotency': 'Idempotency', 'rate-limiting': 'Rate Limiting', 'dos-protection': 'Dos Protection', 'bulkheads': 'Bulkheads'} },
       { key: 'documentation', label: 'API Documentation', pages: {'openapi-swagger': 'Openapi Swagger', 'postman': 'Postman'} },
     ],
@@ -248,8 +271,8 @@ const tree = [
       { key: 'system-design', label: 'System Design', pages: {'capacity-planning': 'Capacity Planning', 'consistency': 'Consistency', 'partitioning': 'Partitioning', 'sharding': 'Sharding', 'disaster-recovery': 'Disaster Recovery'} },
     ],
   },
-    {
-    key: 'messaging', label: 'Messaging & Streaming', children: [
+  {
+    key: 'messaging', label: 'Messaging & Streaming', pages: {'akka-actor': 'Akka Actor', 'mail-api': 'Mail API'}, children: [
       { key: 'kafka', label: 'Apache Kafka', pages: {'architecture': 'Architecture', 'producers-consumers': 'Producers Consumers', 'partitions-offsets': 'Partitions Offsets', 'consumer-groups': 'Consumer Groups', 'delivery-semantics': 'Delivery Semantics', 'transactions': 'Transactions', 'interview': 'Interview Questions'} },
       { key: 'rabbitmq', label: 'RabbitMQ', pages: {'exchanges-queues': 'Exchanges Queues', 'acknowledgements': 'Acknowledgements', 'routing': 'Routing'} },
       { key: 'patterns', label: 'Messaging Patterns', pages: {'outbox-pattern': 'Outbox Pattern', 'saga-pattern': 'Saga Pattern', 'dead-letter-queues': 'Dead Letter Queues', 'exactly-once-processing': 'Exactly Once Processing'} },
@@ -266,7 +289,7 @@ const tree = [
   },
   {
     key: 'security', label: 'Security', children: [
-      { key: 'cryptography', label: 'Cryptography', data: 'content.md', pages: {'symmetric-encryption': 'Symmetric Encryption', 'asymmetric-encryption': 'Asymmetric Encryption', 'hashing': 'Hashing', 'digital-signatures': 'Digital Signatures'} },
+      { key: 'cryptography', label: 'Cryptography', data: 'content.md', pages: {'hashing-encryption': 'Hashing vs Encryption'/*'symmetric-encryption': 'Symmetric Encryption', 'asymmetric-encryption': 'Asymmetric Encryption', 'hashing': 'Hashing', 'digital-signatures': 'Digital Signatures'*/} },
       { key: 'application-security', label: 'Application Security', pages: {'owasp-top-10': 'Owasp Top 10', 'input-validation': 'Input Validation', 'csrf': 'Csrf', 'cors': 'Cors', 'secure-headers': 'Secure Headers'} },
       { key: 'identity', label: 'Identity & Access', pages: {'oauth2': 'Oauth2', 'openid-connect': 'Openid Connect', 'jwt': 'Jwt', 'rbac': 'Rbac', 'secrets': 'Secrets'} },
       { key: 'api-security', label: 'API Security', pages: {'api-authentication': 'Api Authentication', 'api-authorization': 'Api Authorization', 'token-validation': 'Token Validation', 'dos-mitigation': 'Dos Mitigation'} },
@@ -309,6 +332,7 @@ const tree = [
       { key: 'api-testing', label: 'API Testing', pages: {'postman-testing': 'Postman Testing', 'swagger-testing': 'Swagger Testing'} },
       { key: 'quality', label: 'Code Quality', pages: {'sonarqube': 'Sonarqube', 'linting': 'Linting', 'static-analysis': 'Static Analysis', 'quality-gates': 'Quality Gates'} },
       { key: 'performance', label: 'Performance Testing', pages: {'load-testing': 'Load Testing', 'stress-testing': 'Stress Testing', 'profiling': 'Profiling'} },
+      { key: 'selenium-xpaths', label: 'Selenium XPaths', contentKey: 'testing-quality/selenium-xpaths' },
     ],
   },
   {
@@ -318,7 +342,7 @@ const tree = [
       { key: 'containers', label: 'Containers', pages: {'docker': 'Docker', 'docker-compose': 'Docker Compose', 'container-images': 'Container Images'} },
       { key: 'orchestration', label: 'Kubernetes', pages: {'pods': 'Pods', 'deployments': 'Deployments', 'services': 'Services', 'configmaps-secrets': 'Configmaps Secrets', 'ingress': 'Ingress', 'autoscaling': 'Autoscaling'} },
       { key: 'ci-cd', label: 'CI/CD', pages: {'pipeline-basics': 'Pipeline Basics', 'github-actions': 'Github Actions', 'deployment-strategies': 'Deployment Strategies'} },
-      { key: 'cloud', label: 'Cloud', pages: {'aws-basics': 'Aws Basics', 'compute': 'Compute', 'managed-databases': 'Managed Databases', 'object-storage': 'Object Storage'} },
+      { key: 'cloud', label: 'Cloud', pages: {'aws-basics': 'AWS Foundations', 'compute': 'Compute', 'managed-databases': 'Managed Databases', 'object-storage': 'Object Storage'} },
     ],
   },
   {
@@ -373,11 +397,11 @@ const tree = [
   },
 ];
 
-tree.push({
-  key: 'ai',
-  label: 'AI & Machine Learning',
-  contentKey: 'ai',
-});
+tree.push(
+  {
+  key: 'ai', label: 'AI & Machine Learning', contentKey: 'ai', 
+  }
+);
 
 const legacyPlatform = ['text', 'nodejs', 'json', /*'jwt',*/ 'email'].map((categoryKey) => {
   const category = CATEGORIES.find((item) => item.key === categoryKey);
@@ -394,14 +418,21 @@ const legacyPlatform = ['text', 'nodejs', 'json', /*'jwt',*/ 'email'].map((categ
 
 tree.push(
     {
-    key: 'tools', label: 'Developer Tools', children: [
+    key: 'tools', label: 'Developer Tools', pages: {'chromium-docs': 'Chromium Docs', 'bat-files': 'BAT Files', 'windows-command-line': 'Windows Command Line', 'freemarker-ftl': 'FreeMarker Template Language (FTL)'}, children: [
       { key: 'Notepad++', label: 'Notepad++', data: 'content.md', /*pages: {'text-editors': 'Text Editors', 'regex': 'Regex', 'file-compare': 'File Compare'}*/ },
       { key: 'api-tools', label: 'API Tools', pages: {'postman': 'Postman', 'swagger-ui': 'Swagger Ui', 'curl': 'Curl'} },
       { key: 'database-tools', label: 'Database Tools', pages: {'database-clients': 'Database Clients', 'query-analyzers': 'Query Analyzers'} },
       { key: 'developer-tools', label: 'Developer Workflow', pages: {'ide-debugging': 'Ide Debugging', 'terminal-tools': 'Terminal Tools', 'http-debugging': 'Http Debugging'} },
     ],
   },
-  { key: 'platform', label: 'Platform', children: legacyPlatform }
+  { key: 'platform', label: 'Platform', children: legacyPlatform },
+  {
+    key: 'others', label: 'Other ...', pages: {
+      'mapstruct': 'MapStruct', 'connection-pool': 'Connection Pool', 'refactoring': 'Refactoring', 'github-repo-ai': 'GitHub Repo with AI Tools',
+      /*'regex': 'Regex', 'unicode': 'Unicode', 'ascii': 'Ascii', 'base64': 'Base64', 'url-encoding': 'Url Encoding', 'html-entities': 'Html Entities'*/
+    }
+        //{'ioc-di': 'Ioc Di', 'bean-lifecycle': 'Bean Lifecycle', 'application-context': 'Application Context', 'aop': 'Aop', 'interceptors': 'Interceptors', 'filters': 'Filters'} },
+  }
 );
 
 function normalizeNode(node, parentPath = []) {

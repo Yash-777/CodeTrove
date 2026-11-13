@@ -20,8 +20,13 @@ export default function MermaidDiagram({ chart, title = 'Mermaid diagram' }) {
           mermaid.initialize({
             startOnLoad: false,
             securityLevel: 'strict',
-            theme: 'default',
+            //theme: 'default', look: 'classic',
+            theme: 'redux-color', look: 'neo',
             htmlLabels: false,
+            flowchart: {
+              theme: 'default', look: 'classic', layout: 'dagre', curve: 'linear',
+              wrappingWidth: 400, // keeps labels like "Application configuration" on one line
+            },
           });
           mermaidInitialized = true;
         }

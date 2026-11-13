@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { lazy, Suspense, useMemo, useRef, useState } from 'react';
 import { AlertCircle, ArrowLeftRight, Check, ChevronDown, Download, FileSpreadsheet, FileUp, RotateCcw, ShieldCheck, Table2, Text } from 'lucide-react';
 import ToolBackLink from '../../components/ToolBackLink.jsx';
 import { parseCsvTable, serializeCsv } from '../../utils/documentConverter.js';
@@ -15,8 +15,9 @@ import {
 } from '../../utils/spreadsheetCompare.js';
 import './DocumentComparePage.css';
 
-const EMPTY_SIDE = { name: '', size: 0, type: '', rawText: '', table: null, workbook: null, sheetNames: [], sheetName: '' };
+const EMPTY_SIDE = { name: '', size: 0, type: '', rawText: '', table: null, workbook: null, sheetNames: [], sheetName: '', tableDirty: false };
 const ROW_LIMIT = 350;
+const SpreadsheetGrid = lazy(() => import('../../components/SpreadsheetGrid.jsx'));
 
 function getExcelJS() {
   return import('exceljs').then((module) => module.default || module);
@@ -47,21 +48,12 @@ function getDisplayValue(value) {
   return String(value);
 }
 
-function DataTable({ table, label, side }) {
+function DataTable({ table, label, onChange }) {
   if (!table) return <div className="sp-drop-hint"><Table2 size={18} /><span>{label} is not loaded yet. Choose a file or use Sample to preview rows and columns.</span></div>;
-  return (
-    <div className="sp-source-table-wrap" role="region" aria-label={`${label} rows and columns`} tabIndex="0">
-      <table className="sp-source-table">
-        <thead><tr><th scope="col">{side}-ID</th>{table.headers.map((header) => <th scope="col" key={header.key}>{header.label}</th>)}</tr></thead>
-        <tbody>{table.rows.slice(0, 60).map((row, rowIndex) => (
-          <tr key={`${side}-${rowIndex}`}><th scope="row">{side}-{String(rowIndex + 1).padStart(2, '0')}</th>{table.headers.map((header) => <td key={header.key}>{getDisplayValue(row[header.index])}</td>)}</tr>
-        ))}</tbody>
-      </table>
-    </div>
-  );
+  return <Suspense fallback={<div className="sp-drop-hint" role="status">Loading spreadsheet editor…</div>}><SpreadsheetGrid table={table} label={label} onChange={onChange} /></Suspense>;
 }
 
-function SideInput({ side, label, data, fileRef, formatMode, csvView, onLoadFile, onSample, onClear, onSheetChange, onTextChange }) {
+function SideInput({ side, label, data, fileRef, formatMode, csvView, onLoadFile, onSample, onClear, onSheetChange, onTextChange, onTableChange }) {
   const sideName = side === 'left' ? 'Original' : 'Updated';
   const fileAccept = formatMode === 'csv' ? '.csv,.tsv,text/csv,text/tab-separated-values' : '.xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
   return (
@@ -84,12 +76,12 @@ function SideInput({ side, label, data, fileRef, formatMode, csvView, onLoadFile
           <textarea className="sp-csv-textarea" value={data.rawText} onChange={(event) => onTextChange(event.target.value)} spellCheck="false" aria-label={`${sideName} CSV source text`} placeholder={'Employee ID,Name,Department\nE-101,Ada Lovelace,Engineering'} />
         </div>
       )}
-      {formatMode === 'csv' && csvView === 'table' && <div className="sp-source-view"><div className="sp-source-view__heading"><strong>{sideName} rows and columns</strong><span>{data.table?.rows.length > 60 ? `First 60 of ${data.table.rows.length.toLocaleString()} rows` : 'Parsed data preview'}</span></div><DataTable table={data.table} label={sideName} side={side === 'left' ? 'L' : 'R'} /></div>}
+      {formatMode === 'csv' && csvView === 'table' && <div className="sp-source-view"><div className="sp-source-view__heading"><strong>{sideName} rows and columns</strong><span>Editable spreadsheet · source row numbers start at 1</span></div><DataTable table={data.table} label={sideName} onChange={onTableChange} /></div>}
       {formatMode === 'excel' && data.sheetNames.length > 1 && (
         <label className="sp-sheet-select">Worksheet<select value={data.sheetName} onChange={(event) => onSheetChange(event.target.value)} aria-label={`Select ${sideName.toLowerCase()} worksheet`}>{data.sheetNames.map((name) => <option key={name} value={name}>{name}</option>)}</select></label>
       )}
       {formatMode === 'excel' && data.sheetName && data.sheetNames.length <= 1 && <p className="sp-sheet-name">Worksheet: {data.sheetName}</p>}
-      {formatMode === 'excel' && <div className="sp-source-view"><div className="sp-source-view__heading"><strong>{sideName} worksheet preview</strong><span>{data.table?.rows.length > 60 ? `First 60 of ${data.table.rows.length.toLocaleString()} rows` : 'Rows and columns'}</span></div><DataTable table={data.table} label={`${sideName} Excel worksheet`} side={side === 'left' ? 'L' : 'R'} /></div>}
+      {formatMode === 'excel' && <div className="sp-source-view"><div className="sp-source-view__heading"><strong>{sideName} worksheet</strong><span>Editable worksheet grid · Excel row and column coordinates</span></div><DataTable table={data.table} label={`${sideName} Excel worksheet`} onChange={onTableChange} /></div>}
     </section>
   );
 }
@@ -185,9 +177,20 @@ export default function DocumentComparePage() {
 
   function changeCsvText(side, rawText) {
     const current = getSide(side);
-    assignSide(side, { ...current, name: current.name || (rawText ? 'Pasted CSV data' : ''), size: new Blob([rawText]).size, type: current.type === 'tsv' ? 'tsv' : 'csv', rawText, table: null, workbook: null, sheetNames: [], sheetName: '' });
+    assignSide(side, { ...current, name: current.name || (rawText ? 'Pasted CSV data' : ''), size: new Blob([rawText]).size, type: current.type === 'tsv' ? 'tsv' : 'csv', rawText, table: null, workbook: null, sheetNames: [], sheetName: '', tableDirty: false });
     setResult(null); setValidationReady(false);
     setStatus({ type: 'idle', message: 'CSV text changed. Validate both inputs to check the data before comparing.' });
+  }
+
+  function changeGridTable(side, table) {
+    const current = getSide(side);
+    const delimiter = current.type === 'tsv' ? '\t' : ',';
+    const rawText = formatMode === 'csv'
+      ? serializeCsv({ headers: table.headers.map((header) => header.label), rows: table.rows }, delimiter, { escapeFormulae: false })
+      : current.rawText;
+    assignSide(side, { ...current, table, rawText, size: formatMode === 'csv' ? new Blob([rawText]).size : current.size, tableDirty: true });
+    setResult(null); setValidationReady(false);
+    setStatus({ type: 'idle', message: 'Spreadsheet cells changed locally. Validate both inputs again before comparing.' });
   }
 
   async function loadSample(side) {
@@ -236,8 +239,8 @@ export default function DocumentComparePage() {
         rightTable = parseComparisonCsv(right.rawText, right.type === 'tsv' ? '\t' : '');
       } else {
         if (!left.workbook || !right.workbook) throw new Error('Load or sample an Excel workbook on both sides before validating.');
-        leftTable = worksheetToComparisonTable(left.workbook.getWorksheet(left.sheetName));
-        rightTable = worksheetToComparisonTable(right.workbook.getWorksheet(right.sheetName));
+        leftTable = left.tableDirty ? left.table : worksheetToComparisonTable(left.workbook.getWorksheet(left.sheetName));
+        rightTable = right.tableDirty ? right.table : worksheetToComparisonTable(right.workbook.getWorksheet(right.sheetName));
       }
       if (!leftTable.headers.length || !rightTable.headers.length) throw new Error('Both inputs need a header row with at least one column.');
       setLeft((current) => ({ ...current, table: leftTable })); setRight((current) => ({ ...current, table: rightTable }));
@@ -250,7 +253,7 @@ export default function DocumentComparePage() {
     const current = getSide(side);
     try {
       const table = worksheetToComparisonTable(current.workbook?.getWorksheet(name));
-      assignSide(side, { ...current, sheetName: name, table }); setResult(null); setValidationReady(false);
+      assignSide(side, { ...current, sheetName: name, table, tableDirty: false }); setResult(null); setValidationReady(false);
       setStatus({ type: 'ok', message: `Selected worksheet “${name}”. Validate again before comparing.` });
     } catch (error) { setStatus({ type: 'error', message: error?.message || 'Could not read that worksheet.' }); }
   }
@@ -313,9 +316,9 @@ export default function DocumentComparePage() {
 
       <section className="sp-workspace" aria-label={`${formatMode === 'csv' ? 'CSV' : 'Excel'} comparison workspace`}>
         <div className="sp-file-grid">
-          <SideInput side="left" label="LEFT · ORIGINAL" data={left} fileRef={leftInputRef} formatMode={formatMode} csvView={csvView} onLoadFile={(file) => loadFile('left', file)} onSample={() => loadSample('left')} onClear={() => clearSide('left')} onSheetChange={(name) => changeSheet('left', name)} onTextChange={(value) => changeCsvText('left', value)} />
+          <SideInput side="left" label="LEFT · ORIGINAL" data={left} fileRef={leftInputRef} formatMode={formatMode} csvView={csvView} onLoadFile={(file) => loadFile('left', file)} onSample={() => loadSample('left')} onClear={() => clearSide('left')} onSheetChange={(name) => changeSheet('left', name)} onTextChange={(value) => changeCsvText('left', value)} onTableChange={(table) => changeGridTable('left', table)} />
           <div className="sp-swap" aria-hidden="true"><ArrowLeftRight size={19} /></div>
-          <SideInput side="right" label="RIGHT · UPDATED" data={right} fileRef={rightInputRef} formatMode={formatMode} csvView={csvView} onLoadFile={(file) => loadFile('right', file)} onSample={() => loadSample('right')} onClear={() => clearSide('right')} onSheetChange={(name) => changeSheet('right', name)} onTextChange={(value) => changeCsvText('right', value)} />
+          <SideInput side="right" label="RIGHT · UPDATED" data={right} fileRef={rightInputRef} formatMode={formatMode} csvView={csvView} onLoadFile={(file) => loadFile('right', file)} onSample={() => loadSample('right')} onClear={() => clearSide('right')} onSheetChange={(name) => changeSheet('right', name)} onTextChange={(value) => changeCsvText('right', value)} onTableChange={(table) => changeGridTable('right', table)} />
         </div>
 
         <div className="sp-options" aria-label="Comparison options">
@@ -337,10 +340,11 @@ export default function DocumentComparePage() {
         <div className="sp-summary" aria-label="Change summary"><div><strong>{result.summary.unchanged}</strong><span>Identical records</span></div><div><strong>{result.summary.changed}</strong><span>Changed records</span></div><div className="sp-summary__added"><strong>{result.summary.added}</strong><span>Right-only records</span></div><div className="sp-summary__removed"><strong>{result.summary.removed}</strong><span>Left-only records</span></div><div><strong>{result.summary.changedCells}</strong><span>Changed cells</span></div></div>
         {(result.addedColumns.length > 0 || result.removedColumns.length > 0) && <p className="sp-column-note">{result.addedColumns.length > 0 && <span><b>New columns:</b> {result.addedColumns.join(', ')}</span>}{result.addedColumns.length > 0 && result.removedColumns.length > 0 && <span aria-hidden="true"> · </span>}{result.removedColumns.length > 0 && <span><b>Removed columns:</b> {result.removedColumns.join(', ')}</span>}</p>}
         <div className="sp-result-toolbar"><label className="sp-check"><input type="checkbox" checked={changedOnly} onChange={(event) => setChangedOnly(event.target.checked)} /> Show mismatches only</label><label className="sp-search"><span className="sr-only">Filter comparison results</span><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Filter by ID, row, column, or value" /></label><span className="sp-result-count">{visibleCells.length.toLocaleString()} matching cell entries</span></div>
-        {visibleCells.length === 0 ? <div className="sp-empty-result"><Check size={19} /><p>{result.summary.changed || result.summary.added || result.summary.removed ? 'No cells match this filter.' : 'The records match. No differences were found.'}</p></div> : <div className="sp-table-wrap" role="region" aria-label="Scrollable side-by-side cell differences" tabIndex="0"><table className="sp-diff-table"><thead><tr><th scope="col">Change</th><th scope="col">Record IDs</th><th scope="col">Match key</th><th scope="col">Column</th><th scope="col">Original</th><th scope="col">Updated</th></tr></thead><tbody>{visibleRows.map((cell, index) => <tr className={`sp-diff-row sp-diff-row--${cell.type}${cell.changed && cell.type === 'changed' ? ' is-cell-changed' : ''}`} key={`${cell.type}-${cell.rowKey}-${cell.label}-${index}`}><td><span className={`sp-change-badge sp-change-badge--${cell.type}`}>{cell.type}</span></td><td className="sp-record-ids"><span>{cell.leftRecordId || '—'}</span><span>{cell.rightRecordId || '—'}</span></td><td><span className="sp-row-key">{cell.rowKey}</span><small>source rows {cell.leftRowNumber || '—'} / {cell.rightRowNumber || '—'}</small></td><td>{cell.label}</td><td className="sp-value sp-value--left">{getDisplayValue(cell.left)}</td><td className="sp-value sp-value--right">{getDisplayValue(cell.right)}</td></tr>)}</tbody></table>{visibleCells.length > visibleRows.length && <button type="button" className="sp-show-more" onClick={() => setVisibleLimit((limit) => limit + ROW_LIMIT)}><ChevronDown size={16} /> Show more ({(visibleCells.length - visibleRows.length).toLocaleString()} remaining)</button>}</div>}
+        {visibleCells.length === 0 ? <div className="sp-empty-result"><Check size={19} /><p>{result.summary.changed || result.summary.added || result.summary.removed ? 'No cells match this filter.' : 'The records match. No differences were found.'}</p></div> : <div className="sp-table-wrap" role="region" aria-label="Scrollable side-by-side cell differences" tabIndex="0"><table className="sp-diff-table"><thead><tr><th scope="col">Change</th><th scope="col">L-ID</th><th scope="col">Original Excel row</th><th scope="col">R-ID</th><th scope="col">Updated Excel row</th><th scope="col">Match key</th><th scope="col">Column</th><th scope="col">Original value</th><th scope="col">Updated value</th></tr></thead><tbody>{visibleRows.map((cell, index) => <tr className={`sp-diff-row sp-diff-row--${cell.type}${cell.changed && cell.type === 'changed' ? ' is-cell-changed' : ''}`} key={`${cell.type}-${cell.rowKey}-${cell.label}-${index}`}><td><span className={`sp-change-badge sp-change-badge--${cell.type}`}>{cell.type}</span></td><td><span className="sp-id-chip sp-id-chip--left">{cell.leftRecordId || '—'}</span></td><td className="sp-source-position">{cell.leftRowNumber ?? '—'}</td><td><span className="sp-id-chip sp-id-chip--right">{cell.rightRecordId || '—'}</span></td><td className="sp-source-position">{cell.rightRowNumber ?? '—'}</td><td><span className="sp-row-key">{cell.rowKey}</span></td><td>{cell.label}</td><td className="sp-value sp-value--left">{getDisplayValue(cell.left)}</td><td className="sp-value sp-value--right">{getDisplayValue(cell.right)}</td></tr>)}</tbody></table>{visibleCells.length > visibleRows.length && <button type="button" className="sp-show-more" onClick={() => setVisibleLimit((limit) => limit + ROW_LIMIT)}><ChevronDown size={16} /> Show more ({(visibleCells.length - visibleRows.length).toLocaleString()} remaining)</button>}</div>}
       </section>}
 
-      <details className="sp-help"><summary>How to compare CSV and Excel files</summary><div><p>Choose a format tab, then load, paste, or use sample data on both sides. CSV mode lets you edit the source text or switch to a rows-and-columns preview. Excel mode lets you choose a worksheet and preview its records.</p><p><strong>Validate</strong> checks that both sources parse and contain headers. Then choose a shared key to align reordered records, or compare by row position. Ignore selected columns to exclude them from difference counts; ignored columns are retained in record downloads.</p><p>Each matched source record receives an <strong>L-ID</strong> and <strong>R-ID</strong> based on its one-based data-row order (for example, L-21 matched with R-09). Download identical or mismatched records as CSV or Excel, or download the cell-by-cell CSV report.</p><p>Files are processed locally in this browser and are not uploaded. CSV, TSV, and XLSX are supported; legacy XLS files are not supported.</p></div></details>
+      <details className="sp-help"><summary>How to compare CSV and Excel files</summary><div><p>Choose a format tab, then load, paste, or use sample data on both sides. CSV mode lets you edit the source text or switch to the spreadsheet grid. Excel mode lets you choose a worksheet and edit it in the same grid. The lettered columns and numbered rows show Excel-style positions; freeze the column letters and first worksheet row while scrolling.</p><p>Select a cell range to edit or paste data. Click a row number to select a full row, or a column letter to select a full column. Copy selection copies tab-separated values; Delete selection removes selected rows or columns, or clears individual cells. Grid edits stay in this browser and require validation again before comparison.</p><p><strong>Validate</strong> checks that both sources parse and contain headers. By default, the first shared column is selected as the match key (a column named ID takes priority); choose a different key or compare by row position. Ignore selected columns to exclude them from difference counts; ignored columns are retained in record downloads.</p><p>Each matched source record receives an <strong>L-ID</strong> and <strong>R-ID</strong> based on its one-based data-row order (for example, L-21 matched with R-09). The result lists both IDs and each side’s Excel row number. Download identical or mismatched records as CSV or Excel, or download the cell-by-cell CSV report.</p><p>Files are processed locally in this browser and are not uploaded. CSV, TSV, and XLSX are supported; legacy XLS files are not supported.</p></div></details>
+      <p className="sp-open-source-note">Spreadsheet-style editing is powered by <a href="https://github.com/silevis/reactgrid" target="_blank" rel="noreferrer">ReactGrid</a>, an MIT-licensed React grid component.</p>
     </main>
   );
 }
