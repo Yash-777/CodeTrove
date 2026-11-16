@@ -1,0 +1,83 @@
+.api-postman { min-height: 44rem; overflow: hidden; border: 1px solid #2e4060; border-radius: 10px; background: #1a1a2e; color: #e8edf3; font-family: 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif; }
+.api-postman button, .api-postman input, .api-postman select, .api-postman textarea { font: inherit; }
+.api-postman__titlebar { display: flex; align-items: center; justify-content: space-between; gap: 1rem; min-height: 3rem; padding: .55rem .8rem; border-bottom: 1px solid #2e4060; background: #0d1117; }
+.api-postman__brand, .api-postman__title-actions, .api-postman__sidebar-head, .api-postman__collection-name, .api-postman__urlbar, .api-postman__tabs, .api-postman__editor-foot, .api-postman__response-summary { display: flex; align-items: center; }
+.api-postman__brand { gap: .55rem; white-space: nowrap; }
+.api-postman__brand strong { font: 600 .85rem/1.1 'IBM Plex Mono', ui-monospace, monospace; }
+.api-postman__brand > span:last-child { color: #607080; font-size: .7rem; }
+.api-postman__brand-mark { display: grid; width: 1.55rem; height: 1.55rem; place-items: center; border-radius: 5px; background: linear-gradient(135deg, #ff6b35, #e91e63); color: white; font-weight: 800; }
+.api-postman__title-actions { gap: .35rem; }
+.api-postman__button, .api-postman__icon-button, .api-postman__add-row { display: inline-flex; align-items: center; justify-content: center; gap: .3rem; border: 1px solid #2e4060; border-radius: 5px; background: transparent; color: #a8b8cc; cursor: pointer; font-size: .72rem; white-space: nowrap; }
+.api-postman__button { min-height: 2rem; padding: .35rem .6rem; }
+.api-postman__button:hover, .api-postman__icon-button:hover, .api-postman__add-row:hover { border-color: #ff6b35; color: #ff8c5a; }
+.api-postman__button--accent { border-color: #ff6b35; background: #ff6b35; color: white; }
+.api-postman__button:disabled { cursor: not-allowed; opacity: .5; }
+.api-postman__body { display: flex; min-height: 41rem; }
+.api-postman__sidebar { display: flex; width: 16.5rem; flex-shrink: 0; flex-direction: column; border-right: 1px solid #2e4060; background: #12182a; }
+.api-postman__sidebar-head { justify-content: space-between; padding: .65rem .75rem; border-bottom: 1px solid #2e4060; color: #607080; font-size: .7rem; letter-spacing: .1em; text-transform: uppercase; }
+.api-postman__search { display: flex; align-items: center; gap: .4rem; margin: .5rem; padding: 0 .5rem; border: 1px solid #2e4060; border-radius: 5px; color: #607080; }
+.api-postman__search input { min-height: 2rem; border: 0; outline: 0; background: transparent; color: #e8edf3; font-size: .74rem; }
+.api-postman__search input:focus { box-shadow: none; }
+.api-postman__collection-list { flex: 1; overflow: auto; padding: .25rem 0; }
+.api-postman__collection-name { width: 100%; gap: .35rem; padding: .45rem .65rem; border: 0; background: transparent; color: #e8edf3; cursor: pointer; text-align: left; font-size: .75rem; }
+.api-postman__collection-name:hover, .api-postman__request-item:hover { background: rgba(255,255,255,.04); }
+.api-postman__collection-name > span:first-child { display: inline-flex; align-items: center; gap: .2rem; color: #607080; }
+.api-postman__collection-name input, .api-postman__collection-name > span:nth-child(2) { min-width: 0; flex: 1; border: 0; outline: 0; background: transparent; color: #e8edf3; font-size: .75rem; }
+.api-postman__collection-name small { color: #607080; }
+.api-postman__nested-collection { padding-bottom: .45rem; }
+.api-postman__folder-note { padding: .3rem 1.8rem; color: #607080; font-size: .63rem; text-transform: uppercase; }
+.api-postman__sample-collection { border-top: 1px solid rgba(46,64,96,.45); }
+.api-postman__request-list { padding-bottom: .2rem; }
+.api-postman__request-item { display: flex; align-items: center; width: 100%; gap: .45rem; padding: .38rem .55rem .38rem 1.7rem; border: 0; border-right: 2px solid transparent; background: transparent; color: #a8b8cc; cursor: pointer; text-align: left; font-size: .7rem; }
+.api-postman__request-item.is-active { border-right-color: #ff6b35; background: rgba(255,107,53,.12); color: #e8edf3; }
+.api-postman__request-item > span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.api-postman__method { display: inline-grid; min-width: 3rem; padding: .18rem .28rem; place-items: center; border-radius: 3px; font: 700 .58rem 'IBM Plex Mono', ui-monospace, monospace; }
+.api-postman__method--get { background: rgba(0,214,143,.15); color: #00d68f; }
+.api-postman__method--post { background: rgba(79,195,247,.15); color: #4fc3f7; }
+.api-postman__method--put { background: rgba(255,213,79,.15); color: #ffd54f; }
+.api-postman__method--patch { background: rgba(206,147,216,.15); color: #ce93d8; }
+.api-postman__method--delete { background: rgba(255,77,109,.15); color: #ff4d6d; }
+.api-postman__method--head { background: rgba(0,214,143,.1); color: #00d68f; }
+.api-postman__method--options { background: rgba(100,120,140,.15); color: #90a4ae; }
+.api-postman__sidebar-foot { padding: .6rem; border-top: 1px solid #2e4060; }
+.api-postman__sidebar-foot .api-postman__button { width: 100%; }
+.api-postman__editor { min-width: 0; flex: 1; background: #1e2a3a; }
+.api-postman__urlbar { gap: .5rem; padding: .55rem .7rem; border-bottom: 1px solid #2e4060; background: #1e2a3a; }
+.api-postman__urlbar input, .api-postman__urlbar select { min-height: 2.15rem; border: 1px solid #2e4060; border-radius: 5px; outline: 0; background: #2a3f55; color: #e8edf3; font-size: .75rem; }
+.api-postman__urlbar input:focus, .api-postman__urlbar select:focus { border-color: #ff6b35; }
+.api-postman__request-name { width: 12rem; padding: .4rem .55rem; }
+.api-postman__url { min-width: 10rem; flex: 1; padding: .4rem .65rem; font: .75rem 'IBM Plex Mono', ui-monospace, monospace !important; }
+.api-postman__urlbar select { min-width: 5rem; padding: .3rem .45rem; color: #ff8c5a; font-weight: 800; }
+.api-postman__separator { width: 1px; height: 1.4rem; background: #2e4060; }
+.api-postman__tabs { gap: .1rem; padding: 0 .7rem; border-bottom: 1px solid #2e4060; background: #1e2a3a; }
+.api-postman__tabs button:not(.api-postman__button) { padding: .65rem .75rem; border: 0; border-bottom: 2px solid transparent; background: transparent; color: #a8b8cc; cursor: pointer; font-size: .72rem; }
+.api-postman__tabs button.is-active { border-bottom-color: #ff6b35; color: #ff8c5a; }
+.api-postman__tabs > span { flex: 1; }
+.api-postman__pane { min-height: 28rem; padding: 1rem; overflow: auto; }
+.api-postman__section-label { margin: 0 0 .55rem; color: #607080; font-size: .65rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+.api-postman__table-wrap { overflow: auto; }
+.api-postman__table { width: 100%; border-collapse: collapse; color: #a8b8cc; font-size: .72rem; }
+.api-postman__table th { padding: .45rem .5rem; border-bottom: 1px solid #2e4060; background: #243447; color: #607080; font-size: .62rem; text-align: left; text-transform: uppercase; }
+.api-postman__table td { padding: .2rem .3rem; border-bottom: 1px solid rgba(255,255,255,.04); }
+.api-postman__table input:not([type='checkbox']) { width: 100%; min-height: 1.85rem; padding: .3rem .4rem; border: 0; border-radius: 4px; outline: 0; background: transparent; color: #e8edf3; font: .72rem 'IBM Plex Mono', ui-monospace, monospace; }
+.api-postman__table input:not([type='checkbox']):focus { background: #2a3f55; }
+.api-postman__icon-button { width: 1.9rem; height: 1.9rem; padding: 0; }
+.api-postman__add-row { margin-top: .65rem; padding: .4rem .6rem; border-style: dashed; }
+.api-postman__body-toolbar { display: flex; align-items: center; gap: .7rem; margin-bottom: .55rem; }
+.api-postman__body-toolbar p { margin: 0; }
+.api-postman__body-toolbar select { padding: .35rem .5rem; border: 1px solid #2e4060; border-radius: 5px; background: #2a3f55; color: #e8edf3; font-size: .7rem; }
+.api-postman__body-editor { width: 100%; min-height: 15rem; padding: .8rem; border: 1px solid #2e4060; border-radius: 6px; outline: 0; background: #243447; color: #a8ff78; font: .74rem/1.6 'IBM Plex Mono', ui-monospace, monospace; resize: vertical; }
+.api-postman__body-editor:focus { border-color: #ff6b35; }
+.api-postman__blank, .api-postman__empty { display: flex; align-items: center; justify-content: center; min-height: 12rem; flex-direction: column; gap: .55rem; color: #607080; font-size: .75rem; text-align: center; }
+.api-postman__response-summary { gap: .75rem; margin-bottom: .7rem; padding: .65rem .75rem; border: 1px solid #2e4060; border-radius: 6px; color: #a8b8cc; font-size: .72rem; }
+.api-postman__response-summary span:last-child { color: #607080; }
+.api-postman__response-summary .is-ok { color: #00d68f; }
+.api-postman__response-summary .is-error { color: #ff4d6d; }
+.api-postman__response-body, .api-postman__response-summary + pre, .api-postman__pane details pre { margin: 0; padding: .75rem; overflow: auto; background: #243447; color: #a8ff78; white-space: pre-wrap; word-break: break-word; font: .73rem/1.55 'IBM Plex Mono', ui-monospace, monospace; }
+.api-postman__pane details { margin-top: .7rem; border: 1px solid #2e4060; border-radius: 6px; }
+.api-postman__pane details summary { padding: .6rem .7rem; cursor: pointer; color: #ff8c5a; font-size: .72rem; }
+.api-postman__pane details pre { border-top: 1px solid #2e4060; color: #a8b8cc; }
+.api-postman__error { margin-top: .8rem; padding: .7rem; border: 1px solid rgba(255,77,109,.45); border-radius: 6px; background: rgba(255,77,109,.1); color: #ff8c9e; font-size: .72rem; line-height: 1.5; }
+.api-postman__editor-foot { justify-content: space-between; gap: .5rem; padding: .6rem .8rem; border-top: 1px solid #2e4060; color: #607080; font-size: .7rem; }
+@media (max-width: 900px) { .api-postman__body { flex-direction: column; } .api-postman__sidebar { width: 100%; max-height: 18rem; border-right: 0; border-bottom: 1px solid #2e4060; } .api-postman__collection-list { display: grid; grid-template-columns: 1fr 1fr; } .api-postman__titlebar, .api-postman__urlbar { align-items: stretch; flex-direction: column; } .api-postman__title-actions, .api-postman__urlbar > * { width: 100%; } .api-postman__separator { display: none; } .api-postman__urlbar select { min-width: 0; } }
+@media (max-width: 560px) { .api-postman__collection-list { grid-template-columns: 1fr; } .api-postman__tabs { overflow-x: auto; } .api-postman__tabs button { white-space: nowrap; } .api-postman__pane { padding: .65rem; } }

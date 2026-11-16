@@ -33,6 +33,7 @@ import WorldClockPage from './pages/build/WorldClockPage.jsx';
 import HtmlXmlJsonToolPage from './pages/build/HtmlXmlJsonToolPage.jsx';
 import HttpStatusCodesPage from './pages/build/HttpStatusCodesPage.jsx';
 import WebPlaygroundPage from './pages/build/WebPlaygroundPage.jsx';
+import ApiRequestPlaygroundPage from './pages/build/ApiRequestPlaygroundPage.jsx';
 import JsonToGraphqlPage from './pages/build/JsonToGraphqlPage.jsx';
 import DocumentConverterPage from './pages/build/DocumentConverterPage.jsx';
 import DocumentComparePage from './pages/build/DocumentComparePage.jsx';
@@ -89,6 +90,7 @@ export default function App() {
           <Route path="/build/tools/html-xml-json" element={<HtmlXmlJsonToolPage />} />
           <Route path="/build/tools/http-status-codes" element={<HttpStatusCodesPage />} />
           <Route path="/build/tools/web-playground" element={<WebPlaygroundPage />} />
+          <Route path="/build/tools/api-request-playground" element={<ApiRequestPlaygroundPage />} />
           <Route path="/build/tools/json-to-graphql" element={<JsonToGraphqlPage />} />
           <Route path="/build/tools/document-converter" element={<DocumentConverterPage />} />
           <Route path="/build/tools/document-compare" element={<DocumentComparePage />} />

@@ -24,6 +24,7 @@
     { "path": "/build/tools/html-xml-json", "title": "HTML XML JSON Tools" },
     { "path": "/build/tools/http-status-codes", "title": "HTTP Status Codes" },
     { "path": "/build/tools/web-playground", "title": "Web Playground" },
+    { "path": "/build/tools/api-request-playground", "title": "API Request Playground" },
     { "path": "/build/tools/json-to-graphql", "title": "JSON to GraphQL" },
     { "path": "/build/tools/document-converter", "title": "Document Converter" },
     { "path": "/build/tools/document-compare", "title": "Document Compare" },
