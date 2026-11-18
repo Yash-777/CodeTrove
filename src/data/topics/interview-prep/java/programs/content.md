@@ -536,3 +536,127 @@ Outer Finally
 **Key takeaway:** `finally` runs on the way out of its own `try`, so in nested blocks the inner `finally` always runs before the outer `catch`. The only common cases where `finally` doesn't run are `System.exit()`, a JVM crash, or a thread that never finishes the `try` block (for example, an infinite loop).
 
 </details>
+
+---
+
+<details>
+<summary>1. Find repeated numbers in a List using Java 8.</summary>
+
+List<Integer> numbers =
+    Arrays.asList(1, 2, 3, 2, 4, 1, 5);
+
+Set<Integer> seen = new HashSet<>();
+
+List<Integer> duplicates = numbers.stream()
+    .filter(n -> !seen.add(n))
+    .distinct()
+    .toList();
+
+System.out.println(duplicates);
+// [2, 1]
+
+</details>
+
+<details>
+<summary>2. Find the occurrence count of repeated numbers.</summary>
+
+Map<Integer, Long> result = numbers.stream()
+    .collect(Collectors.groupingBy(
+        Function.identity(),
+        Collectors.counting()))
+    .entrySet().stream()
+    .filter(e -> e.getValue() > 1)
+    .collect(Collectors.toMap(
+        Map.Entry::getKey,
+        Map.Entry::getValue));
+
+System.out.println(result);
+// {1=2, 2=2}
+
+</details>
+
+<details>
+<summary>3. Find the first repeated number.</summary>
+
+Set<Integer> seen = new HashSet<>();
+
+Integer result = numbers.stream()
+    .filter(n -> !seen.add(n))
+    .findFirst()
+    .orElse(null);
+
+System.out.println(result);
+
+</details>
+
+<details>
+<summary>4. Find the first non-repeated number.</summary>
+
+Integer result = numbers.stream()
+    .collect(Collectors.groupingBy(
+        Function.identity(),
+        LinkedHashMap::new,
+        Collectors.counting()))
+    .entrySet().stream()
+    .filter(e -> e.getValue() == 1)
+    .map(Map.Entry::getKey)
+    .findFirst()
+    .orElse(null);
+
+System.out.println(result);
+
+</details>
+
+<details>
+<summary>5. Find numbers that occur more than twice.</summary>
+
+List<Integer> result = numbers.stream()
+    .collect(Collectors.groupingBy(
+        Function.identity(),
+        Collectors.counting()))
+    .entrySet().stream()
+    .filter(e -> e.getValue() > 2)
+    .map(Map.Entry::getKey)
+    .toList();
+
+</details>
+
+<details>
+<summary>6. Find duplicate numbers without using Stream API.</summary>
+
+Set<Integer> seen = new HashSet<>();
+Set<Integer> duplicates = new HashSet<>();
+
+for (Integer number : numbers) {
+    if (!seen.add(number)) {
+        duplicates.add(number);
+    }
+}
+
+System.out.println(duplicates);
+
+</details>
+
+<details>
+<summary>7. Find the top 3 highest distinct numbers.</summary>
+
+List<Integer> result = numbers.stream()
+    .distinct()
+    .sorted(Comparator.reverseOrder())
+    .limit(3)
+    .toList();
+
+</details>
+
+<details>
+<summary>8. Partition numbers into even and odd using Java 8.</summary>
+
+Map<Boolean, List<Integer>> result =
+    numbers.stream()
+        .collect(Collectors.partitioningBy(
+            n -> n % 2 == 0));
+
+System.out.println("Even: " + result.get(true));
+System.out.println("Odd: " + result.get(false));
+
+</details>

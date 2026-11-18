@@ -245,7 +245,10 @@ const tree = [
           { key: 'annotation-interview-questions', label: 'Annotation Interview Questions', contentKey: 'backend/spring/annotations/annotation-interview-questions' },
         ] },
       ] },
-      { key: 'spring-boot', label: 'Spring Boot', pages: {'auto-configuration': 'Auto Configuration', 'configuration-properties': 'Configuration Properties', 'actuator': 'Actuator', 'profiles': 'Profiles', 'starters': 'Starters', 'exception-handling': {label: 'Exception Handling', contentKey: 'backend/spring-boot/exception-handling'}} },
+      { key: 'spring-boot', label: 'Spring Boot', pages: {'auto-configuration': 'Auto Configuration', 'configuration-properties': 'Configuration Properties', 'actuator': 'Actuator', 'profiles': 'Profiles', 'starters': 'Starters', 
+        'exception-handling': {label: 'Exception Handling', contentKey: 'backend/spring-boot/exception-handling'},
+        'migration(2.x→3.x)': {label: 'Migration (2.x → 3.x)', contentKey: 'backend/spring-boot/migration-2x-to-3x'}
+        } },
       { key: 'spring-web', label: 'Spring Web', pages: {'dispatcher-servlet': 'Dispatcher Servlet', 'rest-controllers': 'Rest Controllers', 'validation': 'Validation', 'global-exception-handling': 'Global Exception Handling'} },
       { key: 'spring-security', label: 'Spring Security', pages: {'security-filters': 'Security Filters', 'authentication': 'Authentication', 'authorization': 'Authorization', 'preauthorize': 'Preauthorize', 'oauth2-jwt': 'Oauth2 Jwt'} },
       { key: 'spring-data', label: 'Spring Data', pages: {'repositories': 'Repositories', 'transactions': 'Transactions', 'auditing': 'Auditing', 'specifications': 'Specifications'} },
