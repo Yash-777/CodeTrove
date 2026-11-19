@@ -45,15 +45,17 @@ const tree = [
         { key: 'java-8to17', label: 'Java 8–17', contentKey: 'languages/java/java-8to17' },
         { key: 'java-17andAbove', label: 'Java 17 and Above', contentKey: 'languages/java/java-17andAbove' },
         { key: 'core', label: 'Core', data: 'content.md', pages: { 'errors-exceptions': 'Errors & Exceptions' }, children: [
-          { key: 'arrays-collections', label: 'Arrays, Collection Framework & Generics', data: 'content.md'},
+          { key: 'arrays-collections', label: 'Arrays, Collections', data: 'content.md'},
           { key: 'oop', label: 'Object-Oriented Programming', data: 'content.md', children: [
             { key: 'class-object', label: 'Class & Object', contentKey: 'languages/java/core/oop/class-object' },
             { key: 'interface-abstract-class', label: 'Interface & Abstract Class', contentKey: 'languages/java/core/oop/interface-abstract-class' },
           ], pages: { 'encapsulation': 'Encapsulation (Data Hiding)', 'inheritance': 'Inheritance (Code Reuse)', 'abstraction': 'Abstraction (Hiding Complexity)', 'polymorphism': 'Polymorphism (Many Forms)' } },
           //{ key: 'language-basics', label: 'Language Basics', pages: {'generics': 'Generics', 'collections': 'Collections', 'exceptions': 'Exceptions', 'optional': {label: 'Optional', contentKey: 'java/optional'}, 'records': {label: 'Records', contentKey: 'java/records'}, 'streams': {label: 'Streams', contentKey: 'java/streams'}} },
-          { key: 'language-basics', label: 'Language Basics', pages: {'generics': 'Generics', 'collections': 'Collections', 'exceptions': 'Exceptions', 'optional': 'Optional', 'records': 'Records', 'streams': 'Streams'} },
+          { key: 'language-basics', label: 'Language Basics', pages: {/*'generics': 'Generics', 'collections': 'Collections',*/ 'exceptions': 'Exceptions', 'optional': 'Optional', 'records': 'Records', 'streams': 'Streams'} },
           { key: 'concurrency', label: 'Concurrency', pages: {'threads': 'Threads', 'executors': 'Executors', 'completable-future': 'Completable Future', 'synchronization': 'Synchronization', 'locks': 'Locks'} },
           { key: 'jvm', label: 'JVM', pages: {'jvm-memory': 'Jvm Memory', 'garbage-collection': 'Garbage Collection', 'class-loading': 'Class Loading', 'jvm-tuning': 'Jvm Tuning'} },
+          { key: 'dataTypes', label: 'Data Types', contentKey: 'languages/java/dataTypes', /*pages: {'primitive-types': 'Primitive Types', 'wrapper-classes': 'Wrapper Classes'} */
+          }
         ]},
         { key: 'advanced', label: 'Advanced', children: [
           { key: 'performance', label: 'Performance', pages: {'profiling': 'Profiling', 'heap-dumps': 'Heap Dumps', 'thread-dumps': 'Thread Dumps', 'performance-tuning': 'Performance Tuning'} },
@@ -318,7 +320,7 @@ const tree = [
           'relational-model': 'Relational Model',
           'normalization': 'Normalization',
           'joins': 'Joins',
-          'transactions': 'Transactions',
+          'transactions': {label: 'Transactions', contentKey: 'backend/spring-data/transactions'},
           'deadlocks': 'Deadlocks',
         },
       },
