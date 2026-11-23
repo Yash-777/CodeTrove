@@ -38,12 +38,13 @@ Payment processing, order creation, money transfers, ticket booking, subscriptio
 
 </details>
 
-<details>
+<details open>
 <summary><strong>2. Why do we need idempotency?</strong></summary>
 
 ## The real-world problem
 
 A client sends a payment request. The server processes the payment, but the response never reaches the client because of a network timeout. The client cannot tell whether the payment succeeded or failed, so it retries.
+<img src="\svg\api_retries_idempotency.svg" alt="" class="img-lightbox__img is-svg" width="600px" height="470">
 
 <table>
 <thead><tr><td><strong>Without idem potency</strong></td><td><strong>With idempotency</strong></td></tr></thead>

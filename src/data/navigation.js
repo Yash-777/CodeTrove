@@ -160,7 +160,7 @@ const tree = [
           { key: 'circuit-breaker-fallback', label: 'Circuit Breaker & Fallback', pages: {'circuit-breaker-fallback': 'Circuit Breaker Fallback'} },
         ] },
         { key: 'distributed-systems', label: 'Distributed Systems', pages: {'service-discovery': 'Service Discovery', 'config-server-vault': 'Config Server Vault', 'circuit-breaker': 'Circuit Breaker', 'distributed-tracing': 'Distributed Tracing', 'metrics-observability': 'Metrics Observability'} },
-        { key: 'messaging', label: 'Messaging', pages: {'kafka': 'Kafka', 'kafka-transactions': 'Kafka Transactions', 'message-brokers': 'Message Brokers'} },
+        /* { key: 'messaging', label: 'Messaging', pages: {'kafka': 'Kafka', 'kafka-transactions': 'Kafka Transactions', 'message-brokers': 'Message Brokers'} }, */
       ]},
       { key: 'javascript', label: 'JavaScript', pages: {'javascript-interview-questions': 'Javascript Interview Questions', 'frontend-architecture-interview': 'Frontend Architecture Interview'} },
       { key: 'system-design', label: 'System Design', pages: {'system-design-fundamentals': 'System Design Fundamentals', 'scalability': 'Scalability', 'availability-reliability': 'Availability Reliability', 'caching-strategies': 'Caching Strategies', 'rate-limiting': 'Rate Limiting'} },

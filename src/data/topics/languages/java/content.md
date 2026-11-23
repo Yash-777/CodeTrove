@@ -15,12 +15,9 @@ _In the Java programming language, all source code is first written in plain tex
 | Figure showing MyProgram.java, compiler, MyProgram.class, Java VM, and My Program running on a computer. |
 | :--: |
 | ![MyProgram.java](https://docs.oracle.com/javase/tutorial/figures/getStarted/getStarted-compiler.gif "An overview of the software development process.") |
+| ![](\svg\java-source-to-output.svg) |
 
-Because the Java VM is available on many different operating systems, the same .class files are capable of running on Microsoft Windows, the Solaris™ Operating System (Solaris OS), Linux, or Mac OS.
-
-| _Figure showing source code, compiler, and Java VM's for Win32, Solaris OS/Linux, and Mac OS_ |
-| :--: |
-| ![Figure showing source code, compiler, and Java VM's for Win32, Solaris OS/Linux, and Mac OS](https://docs.oracle.com/javase/tutorial/figures/getStarted/helloWorld.gif "Through the Java VM, the same application is capable of running on multiple platforms.") |
+Because the Java VM is available on many different operating systems, the same `.class` files are capable of running on Microsoft Windows, the Solaris™ Operating System (Solaris OS), Linux, or Mac OS.
 
 ---
 

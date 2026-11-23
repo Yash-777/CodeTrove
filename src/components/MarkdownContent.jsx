@@ -18,6 +18,7 @@ import RunnableCode from './CodeRunner/RunnableCode.jsx';
 import MermaidDiagram from './MermaidDiagram.jsx';
 import './MarkdownContent.css';
 import remarkInlineMarks from './remarkInlineMarks';
+import ImageLightbox from './ImageLightbox.jsx';
 
 import { Children, cloneElement, isValidElement } from "react";
 
@@ -114,9 +115,25 @@ function resolveMarkdownImageSrc(src) {
     return normalizedSrc;
   }
 
-  const publicPath = normalizedSrc.replace(/^\/?public\//, '');
-  if (publicPath !== normalizedSrc || normalizedSrc.startsWith('/')) {
-    return `${import.meta.env.BASE_URL}${publicPath.replace(/^\/+/, '')}`;
+  const base = import.meta.env.BASE_URL || '/';
+
+  // Already prefixed with the deploy base (e.g. /CodeTrove/svg/JVM.svg)
+  if (base !== '/' && normalizedSrc.startsWith(base)) {
+    return normalizedSrc;
+  }
+
+  // Strip Vite's public/ source prefix and any leading slashes or ./
+  const publicPath = normalizedSrc
+    .replace(/^\.?\/?public\//, '')
+    .replace(/^\.?\/+/, '');
+
+  // Root-relative, public/-prefixed, or a bare svg/... path -> resolve against base
+  if (
+    normalizedSrc.startsWith('/') ||
+    publicPath !== normalizedSrc ||
+    /^(svg|images?|assets)\//i.test(publicPath)
+  ) {
+    return `${base.replace(/\/?$/, '/')}${publicPath}`;
   }
 
   return normalizedSrc;
@@ -276,7 +293,8 @@ export default function MarkdownContent({ children }) {
         ol: ({ node, ...props }) => <ol className="markdown-ol" {...props} />,
         li: ({ node, ordered: _ordered, ...props }) => <li className="markdown-li" {...props} />,
         img: ({ node, src, ...props }) => (
-          <img className="markdown-image" loading="lazy" src={resolveMarkdownImageSrc(src)} {...props} />
+          //<img className="markdown-image" loading="lazy" src={resolveMarkdownImageSrc(src)} {...props} />
+          <ImageLightbox className="markdown-image" src={resolveMarkdownImageSrc(src)} {...props} />
         ),
         table: ({ node, ...props }) => <table className="markdown-table" {...props} />,
         thead: ({ node, ...props }) => <thead className="markdown-thead" {...props} />,

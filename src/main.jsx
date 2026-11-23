@@ -17,6 +17,9 @@ import { ThemeProvider } from './modules/theme/ThemeContext.jsx';
 import { ViewModeProvider } from './context/ViewModeContext.jsx';
 import './index.css';
 
+import { initTableTheme } from './utils/tableTheme';
+initTableTheme();
+
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <ThemeProvider>

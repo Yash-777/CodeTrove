@@ -2,6 +2,8 @@
 
 The Java Virtual Machine runs Java bytecode and provides a consistent execution model across operating systems. A Java source file is compiled into class files, then a JVM loads, verifies, links, and executes those classes.
 
+<img src="\svg\jdk-jre-jvm-architecture.svg" alt="" class="img-lightbox__img is-svg" width="600px" height="700">
+
 ## Main subsystems
 
 A practical JVM mental model has four cooperating parts:
