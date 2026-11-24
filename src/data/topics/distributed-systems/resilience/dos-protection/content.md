@@ -7,5 +7,3 @@ Use trustworthy identity keys where possible and protect tenants from noisy neig
 **Pitfalls:** unlimited bodies, expensive unauthenticated operations, unbounded queues, and retries that amplify an outage. A limiter cannot compensate for insecure code or poor capacity planning.
 
 **Interview points:** identify the threat and protected resource, choose edge and application controls, and explain fail-open/fail-closed behavior when the limiter store is unavailable.
-
-**Related:** [Rate Limiting](/content/tree/api-integration/resilience/rate-limiting), [Bulkheads](/content/tree/api-integration/resilience/bulkheads), [API Gateway](/content/tree/api-integration/api-gateway/gateway-pattern).

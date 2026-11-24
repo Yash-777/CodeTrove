@@ -264,7 +264,7 @@ const tree = [
       { key: 'rest', label: 'REST APIs', pages: {'rest-principles': 'Rest Principles', 
         'http-methods': {label: 'Http Methods & Status Codes', contentKey: 'networking/protocols/http-https'},
         'pagination': 'Pagination', 'versioning': 'Versioning'} },
-      { key: 'resilience', label: 'Resilience', pages: {'timeouts-retries': 'Timeouts Retries', 'idempotency': 'Idempotency', 'rate-limiting': 'Rate Limiting', 'dos-protection': 'Dos Protection', 'bulkheads': 'Bulkheads'} },
+      { key: 'resilience', label: 'Resilience', contentKey: 'distributed-systems/resilience' },
       { key: 'documentation', label: 'API Documentation', pages: {'openapi-swagger': 'Openapi Swagger', 'postman': 'Postman'} },
     ],
   },
@@ -277,21 +277,22 @@ const tree = [
     ],
   },
   {
+    key: 'distributed-systems', label: 'Distributed Systems', children: [
+      { key: 'service-discovery', label: 'Service Discovery', pages: {'eureka-server': 'Eureka Server', 'eureka-client': 'Eureka Client', 'service-registry': 'Service Registry'} },
+      { key: 'configuration', label: 'Configuration', pages: {'config-server': 'Config Server', 'vault': 'Vault', 'secrets-management': 'Secrets Management'} },
+      { key: 'resilience', label: 'Resilience Patterns', pages: {'timeouts-retries-idempotency': 'Timeouts Retries & Idempotency', 'rate-limiting': 'Rate Limiting', 'circuit-breaker': 'Circuit Breaker', 'fallback': 'Fallback', 'dos-protection': 'Dos Protection', 'bulkheads': 'Bulkheads'} },
+      { key: 'observability', label: 'Observability', pages: {'logs': 'Logs', 'distributed-tracing': 'Distributed Tracing', 'sleuth': 'Sleuth', 'metrics': 'Metrics', 'health-checks': 'Health Checks'} },
+      { key: 'scaling', label: 'Scaling', pages: {'horizontal-scaling': 'Horizontal Scaling', 'vertical-scaling': 'Vertical Scaling', 'autoscaling': 'Autoscaling', 'stateless-services': 'Stateless Services'} },
+    ],
+  },
+  {
     key: 'messaging', label: 'Messaging & Streaming', pages: {'akka-actor': 'Akka Actor', 'mail-api': 'Mail API'}, children: [
       { key: 'kafka', label: 'Apache Kafka', pages: {'architecture': 'Architecture', 'producers-consumers': 'Producers Consumers', 'partitions-offsets': 'Partitions Offsets', 'consumer-groups': 'Consumer Groups', 'delivery-semantics': 'Delivery Semantics', 'transactions': 'Transactions', 'interview': 'Interview Questions'} },
       { key: 'rabbitmq', label: 'RabbitMQ', pages: {'exchanges-queues': 'Exchanges Queues', 'acknowledgements': 'Acknowledgements', 'routing': 'Routing'} },
       { key: 'patterns', label: 'Messaging Patterns', pages: {'outbox-pattern': 'Outbox Pattern', 'saga-pattern': 'Saga Pattern', 'dead-letter-queues': 'Dead Letter Queues', 'exactly-once-processing': 'Exactly Once Processing'} },
     ],
   },
-  {
-    key: 'distributed-systems', label: 'Distributed Systems', children: [
-      { key: 'service-discovery', label: 'Service Discovery', pages: {'eureka-server': 'Eureka Server', 'eureka-client': 'Eureka Client', 'service-registry': 'Service Registry'} },
-      { key: 'configuration', label: 'Configuration', pages: {'config-server': 'Config Server', 'vault': 'Vault', 'secrets-management': 'Secrets Management'} },
-      { key: 'resilience', label: 'Resilience Patterns', pages: {'circuit-breaker': 'Circuit Breaker', 'retry': 'Retry', 'timeout': 'Timeout', 'fallback': 'Fallback'} },
-      { key: 'observability', label: 'Observability', pages: {'logs': 'Logs', 'distributed-tracing': 'Distributed Tracing', 'sleuth': 'Sleuth', 'metrics': 'Metrics', 'health-checks': 'Health Checks'} },
-      { key: 'scaling', label: 'Scaling', pages: {'horizontal-scaling': 'Horizontal Scaling', 'vertical-scaling': 'Vertical Scaling', 'autoscaling': 'Autoscaling', 'stateless-services': 'Stateless Services'} },
-    ],
-  },
+
   {
     key: 'security', label: 'Security', children: [
       { key: 'cryptography', label: 'Cryptography', data: 'content.md', pages: {'hashing-encryption': 'Hashing vs Encryption'/*'symmetric-encryption': 'Symmetric Encryption', 'asymmetric-encryption': 'Asymmetric Encryption', 'hashing': 'Hashing', 'digital-signatures': 'Digital Signatures'*/} },

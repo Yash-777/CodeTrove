@@ -9,5 +9,3 @@ For example, payment calls and report generation should not share an unbounded e
 **Pitfalls:** unbounded queues, silently dropping critical work, and fallbacks that overload another dependency.
 
 **Interview points:** identify shared bottlenecks, select an isolation mechanism, and explain how saturation and rejected work are measured.
-
-**Related:** [Timeouts and Retries](/content/tree/api-integration/resilience/timeouts-retries), [Rate Limiting](/content/tree/api-integration/resilience/rate-limiting), [Circuit Breaker](/content/tree/distributed-systems/resilience/circuit-breaker).
