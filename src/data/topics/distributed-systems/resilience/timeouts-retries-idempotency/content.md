@@ -1,6 +1,29 @@
-# Idempotency (One Key, One Charge)
+# Timeouts and Retries, Idempotency (One Key, One Charge)
 
 > **Reading path:** what it is → why it matters → HTTP methods → Idempotency-Key → database design → concurrency → Spring Boot → client retries → Kafka and microservices → failure recovery → interview Q&A → checklist.
+
+<details open>
+<summary>Timeouts and Retries</summary>
+
+A **timeout** limits how long a service waits for another service to respond. Set connection and response timeouts within the overall request deadline so requests do not wait forever.
+
+**Retries** try a failed request again when the failure is temporary. Use a limited number of attempts, increasing wait times (exponential backoff), and random delays (jitter) to avoid sending too many requests at once.
+
+Always check the remaining request deadline before retrying. Avoid retries at multiple service layers because they can multiply traffic during failures.
+
+Retries are safe only when the operation is **idempotent** or uses an idempotency mechanism to prevent duplicate actions.
+
+**Common Pitfalls:**
+- Not setting timeouts.
+- Too many retries at the same time.
+- Retrying permanent errors, such as validation failures.
+- Retrying a write operation when it may have succeeded but its response was lost.
+
+**Useful Reference:**
+
+[Microsoft – Retry Pattern](https://learn.microsoft.com/en-us/azure/architecture/patterns/retry)
+
+</details>
 
 <details open>
 <summary><strong>1. What is idempotency?</strong></summary>
@@ -38,12 +61,13 @@ Payment processing, order creation, money transfers, ticket booking, subscriptio
 
 </details>
 
-<details>
+<details open>
 <summary><strong>2. Why do we need idempotency?</strong></summary>
 
 ## The real-world problem
 
 A client sends a payment request. The server processes the payment, but the response never reaches the client because of a network timeout. The client cannot tell whether the payment succeeded or failed, so it retries.
+<img src="\svg\api_retries_idempotency.svg" alt="" class="img-lightbox__img is-svg" width="600px" height="470">
 
 <table>
 <thead><tr><td><strong>Without idem potency</strong></td><td><strong>With idempotency</strong></td></tr></thead>
@@ -1056,11 +1080,3 @@ In a microservices environment, the unique constraint also handles concurrent re
 **The main goal is simple: one business operation should produce one business effect, even when the request is retried several times.**
 
 </details>
-
----
-
-## Related CodeTrove topics
-
-- [Timeouts and Retries](/content/tree/api-integration/resilience/timeouts-retries)
-- [Rate Limiting](/content/tree/api-integration/resilience/rate-limiting)
-- [API Gateway and Idempotency Implementation](/content/tree/interview-prep/microservices/project-flow/api-gateway-idempotency/api-gateway-idempotency)

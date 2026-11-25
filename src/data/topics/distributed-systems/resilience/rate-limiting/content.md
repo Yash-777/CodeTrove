@@ -4,4 +4,4 @@ Rate limiting bounds request volume over time for a key such as a user, API key,
 
 [Open the Rate Limiting design guide](/content/tree/interview-prep/system-design/rate-limiting)
 
-For distributed services, an in-memory limiter is only per instance; a global quota needs shared atomic state or deliberate partitioning. Return `429 Too Many Requests` with documented retry guidance when appropriate. See also [Denial-of-Service Protection](/content/tree/api-integration/resilience/dos-protection) and [Bulkheads](/content/tree/api-integration/resilience/bulkheads).
+For distributed services, an in-memory limiter is only per instance; a global quota needs shared atomic state or deliberate partitioning. Return `429 Too Many Requests` with documented retry guidance when appropriate. See also [Denial-of-Service Protection](/content/tree/distributed-systems/resilience/dos-protection) and [Bulkheads](/content/tree/distributed-systems/resilience/bulkheads).

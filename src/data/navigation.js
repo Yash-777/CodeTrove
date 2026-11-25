@@ -45,15 +45,17 @@ const tree = [
         { key: 'java-8to17', label: 'Java 8–17', contentKey: 'languages/java/java-8to17' },
         { key: 'java-17andAbove', label: 'Java 17 and Above', contentKey: 'languages/java/java-17andAbove' },
         { key: 'core', label: 'Core', data: 'content.md', pages: { 'errors-exceptions': 'Errors & Exceptions' }, children: [
-          { key: 'arrays-collections', label: 'Arrays, Collection Framework & Generics', data: 'content.md'},
+          { key: 'arrays-collections', label: 'Arrays, Collections', data: 'content.md'},
           { key: 'oop', label: 'Object-Oriented Programming', data: 'content.md', children: [
             { key: 'class-object', label: 'Class & Object', contentKey: 'languages/java/core/oop/class-object' },
             { key: 'interface-abstract-class', label: 'Interface & Abstract Class', contentKey: 'languages/java/core/oop/interface-abstract-class' },
           ], pages: { 'encapsulation': 'Encapsulation (Data Hiding)', 'inheritance': 'Inheritance (Code Reuse)', 'abstraction': 'Abstraction (Hiding Complexity)', 'polymorphism': 'Polymorphism (Many Forms)' } },
           //{ key: 'language-basics', label: 'Language Basics', pages: {'generics': 'Generics', 'collections': 'Collections', 'exceptions': 'Exceptions', 'optional': {label: 'Optional', contentKey: 'java/optional'}, 'records': {label: 'Records', contentKey: 'java/records'}, 'streams': {label: 'Streams', contentKey: 'java/streams'}} },
-          { key: 'language-basics', label: 'Language Basics', pages: {'generics': 'Generics', 'collections': 'Collections', 'exceptions': 'Exceptions', 'optional': 'Optional', 'records': 'Records', 'streams': 'Streams'} },
+          { key: 'language-basics', label: 'Language Basics', pages: {/*'generics': 'Generics', 'collections': 'Collections',*/ 'exceptions': 'Exceptions', 'optional': 'Optional', 'records': 'Records', 'streams': 'Streams'} },
           { key: 'concurrency', label: 'Concurrency', pages: {'threads': 'Threads', 'executors': 'Executors', 'completable-future': 'Completable Future', 'synchronization': 'Synchronization', 'locks': 'Locks'} },
           { key: 'jvm', label: 'JVM', pages: {'jvm-memory': 'Jvm Memory', 'garbage-collection': 'Garbage Collection', 'class-loading': 'Class Loading', 'jvm-tuning': 'Jvm Tuning'} },
+          { key: 'dataTypes', label: 'Data Types', contentKey: 'languages/java/dataTypes', /*pages: {'primitive-types': 'Primitive Types', 'wrapper-classes': 'Wrapper Classes'} */
+          }
         ]},
         { key: 'advanced', label: 'Advanced', children: [
           { key: 'performance', label: 'Performance', pages: {'profiling': 'Profiling', 'heap-dumps': 'Heap Dumps', 'thread-dumps': 'Thread Dumps', 'performance-tuning': 'Performance Tuning'} },
@@ -158,7 +160,7 @@ const tree = [
           { key: 'circuit-breaker-fallback', label: 'Circuit Breaker & Fallback', pages: {'circuit-breaker-fallback': 'Circuit Breaker Fallback'} },
         ] },
         { key: 'distributed-systems', label: 'Distributed Systems', pages: {'service-discovery': 'Service Discovery', 'config-server-vault': 'Config Server Vault', 'circuit-breaker': 'Circuit Breaker', 'distributed-tracing': 'Distributed Tracing', 'metrics-observability': 'Metrics Observability'} },
-        { key: 'messaging', label: 'Messaging', pages: {'kafka': 'Kafka', 'kafka-transactions': 'Kafka Transactions', 'message-brokers': 'Message Brokers'} },
+        /* { key: 'messaging', label: 'Messaging', pages: {'kafka': 'Kafka', 'kafka-transactions': 'Kafka Transactions', 'message-brokers': 'Message Brokers'} }, */
       ]},
       { key: 'javascript', label: 'JavaScript', pages: {'javascript-interview-questions': 'Javascript Interview Questions', 'frontend-architecture-interview': 'Frontend Architecture Interview'} },
       { key: 'system-design', label: 'System Design', pages: {'system-design-fundamentals': 'System Design Fundamentals', 'scalability': 'Scalability', 'availability-reliability': 'Availability Reliability', 'caching-strategies': 'Caching Strategies', 'rate-limiting': 'Rate Limiting'} },
@@ -245,7 +247,10 @@ const tree = [
           { key: 'annotation-interview-questions', label: 'Annotation Interview Questions', contentKey: 'backend/spring/annotations/annotation-interview-questions' },
         ] },
       ] },
-      { key: 'spring-boot', label: 'Spring Boot', pages: {'auto-configuration': 'Auto Configuration', 'configuration-properties': 'Configuration Properties', 'actuator': 'Actuator', 'profiles': 'Profiles', 'starters': 'Starters', 'exception-handling': {label: 'Exception Handling', contentKey: 'backend/spring-boot/exception-handling'}} },
+      { key: 'spring-boot', label: 'Spring Boot', pages: {'auto-configuration': 'Auto Configuration', 'configuration-properties': 'Configuration Properties', 'actuator': 'Actuator', 'profiles': 'Profiles', 'starters': 'Starters', 
+        'exception-handling': {label: 'Exception Handling', contentKey: 'backend/spring-boot/exception-handling'},
+        'migration(2.x→3.x)': {label: 'Migration (2.x → 3.x)', contentKey: 'backend/spring-boot/migration-2x-to-3x'}
+        } },
       { key: 'spring-web', label: 'Spring Web', pages: {'dispatcher-servlet': 'Dispatcher Servlet', 'rest-controllers': 'Rest Controllers', 'validation': 'Validation', 'global-exception-handling': 'Global Exception Handling'} },
       { key: 'spring-security', label: 'Spring Security', pages: {'security-filters': 'Security Filters', 'authentication': 'Authentication', 'authorization': 'Authorization', 'preauthorize': 'Preauthorize', 'oauth2-jwt': 'Oauth2 Jwt'} },
       { key: 'spring-data', label: 'Spring Data', pages: {'repositories': 'Repositories', 'transactions': 'Transactions', 'auditing': 'Auditing', 'specifications': 'Specifications'} },
@@ -259,7 +264,7 @@ const tree = [
       { key: 'rest', label: 'REST APIs', pages: {'rest-principles': 'Rest Principles', 
         'http-methods': {label: 'Http Methods & Status Codes', contentKey: 'networking/protocols/http-https'},
         'pagination': 'Pagination', 'versioning': 'Versioning'} },
-      { key: 'resilience', label: 'Resilience', pages: {'timeouts-retries': 'Timeouts Retries', 'idempotency': 'Idempotency', 'rate-limiting': 'Rate Limiting', 'dos-protection': 'Dos Protection', 'bulkheads': 'Bulkheads'} },
+      { key: 'resilience', label: 'Resilience', contentKey: 'distributed-systems/resilience' },
       { key: 'documentation', label: 'API Documentation', pages: {'openapi-swagger': 'Openapi Swagger', 'postman': 'Postman'} },
     ],
   },
@@ -272,21 +277,22 @@ const tree = [
     ],
   },
   {
+    key: 'distributed-systems', label: 'Distributed Systems', children: [
+      { key: 'service-discovery', label: 'Service Discovery', pages: {'eureka-server': 'Eureka Server', 'eureka-client': 'Eureka Client', 'service-registry': 'Service Registry'} },
+      { key: 'configuration', label: 'Configuration', pages: {'config-server': 'Config Server', 'vault': 'Vault', 'secrets-management': 'Secrets Management'} },
+      { key: 'resilience', label: 'Resilience Patterns', pages: {'timeouts-retries-idempotency': 'Timeouts Retries & Idempotency', 'rate-limiting': 'Rate Limiting', 'circuit-breaker': 'Circuit Breaker', 'fallback': 'Fallback', 'dos-protection': 'Dos Protection', 'bulkheads': 'Bulkheads'} },
+      { key: 'observability', label: 'Observability', pages: {'logs': 'Logs', 'distributed-tracing': 'Distributed Tracing', 'sleuth': 'Sleuth', 'metrics': 'Metrics', 'health-checks': 'Health Checks'} },
+      { key: 'scaling', label: 'Scaling', pages: {'horizontal-scaling': 'Horizontal Scaling', 'vertical-scaling': 'Vertical Scaling', 'autoscaling': 'Autoscaling', 'stateless-services': 'Stateless Services'} },
+    ],
+  },
+  {
     key: 'messaging', label: 'Messaging & Streaming', pages: {'akka-actor': 'Akka Actor', 'mail-api': 'Mail API'}, children: [
       { key: 'kafka', label: 'Apache Kafka', pages: {'architecture': 'Architecture', 'producers-consumers': 'Producers Consumers', 'partitions-offsets': 'Partitions Offsets', 'consumer-groups': 'Consumer Groups', 'delivery-semantics': 'Delivery Semantics', 'transactions': 'Transactions', 'interview': 'Interview Questions'} },
       { key: 'rabbitmq', label: 'RabbitMQ', pages: {'exchanges-queues': 'Exchanges Queues', 'acknowledgements': 'Acknowledgements', 'routing': 'Routing'} },
       { key: 'patterns', label: 'Messaging Patterns', pages: {'outbox-pattern': 'Outbox Pattern', 'saga-pattern': 'Saga Pattern', 'dead-letter-queues': 'Dead Letter Queues', 'exactly-once-processing': 'Exactly Once Processing'} },
     ],
   },
-  {
-    key: 'distributed-systems', label: 'Distributed Systems', children: [
-      { key: 'service-discovery', label: 'Service Discovery', pages: {'eureka-server': 'Eureka Server', 'eureka-client': 'Eureka Client', 'service-registry': 'Service Registry'} },
-      { key: 'configuration', label: 'Configuration', pages: {'config-server': 'Config Server', 'vault': 'Vault', 'secrets-management': 'Secrets Management'} },
-      { key: 'resilience', label: 'Resilience Patterns', pages: {'circuit-breaker': 'Circuit Breaker', 'retry': 'Retry', 'timeout': 'Timeout', 'fallback': 'Fallback'} },
-      { key: 'observability', label: 'Observability', pages: {'logs': 'Logs', 'distributed-tracing': 'Distributed Tracing', 'sleuth': 'Sleuth', 'metrics': 'Metrics', 'health-checks': 'Health Checks'} },
-      { key: 'scaling', label: 'Scaling', pages: {'horizontal-scaling': 'Horizontal Scaling', 'vertical-scaling': 'Vertical Scaling', 'autoscaling': 'Autoscaling', 'stateless-services': 'Stateless Services'} },
-    ],
-  },
+
   {
     key: 'security', label: 'Security', children: [
       { key: 'cryptography', label: 'Cryptography', data: 'content.md', pages: {'hashing-encryption': 'Hashing vs Encryption'/*'symmetric-encryption': 'Symmetric Encryption', 'asymmetric-encryption': 'Asymmetric Encryption', 'hashing': 'Hashing', 'digital-signatures': 'Digital Signatures'*/} },
@@ -315,7 +321,7 @@ const tree = [
           'relational-model': 'Relational Model',
           'normalization': 'Normalization',
           'joins': 'Joins',
-          'transactions': 'Transactions',
+          'transactions': {label: 'Transactions', contentKey: 'backend/spring-data/transactions'},
           'deadlocks': 'Deadlocks',
         },
       },
