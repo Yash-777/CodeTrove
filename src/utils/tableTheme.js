@@ -2,13 +2,14 @@ const KEY = 'codetrove.tableTheme';
 
 export const TABLE_PRESETS = [
   { name: 'Blue',   color: '#4472c4' },
+  { name: 'Light Blue',   color: '#6793e1' },
   { name: 'Orange', color: '#ed7d31' },
   { name: 'Gray',   color: '#7f7f7f' },
   { name: 'Gold',   color: '#ffc000' },
   { name: 'Green',  color: '#70ad47' },
 ];
 
-export const DEFAULT_TABLE_COLOR = TABLE_PRESETS[0].color;
+export const DEFAULT_TABLE_COLOR = TABLE_PRESETS[1].color;
 
 // Pick black or white header text for readable contrast
 function headText(hex) {
@@ -40,4 +41,4 @@ export function resetTableColor() {
 
 export function initTableTheme() {
   applyTableColor(getSavedTableColor());
-}
+}

@@ -29,8 +29,19 @@
 
 .markdown-p { font-size: 1rem; line-height: 1.6; margin: 0.75rem 0; color: var(--color-text-primary); }
 .markdown-ul,
-.markdown-ol { margin: 1rem 0; padding-left: 2rem; }
-.markdown-li { margin: 0.5rem 0; line-height: 1.6; color: var(--color-text-primary); }
+.markdown-ol { 
+  /* margin: 1rem 0; padding-left: 2rem; */
+  background: var(--tint);
+  border-radius: 8px;
+  padding: 12px 18px 12px 36px;
+  margin: 0;
+}
+/* ---------- list items ---------- */
+.markdown-li {
+  margin: 0.4rem 0;
+  line-height: 1.3;
+  color: var(--color-text-primary);
+}
 
 .markdown-li input[type='checkbox'] {
   margin: 0 0.45rem 0 0;
@@ -61,7 +72,8 @@
   padding: 0.2rem 0.4rem;
   border-radius: 3px;
   font-family: 'Monaco', 'Courier New', monospace;
-  font-size: 0.9em;
+  font-size: 0.88em;
+
 }
 
 .markdown-image {
@@ -106,9 +118,78 @@
   color: var(--color-text-secondary);
 }
 
-.markdown-details { margin: 1rem 0; padding: 0.75rem 1rem; border: 1px solid var(--color-border); border-radius: 8px; color: var(--color-text-primary); }
+/* .markdown-details { margin: 1rem 0; padding: 0.75rem 1rem; border: 1px solid var(--color-border); border-radius: 8px; color: var(--color-text-primary); }
 .markdown-summary { cursor: pointer; font-weight: 600; }
-.markdown-details[open] > .markdown-summary { margin-bottom: 0.75rem; }
+.markdown-details[open] > .markdown-summary { margin-bottom: 0.75rem; } */
+
+/* ---------- details block ---------- */
+.markdown-details {
+  margin: 0.5rem 0;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  color: var(--color-text-primary);
+}
+/* ---------- question row ---------- */
+.markdown-summary {
+  display: flex;
+  gap: 10px;
+  cursor: pointer;
+  list-style: none;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.markdown-summary::-webkit-details-marker {
+  display: none;
+}
+
+.markdown-summary::before {
+  content: "+";
+  flex: none;
+  width: 1ch;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.markdown-details[open] > .markdown-summary::before {
+  content: "\2212"; /* minus sign */
+}
+
+.markdown-details[open] > .markdown-summary {
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.markdown-summary:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ---------- answer area ---------- */
+.markdown-summary-line {
+  padding: 4px 0 0;
+}
+
+.markdown-summary-line p {
+  margin: 9px 0;
+}
+
+.markdown-summary-line ul,
+.markdown-summary-line ol {
+  margin: 8px 0;
+  padding-left: 22px;
+}
+
+.markdown-summary-line code {
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-size: 0.88em;
+  background: var(--code);
+}
+
+details[open]>summary::before{content:"\2212"}
+details[open]>summary{border-bottom:1px solid var(--line)}
 
 [data-theme='dark'] .markdown-inline-code { background-color: rgba(255, 255, 255, 0.1); }
 /* [data-theme='dark'] .markdown-th { background-color: rgba(255, 255, 255, 0.1); }
@@ -176,15 +257,19 @@
 }
 
 /* ---------- Word-style tables (defaults come from :root) ---------- */
-:root {
-  --tbl-color: #4472c4;
-  --tbl-head-text: #ffffff;
+:root { /* src\index.css */
+  --tbl-color: #6793e1;
+  --tbl-head-text: #000000;
+  /* --tbl-color: #4472c4; */
+  /* --tbl-head-text: #ffffff; */
 }
+
 /* Optional per-table override via wrapper div (still works, no longer required) */
 .md-table-orange { --tbl-color: #ed7d31; }
 .md-table-gray   { --tbl-color: #7f7f7f; }
 .md-table-gold   { --tbl-color: #ffc000; --tbl-head-text: #1f1f1f; }
 .md-table-blue   { --tbl-color: #4472c4; }
+.md-table-blue-light   { --tbl-color: #6793e1; }
 .md-table-green  { --tbl-color: #70ad47; }
 
 .markdown-table {
@@ -199,7 +284,7 @@
   padding: 0.2rem 0.3rem;  /* padding: 0.6rem 0.75rem;  */
   /* text-align: left; */
   vertical-align: top;
-  border: 2px solid var(--tbl-line); /* border: 1px solid var(--tbl-line); */
+  border: 1.5px solid var(--tbl-line); /* border: 1px solid var(--tbl-line); */
 }
 
 .markdown-th {
@@ -215,3 +300,5 @@
 
 /* HTML tables that put the header <tr> inside <tbody>: don't tint it */
 .markdown-tbody .markdown-tr:has(> .markdown-th) { background: transparent; }
+
+/* code{background:var(--code);padding:1px 5px;border-radius:4px;font-size:.88em} markdown-inline-code */

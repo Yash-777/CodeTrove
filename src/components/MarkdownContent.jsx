@@ -340,11 +340,39 @@ export default function MarkdownContent({ children }) {
             </blockquote>
           );
         },
-        details: ({ node, ...props }) => <details className="markdown-details" {...props} />,
-        summary: ({ node, ...props }) => <summary className="markdown-summary" {...props} />,
+        // details: ({ node, ...props }) => <details className="markdown-details" {...props} />,
+        // summary: ({ node, ...props }) => <summary className="markdown-summary" {...props} />,
+        details: Details,
+        summary: Summary,
       }}
     >
       {children}
     </ReactMarkdown>
   );
 }
+
+import React from "react";
+// import rehypeRaw from "rehype-raw";
+// import remarkGfm from "remark-gfm";
+const Summary = ({ node, ...props }) => (
+  <summary className="markdown-summary" {...props} />
+);
+
+const Details = ({ node, children, ...props }) => {
+  const items = React.Children.toArray(children);
+
+  // find the <summary> element
+  const isSummary = (child) =>
+    React.isValidElement(child) &&
+    (child.type === Summary || child.props?.node?.tagName === "summary");
+
+  const summary = items.find(isSummary);
+  const rest = items.filter((child) => !isSummary(child));
+
+  return (
+    <details className="markdown-details" {...props}>
+      {summary}
+      <div className="markdown-summary-line"/>{rest}
+    </details>
+  );
+};

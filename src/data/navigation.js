@@ -146,12 +146,7 @@ const tree = [
             { key: 'eureka-vs-zookeeper-consul', label: 'Eureka vs Zookeeper / Consul', pages: {'eureka-vs-zookeeper-consul': 'Eureka Vs Zookeeper Consul'} },
           ] },
           { key: 'zipkin-sleuth', label: 'Zipkin & Sleuth', pages: {'zipkin-sleuth': 'Zipkin Sleuth'} },
-          { key: 'kafka', label: 'Kafka', children: [
-            { key: 'topic-partition-broker', label: 'Topic, Partition & Broker Relationship', pages: {'kafka-topic-partition-broker': 'Kafka Topic Partition Broker'} },
-            { key: 'producer-consumer-offsets', label: 'Producer & Consumer Mechanics / Offset Management', pages: {'kafka-producer-consumer-offsets': 'Kafka Producer Consumer Offsets'} },
-            { key: 'zookeeper-vs-kraft', label: 'ZooKeeper vs KRaft', pages: {'kafka-zookeeper-vs-kraft': 'Kafka Zookeeper Vs Kraft'} },
-            { key: 'sync-vs-async', label: 'Synchronous vs Asynchronous Communication', pages: {'kafka-sync-vs-async': 'Kafka Sync Vs Async'} },
-          ] },
+          { key: 'kafka', label: 'Kafka', contentKey: 'messaging/kafka/interview' },
           { key: 'saga-pattern', label: 'Saga Design Pattern', children: [
             { key: 'choreography', label: 'Choreography (Decentralized)', pages: {'saga-choreography': 'Saga Choreography'} },
             { key: 'orchestration', label: 'Orchestration (Centralized)', pages: {'saga-orchestration': 'Saga Orchestration'} },

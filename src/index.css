@@ -18,12 +18,41 @@
   --color-accent: #ff6a3d;       /* warm coral - the one deliberate highlight color */
   --color-accent-soft: #ffe4d9;
 
+  --color-bg-secondary: #eef0f4;  /* secondary background for code blocks, etc. */
+  --color-bg-tertiary: #f0f1f5;   /* tertiary background for code blocks, etc. */
+
   --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
 
   --sidebar-width: 260px;
   --sidebar-width-collapsed: 64px;
+
+  /* ---------- Word-style tables ---------- */
+  --tbl-color: #6793e1;
+  --tbl-head-text: #000000;
+
+  /* ---------- details block ---------- */
+  /* --color-border: #d9dee7;  --color-text-primary: #1d2330; */
+  --line: #d9dee7;
+  --accent: #1f5fd1;
+  --tint: #eaf1fd;
+  --code: #eef0f4;
 }
+
+/* Dark theme: same variable names, different values - every
+   component that reads var(--color-bg) etc. switches automatically.
+   Applied by ThemeContext.jsx setting data-theme="dark" on <html>.
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-border: #2e3441;
+    --color-text-primary: #e6e9ef;
+    --line: #2e3441;
+    --accent: #7aa7ff;
+    --tint: #1d2740;
+    --code: #262b36;
+  }
+}
+*/
 
 /* Dark theme: same variable names, different values - every
    component that reads var(--color-bg) etc. switches automatically.
@@ -37,6 +66,11 @@
   --color-muted: #9aa0ae;
   --color-accent: #ff8a63;
   --color-accent-soft: #3a2620;
+
+  --line: #2e3441;
+  --accent: #7aa7ff;
+  --tint: #1d2740;
+  --code: #262b36;
 }
 
 * {
