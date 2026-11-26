@@ -2,7 +2,22 @@
 
 A producer publishes records; a consumer polls and processes them. The code is small, but the surrounding decisions determine whether a service is reliable. Start with a clear event contract, choose a key that matches the ordering requirement, and make downstream effects safe when a record is delivered again.
 
-![Kafka producer and consumer record flow](/public/messaging/kafka/architecture-flow.png)
+```mermaid
+sequenceDiagram
+    participant P as Producer
+    participant L as Leader broker
+    participant F as Follower replicas
+    participant C as Consumer group
+
+    P->>L: 1. Produce record with key
+    L->>L: 2. Append to partition log
+    L-->>F: 3. Replicate record
+    L-->>P: 4. Acknowledge according to acks
+
+    C->>L: 5. Fetch records
+    L-->>C: 6. Record and partition offset
+    C->>C: 7. Process and commit next offset
+```
 
 ## Producer flow
 

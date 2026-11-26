@@ -2,7 +2,31 @@
 
 Delivery semantics describe what can happen when a producer, broker, consumer, or downstream service fails. The useful question is not “is Kafka exactly once?” It is “exactly which operations are covered by the guarantee, and what happens in each crash window?”
 
-![Kafka delivery semantics and failure windows](/public/messaging/kafka/delivery-semantics-flow.png)
+```mermaid
+sequenceDiagram
+    participant P as Producer
+    participant K as Kafka
+    participant C as Consumer
+    participant D as Database
+
+    P->>K: 1. Send record
+    K-->>P: 2. Acknowledge
+    C->>K: 3. Poll record
+
+    alt At-most-once
+        C->>K: 4. Commit offset first
+        C->>D: 5. Apply side effect
+
+    else At-least-once
+        C->>D: 6. Apply side effect
+        C->>K: 7. Commit offset after success
+
+    else Kafka transaction
+        C->>K: 8. Begin transaction
+        C->>K: 9. Produce output + send offsets
+        K-->>C: 10. Commit atomically
+    end
+```
 
 ## At-most-once
 

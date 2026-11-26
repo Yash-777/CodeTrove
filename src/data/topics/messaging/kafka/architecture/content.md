@@ -2,7 +2,22 @@
 
 Kafka is easiest to understand as a distributed, append-only log. Producers write records to named topics. Kafka divides each topic into partitions, stores those partitions on brokers, and lets consumer groups read the log at their own pace. The design is powerful because a record can be replayed, but it also means you must make deliberate choices about keys, retention, replication, acknowledgements, and failure recovery.
 
-![Kafka producer, broker replication, and consumer flow](/public/messaging/kafka/architecture-flow.png)
+```mermaid
+sequenceDiagram
+    participant P as Producer
+    participant L as Leader broker
+    participant F as Follower replicas
+    participant C as Consumer group
+
+    P->>L: 1. Produce record with key
+    L->>L: 2. Append to partition log
+    L-->>F: 3. Replicate record
+    L-->>P: 4. Acknowledge according to acks
+
+    C->>L: 5. Fetch records
+    L-->>C: 6. Record and partition offset
+    C->>C: 7. Process and commit next offset
+```
 
 ## The core building blocks
 

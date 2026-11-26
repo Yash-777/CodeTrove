@@ -2,7 +2,28 @@
 
 A consumer group turns a set of consumers into one logical worker. Kafka assigns each subscribed partition to one active member of that group, so the members share work. A different group receives its own view of the retained topic and can process the same events for a different purpose.
 
-![Kafka consumer group assignment and rebalance flow](/public/messaging/kafka/consumer-groups-flow.png)
+```mermaid
+sequenceDiagram
+    participant G as Group coordinator
+    participant A as Consumer A
+    participant B as Consumer B
+    participant T as Topic partitions
+
+    A->>G: 1. Join group
+    B->>G: 2. Join group
+
+    G->>A: 3. Assign P0
+    G->>B: 4. Assign P1
+
+    A->>T: 5. Poll P0
+    B->>T: 6. Poll P1
+
+    A--xG: 7. Heartbeat stops
+
+    G->>B: 8. Rebalance and assign P0
+
+    B->>T: 9. Resume from committed offset
+```
 
 ## Same group versus different groups
 

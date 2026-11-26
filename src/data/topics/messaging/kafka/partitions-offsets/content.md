@@ -6,7 +6,22 @@ A partition is Kafka's basic unit of ordering, storage, replication, and consume
 
 A topic named `orders` may have partitions `0`, `1`, and `2`. Each partition has its own offset sequence. Offset `42` in partition `0` is unrelated to offset `42` in partition `2`; there is no global topic offset.
 
-![Kafka partition and offset flow](/public/messaging/kafka/architecture-flow.png)
+```mermaid
+sequenceDiagram
+    participant P as Producer
+    participant L as Leader broker
+    participant F as Follower replicas
+    participant C as Consumer group
+
+    P->>L: 1. Produce record with key
+    L->>L: 2. Append to partition log
+    L-->>F: 3. Replicate record
+    L-->>P: 4. Acknowledge according to acks
+
+    C->>L: 5. Fetch records
+    L-->>C: 6. Record and partition offset
+    C->>C: 7. Process and commit next offset
+```
 
 Kafka preserves the order in which records are appended to one partition. If events for an order must remain ordered, use `orderId` as the record key so those events normally map to the same partition. This gives per-order ordering, not a total order for every order in the topic.
 

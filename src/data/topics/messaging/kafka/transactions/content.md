@@ -2,7 +2,31 @@
 
 Kafka transactions let a producer group several Kafka writes and consumed-offset commits into one atomic Kafka operation. They are most useful when a service consumes from Kafka and produces to Kafka, or when Kafka Streams coordinates input offsets with output records. Transactions improve consistency, but they do not turn every external side effect into a distributed transaction.
 
-![Kafka transaction and offset-commit boundary](/public/messaging/kafka/delivery-semantics-flow.png)
+```mermaid
+sequenceDiagram
+    participant P as Producer
+    participant K as Kafka
+    participant C as Consumer
+    participant D as Database
+
+    P->>K: 1. Send record
+    K-->>P: 2. Acknowledge
+    C->>K: 3. Poll record
+
+    alt At-most-once
+        C->>K: 4. Commit offset first
+        C->>D: 5. Apply side effect
+
+    else At-least-once
+        C->>D: 6. Apply side effect
+        C->>K: 7. Commit offset after success
+
+    else Kafka transaction
+        C->>K: 8. Begin transaction
+        C->>K: 9. Produce output + send offsets
+        K-->>C: 10. Commit atomically
+    end
+```
 
 ## The consume-transform-produce pattern
 

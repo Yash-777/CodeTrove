@@ -110,16 +110,30 @@ function normalizeRunnableLanguage(language = '') {
 function resolveMarkdownImageSrc(src) {
   if (typeof src !== 'string') return src;
 
-  const normalizedSrc = src.trim();
-  if (!normalizedSrc || /^(?:[a-z][a-z\d+.-]*:|\/\/|#)/i.test(normalizedSrc)) {
+  // 1. Trim and convert Windows backslashes -> forward slashes
+  let normalizedSrc = src.trim().replace(/\\/g, '/');
+
+  // 2. Leave empty, hash, scheme (https:, data:, mailto:) and real
+  //    protocol-relative URLs (//cdn.example.com/x.png) alone.
+  //    "//svg/x.svg" has no dot in the first segment, so it is NOT external.
+  if (
+    !normalizedSrc ||
+    /^(?:[a-z][a-z\d+.-]*:|#)/i.test(normalizedSrc) ||
+    /^\/\/[^/]+\.[^/]+/.test(normalizedSrc)
+  ) {
     return normalizedSrc;
   }
 
+  // 3. Collapse leading repeated slashes: //svg/a.svg -> /svg/a.svg
+  normalizedSrc = normalizedSrc.replace(/^\/{2,}/, '/');
+
   const base = import.meta.env.BASE_URL || '/';
 
-  // Already prefixed with the deploy base (e.g. /CodeTrove/svg/JVM.svg)
-  if (base !== '/' && normalizedSrc.startsWith(base)) {
-    return normalizedSrc;
+  // Base without leading/trailing slashes: "/CodeTrove/" -> "CodeTrove", "/" -> ""
+  const prefix = base.replace(/^\/+|\/+$/g, '');
+  // Already prefixed with the deploy base -> return it without the leading "/"
+  if (prefix && normalizedSrc.replace(/^\/+/, '').startsWith(prefix + '/')) {
+    return normalizedSrc.replace(/^\/+/, '');
   }
 
   // Strip Vite's public/ source prefix and any leading slashes or ./
@@ -133,7 +147,7 @@ function resolveMarkdownImageSrc(src) {
     publicPath !== normalizedSrc ||
     /^(svg|images?|assets)\//i.test(publicPath)
   ) {
-    return `${base.replace(/\/?$/, '/')}${publicPath}`;
+    return prefix ? `${prefix}/${publicPath}` : publicPath;
   }
 
   return normalizedSrc;
@@ -375,4 +389,4 @@ const Details = ({ node, children, ...props }) => {
       <div className="markdown-summary-line"/>{rest}
     </details>
   );
-};
+};
