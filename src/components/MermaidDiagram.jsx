@@ -1,12 +1,18 @@
-import { useEffect, useId, useState } from 'react';
+import { useCallback, useEffect, useId, useState } from 'react';
+import MermaidLightbox from './MermaidLightbox';
 import './MermaidDiagram.css';
 
 let mermaidInitialized = false;
 
-export default function MermaidDiagram({ chart, title = 'Mermaid diagram' }) {
+/**
+ * width / height (optional): "specified" size in px for the popup's Specified view.
+ */
+export default function MermaidDiagram({ chart, title = 'Mermaid diagram', width, height }) {
   const reactId = useId();
   const diagramId = `codetrove-mermaid-${reactId.replace(/[^a-zA-Z0-9_-]/g, '')}`;
   const [rendered, setRendered] = useState({ svg: '', error: '' });
+  const [open, setOpen] = useState(false);
+  const close = useCallback(() => setOpen(false), []);
 
   useEffect(() => {
     let cancelled = false;
@@ -50,7 +56,27 @@ export default function MermaidDiagram({ chart, title = 'Mermaid diagram' }) {
   return (
     <figure className="markdown-mermaid" aria-label={title}>
       {rendered.svg ? (
-        <div className="markdown-mermaid__canvas" role="img" aria-label={title} dangerouslySetInnerHTML={{ __html: rendered.svg }} />
+        <>
+          <div
+            className="markdown-mermaid__canvas markdown-mermaid__canvas--zoomable"
+            role="button"
+            tabIndex={0}
+            aria-label={`${title} — click to enlarge`}
+            title="Click to enlarge"
+            onClick={() => setOpen(true)}
+            onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), setOpen(true))}
+            dangerouslySetInnerHTML={{ __html: rendered.svg }}
+          />
+          {open && (
+            <MermaidLightbox
+              svg={rendered.svg}
+              title={title}
+              width={width}
+              height={height}
+              onClose={close}
+            />
+          )}
+        </>
       ) : rendered.error ? (
         <div className="markdown-mermaid__fallback" role="status">
           <p>Diagram unavailable; showing its source instead.</p>
@@ -61,4 +87,4 @@ export default function MermaidDiagram({ chart, title = 'Mermaid diagram' }) {
       )}
     </figure>
   );
-}
+}

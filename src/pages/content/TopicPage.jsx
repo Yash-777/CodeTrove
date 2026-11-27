@@ -9,7 +9,7 @@
  * including plain "viewer" - see the roles table in README.md).
  */
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { getTopic, getCategory } from '../../data/topics/index.js';
 import { getDocumentationRoute } from '../../data/topics/navigation.js';
@@ -20,6 +20,7 @@ import { paths } from '../../routes/routes.config.js';
 import { useAuth } from '../../context/AuthContext.jsx';
 import MarkdownContent from '../../components/MarkdownContent.jsx';
 import ContentBreadcrumbs from '../../components/ContentBreadcrumbs.jsx';
+import DetailsToggleButton from '../../components/DetailsToggleButton.jsx';
 import './ContentPages.css';
 
 function findNavigationDescendant(parent, label) {
@@ -43,6 +44,8 @@ export default function TopicPage() {
   const { categoryKey, topicSlug, sectionKey, subtopicSlug, pageSlug } = useParams();
   const { user } = useAuth();
   const [content, setContent] = useState('');
+  // Hooks must run on every render, so this lives above the early return below.
+  const contentRef = useRef(null);
 
   const nestedRoute = sectionKey
     ? getDocumentationRoute(sectionKey, topicSlug, subtopicSlug, pageSlug)
@@ -126,11 +129,18 @@ export default function TopicPage() {
         { label: legacyCategory?.label || categoryKey, to: paths.category(categoryKey), path: categoryKey },
       ];
 
+  // New element per page so a <details> the reader opened never carries over to the next topic.
+  const routeKey = [categoryKey, sectionKey, topicSlug, subtopicSlug, pageSlug].join('/');
+
   return (
     <article className="content-page">
       <ContentBreadcrumbs items={breadcrumbItems} />
 
-      <h1>{title}</h1>
+      <div className="content-page__header">
+        <h1>{title || 'Untitled page'}</h1>
+        {/* Hidden automatically when the page has no collapsed <details>, or while locked */}
+        <DetailsToggleButton containerRef={contentRef} watch={isLocked ? '' : content} />
+      </div>
 
       {tags.length > 0 && (
         <div className="content-page__tags">
@@ -149,7 +159,9 @@ export default function TopicPage() {
           </div>
         </div>
       ) : (
-        <MarkdownContent>{content}</MarkdownContent>
+        <div key={routeKey} ref={contentRef} className="content-page__markdown">
+          <MarkdownContent>{content}</MarkdownContent>
+        </div>
       )}
 
       {legacyTopic?.gifUrl && !isLocked && (
@@ -163,4 +175,4 @@ export default function TopicPage() {
       )}
     </article>
   );
-}
+}

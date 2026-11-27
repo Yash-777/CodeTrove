@@ -1,0 +1,38 @@
+/* Heading row: title on the left, button pinned right.
+   The margin moves from the h1 to the row so spacing stays the same. */
+.content-page__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.content-page__header h1 {
+  margin: 0;
+  min-width: 0;
+}
+
+.details-toggle {
+  margin-left: auto;
+  flex-shrink: 0;
+  font: inherit;
+  font-size: 0.85rem;
+  line-height: 1.2;
+  padding: 0.35rem 0.75rem;
+  color: inherit;
+  background: transparent;
+  border: 1px solid currentColor;
+  border-radius: 6px;
+  opacity: 0.8;
+  cursor: pointer;
+}
+
+.details-toggle:hover {
+  opacity: 1;
+}
+
+.details-toggle:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}

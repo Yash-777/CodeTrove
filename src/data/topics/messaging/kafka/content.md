@@ -14,7 +14,7 @@ Start with the [Kafka architecture page](#/content/tree/messaging/kafka/architec
 
 ```mermaid
 flowchart LR
-  Source[Order API] -->|OrderCreated, key = orderId| Producer[Kafka producer]
+  Source[Order API] -->|OrderCreated,<br/>key = orderId| Producer[Kafka producer]
   Producer --> Topic[orders topic]
   Topic --> P0[Partition 0: ordered log]
   Topic --> P1[Partition 1: ordered log]

@@ -23,7 +23,7 @@
  * filesystem access, running locally on your own machine.
  */
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CATEGORIES } from '../../data/topics/index.js';
 import { useAuth } from '../../context/AuthContext.jsx';
@@ -35,6 +35,8 @@ import {
   downloadTextFile,
 } from '../../utils/topicCodegen.js';
 import { paths } from '../../routes/routes.config.js';
+import MarkdownContent from '../../components/MarkdownContent.jsx';
+import DetailsToggleButton from '../../components/DetailsToggleButton.jsx';
 import '../content/ContentPages.css';
 import './NewTopicPage.css';
 
@@ -63,6 +65,9 @@ export default function NewTopicPage() {
   const [copiedIndex, setCopiedIndex] = useState(null);
   const [draftStatus, setDraftStatus] = useState(null); // { type: 'success'|'error', message }
   const [savingDraft, setSavingDraft] = useState(false);
+
+  // Wraps the rendered markdown preview; DetailsToggleButton looks for <details> inside it.
+  const previewBodyRef = useRef(null);
 
   const isNewCategory = categoryMode === NEW_CATEGORY_VALUE;
 
@@ -119,8 +124,8 @@ export default function NewTopicPage() {
         body: JSON.stringify(buildPayload()),
       });
       if (!res.ok) {
-        const body = await res.json().catch(() => ({}));
-        throw new Error(body.error || `Server responded with ${res.status}`);
+        const errorBody = await res.json().catch(() => ({})); // was `body`, which shadowed the state variable
+        throw new Error(errorBody.error || `Server responded with ${res.status}`);
       }
       await res.json();
       navigate(paths.drafts());
@@ -279,11 +284,23 @@ export default function NewTopicPage() {
             <p className="content-page__breadcrumb">
               {isNewCategory ? newCategoryLabel || 'new-category' : categoryMode}
             </p>
-            <h1>{title || 'Untitled page'}</h1>
+
+            <div className="content-page__header">
+              <h1>{title || 'Untitled page'}</h1>
+              <DetailsToggleButton containerRef={previewBodyRef} watch={body} />
+            </div>
+
             <div className="content-page__tags">
               {tagList.map((tag) => <span key={tag} className="content-page__tag">{tag}</span>)}
             </div>
-            <pre className="content-page__body">{body || 'Body preview appears here as you type…'}</pre>
+
+            {/* Real markdown render (same as TopicPage) so <details> exist in the DOM.
+                A <pre> only shows raw text, so the toggle could never find anything. */}
+            <div ref={previewBodyRef} className="content-page__markdown">
+              {body.trim()
+                ? <MarkdownContent>{body}</MarkdownContent>
+                : <p className="markdown-p">Body preview appears here as you type…</p>}
+            </div>
           </article>
         </aside>
       </div>
